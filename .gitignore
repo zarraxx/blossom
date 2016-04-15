@@ -1,0 +1,10 @@
+/target
+.settings
+.DS_Store
+.project
+.classpath
+/.idea
+*.iml
+*.dylib
+*.jar
+*.war
