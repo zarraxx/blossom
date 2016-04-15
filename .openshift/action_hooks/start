@@ -15,4 +15,4 @@ cd $OPENSHIFT_REPO_DIR
 
 mvn  -s .openshift/settings.xml -t .openshift/toolchain.xml -P openshift -DskipTests=true clean package
 
-nohup java -jar target/*.jar --server.port=${OPENSHIFT_DIY_PORT} --server.address=${OPENSHIFT_DIY_IP}
+nohup /etc/alternatives/java_sdk_1.8.0/bin/java -jar target/*.jar --server.port=${OPENSHIFT_DIY_PORT} --server.address=${OPENSHIFT_DIY_IP} &
