@@ -6,4 +6,4 @@ export JAVA_HOME=/etc/alternatives/java_sdk_1.8.0
 export PATH=$JAVA_HOME/bin:$PATH
 
 cd $OPENSHIFT_REPO_DIR
-mvn package -s .openshift/settings.xml -t .openshift/toolchain.xml -P openshift -DskipTests=true
+mvn  -s .openshift/settings.xml -t .openshift/toolchain.xml -P openshift -DskipTests=true clean install
