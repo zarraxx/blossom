@@ -1,0 +1,12 @@
+@mixin xyan {
+  .test {
+    background-color: gray;
+  }
+
+  .login-form{
+    border-style: solid;
+    border-width: 2px;
+    border-radius:10px;
+    padding: 40px;
+  }
+}

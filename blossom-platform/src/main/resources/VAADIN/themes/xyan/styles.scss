@@ -1,0 +1,9 @@
+@import "../valo/valo";
+@import "xyan.scss";
+.xyan {
+  @include valo;
+  @include xyan;
+  // Your theme's rules go here
+
+
+}
