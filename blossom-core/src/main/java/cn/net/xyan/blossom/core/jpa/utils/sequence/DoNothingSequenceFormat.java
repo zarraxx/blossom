@@ -12,7 +12,7 @@ final  public class DoNothingSequenceFormat implements ISequenceFormat {
     }
 
     @Override
-    public Serializable formatSequence(Class<? extends Serializable> returnClass, Long sequence, Object[] propertyStates, String[] propertyNames, String propertyName) {
+    public Serializable formatSequence(Class<? extends Serializable> returnClass,Object e, Long sequence, Object[] propertyStates, String[] propertyNames, String propertyName) {
         return null;
     }
 }

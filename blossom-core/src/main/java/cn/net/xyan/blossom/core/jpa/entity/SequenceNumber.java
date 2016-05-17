@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by xiashenpin on 16/1/18.
  */
 @Entity
-@Table(name = "sys_ez_sequence_number", uniqueConstraints = { @UniqueConstraint(columnNames = { "sequence_name" }) })
+@Table(name = "sys_sequence_number", uniqueConstraints = { @UniqueConstraint(columnNames = { "sequence_name" }) })
 public class SequenceNumber
 {
     @Id

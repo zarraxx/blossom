@@ -2,6 +2,7 @@ package cn.net.xyan.blossom.platform;
 
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.LazyHibernateFilter;
+import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -135,6 +136,11 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         LazyHibernateFilter lazyHibernateFilter = new LazyHibernateFilter();
         lazyHibernateFilter.setEmf(getEmf());
         return lazyHibernateFilter;
+    }
+
+    @Bean
+    ApplicationContextUtils applicationContextUtils(){
+        return new ApplicationContextUtils();
     }
 
 }

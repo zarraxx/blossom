@@ -1,5 +1,6 @@
 package cn.net.xyan.blossom.platform;
 
+import cn.net.xyan.blossom.platform.entity.dict.StatusAndType;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 public class AppTest {
     public static void main(String[] args) {
+        //System.out.println(StatusAndType.StatusAndTypeIDFormat.class.getName());
         SpringApplication.run(AppTest.class, args);
     }
 

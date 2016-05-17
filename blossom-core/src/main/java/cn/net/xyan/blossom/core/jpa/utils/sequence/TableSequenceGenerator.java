@@ -94,6 +94,7 @@ public class TableSequenceGenerator extends TableGenerator {
 
             return ISequenceFormat.formatSequence(
                     (Class<? extends Serializable>) pkClass,
+                    object,
                     generated,
                     values.toArray(new Object[0]),
                     names.toArray(new String[0]), pkName);

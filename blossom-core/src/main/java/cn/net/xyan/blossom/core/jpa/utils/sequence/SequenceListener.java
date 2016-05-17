@@ -94,7 +94,7 @@ public class SequenceListener implements PreInsertEventListener,InitializingBean
                     Long value = getSequenceNumber(sequence);
                     String property = ReflectUtils.getPropertyName(method);
                     if (property!=null)
-                        setPropertyState(p_state, p_propertyNames, property, value,sequence,returnClass);
+                        setPropertyState(p_entity,p_state, p_propertyNames, property, value,sequence,returnClass);
                 }
             }
             else if (!fields.isEmpty())
@@ -112,7 +112,7 @@ public class SequenceListener implements PreInsertEventListener,InitializingBean
                     field.setAccessible(true);
                     field.set(p_entity, value);
                     Class<? extends Serializable> returnClass = (Class<? extends Serializable>) field.getDeclaringClass();
-                    setPropertyState(p_state, p_propertyNames, field.getName(), value,sequence,returnClass);
+                    setPropertyState(p_entity,p_state, p_propertyNames, field.getName(), value,sequence,returnClass);
 
                     if (log.isDebugEnabled())
                     {
@@ -179,7 +179,7 @@ public class SequenceListener implements PreInsertEventListener,InitializingBean
         }
     }
 
-    private void setPropertyState(Object[] propertyStates, String[] propertyNames, String propertyName, Object propertyState,Sequence annotation,Class<? extends Serializable> returnClass)
+    private void setPropertyState(Object entity,Object[] propertyStates, String[] propertyNames, String propertyName, Object propertyState,Sequence annotation,Class<? extends Serializable> returnClass)
     {
         for (int i = 0; i < propertyNames.length; i++)
         {
@@ -188,7 +188,7 @@ public class SequenceListener implements PreInsertEventListener,InitializingBean
                 if (!annotation.format().isAssignableFrom(DoNothingSequenceFormat.class)){
                     try {
                         ISequenceFormat format = annotation.format().newInstance();
-                        Serializable formatValue = format.formatSequence(returnClass,(Long)propertyState,propertyStates,propertyNames,propertyName);
+                        Serializable formatValue = format.formatSequence(returnClass,entity,(Long)propertyState,propertyStates,propertyNames,propertyName);
                         propertyStates[i] = formatValue;
                         propertyStates[i] = formatValue;
                     } catch (Exception e) {

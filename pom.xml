@@ -150,7 +150,7 @@
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-maven-plugin</artifactId>
                     <configuration>
-                        <theme>xyan</theme>
+                        <theme>blossom</theme>
                         <warSourceDirectory>${basedir}/src/main/resources</warSourceDirectory>
                     </configuration>
                     <executions>

@@ -58,7 +58,7 @@ public class ReflectUtils {
 
     static public List<Method> methods(Class<?> cls, Class<? extends Annotation>... annotationCls) {
         List<Method> methods = new LinkedList<>();
-        for (Method method : cls.getDeclaredMethods()) {
+        for (Method method : cls.getMethods()) {
             boolean add = true;
             for (Class<? extends Annotation> annotationClass : annotationCls) {
                 if (!method.isAnnotationPresent(annotationClass)) {
