@@ -73,7 +73,7 @@ public abstract class StatusAndType {
             strategy = TableSequenceGenerator.STRATEGY,
             parameters = {
                     //@Parameter(name = "format", value = "LD0000000")
-                    @org.hibernate.annotations.Parameter(name = "segment_value", value = "sys_status_and_type"),
+                    @org.hibernate.annotations.Parameter(name = "segment_value", value = StatusAndTypeID),
                     @org.hibernate.annotations.Parameter(name = "formatClass", value = StatusAndTypeIDFormat.FormatClass)
             })
     public String getStatusId() {
