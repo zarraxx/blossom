@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>cn.net.xyan</groupId>
+            <groupId>cn.net.xyan.blossom</groupId>
             <artifactId>blossom-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
