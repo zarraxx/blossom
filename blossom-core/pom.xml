@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>blossom-parent</artifactId>
-        <groupId>cn.net.xyan</groupId>
+        <groupId>cn.net.xyan.blossom</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -102,9 +102,9 @@
           explicit dependency.
         -->
         <!--<dependency>-->
-            <!--<groupId>com.vaadin</groupId>-->
-            <!--<artifactId>vaadin-client-compiler</artifactId>-->
-            <!--<scope>provided</scope>-->
+        <!--<groupId>com.vaadin</groupId>-->
+        <!--<artifactId>vaadin-client-compiler</artifactId>-->
+        <!--<scope>provided</scope>-->
         <!--</dependency>-->
 
         <dependency>
@@ -131,6 +131,15 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>
