@@ -43,10 +43,15 @@
 
     <repositories>
         <repository>
+            <id>xyan</id>
+            <url>http://repo.xyan.net.cn/content/groups/public/</url>
+        </repository>
+        <repository>
             <id>vaadin-addons</id>
             <url>http://repo.xyan.net.cn/content/repositories/vaadin-addons/</url>
         </repository>
     </repositories>
+
 
 
     <dependencyManagement>
