@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 public class AppTest {
     public static void main(String[] args) {
-        ////System.out.println(StatusAndType.StatusAndTypeIDFormat.class.getName());
+        /////System.out.println(StatusAndType.StatusAndTypeIDFormat.class.getName());
         SpringApplication.run(AppTest.class, args);
     }
 
