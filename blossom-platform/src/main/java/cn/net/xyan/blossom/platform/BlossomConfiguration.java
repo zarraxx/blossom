@@ -5,6 +5,7 @@ import cn.net.xyan.blossom.core.support.LazyHibernateFilter;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +37,7 @@ import javax.persistence.PersistenceUnit;
  */
 
 @Configuration
+@ComponentScan
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
 @EnableVaadinSharedSecurity
