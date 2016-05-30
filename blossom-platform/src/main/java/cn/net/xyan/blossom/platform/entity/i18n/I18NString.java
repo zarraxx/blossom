@@ -68,4 +68,22 @@ public class I18NString {
         Language language = new Language(locale);
         getValues().put(language,value);
     }
+
+    public String value(Language lang){
+        String v = getValues().get(lang);
+        if (v != null)
+            return v;
+        else
+            return getDefaultValue();
+    }
+
+    public String value(Locale locale){
+        Language language = new Language(locale);
+        return value(language);
+    }
+
+    public String value(){
+        Locale locale = Locale.getDefault();
+        return value(locale);
+    }
 }

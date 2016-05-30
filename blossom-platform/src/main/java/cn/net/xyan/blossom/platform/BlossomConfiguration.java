@@ -2,8 +2,17 @@ package cn.net.xyan.blossom.platform;
 
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.LazyHibernateFilter;
+import cn.net.xyan.blossom.core.ui.BSideBar;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import cn.net.xyan.blossom.platform.service.I18NService;
+import cn.net.xyan.blossom.platform.service.UISystemService;
+import cn.net.xyan.blossom.platform.service.impl.I18NServiceImpl;
+import cn.net.xyan.blossom.platform.service.impl.UISystemServiceImpl;
+import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
+import com.vaadin.spring.annotation.UIScope;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,12 +31,14 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.vaadin.spring.http.HttpService;
+import org.vaadin.spring.i18n.I18N;
 import org.vaadin.spring.security.annotation.EnableVaadinSharedSecurity;
 import org.vaadin.spring.security.config.VaadinSharedSecurityConfiguration;
 import org.vaadin.spring.security.shared.VaadinAuthenticationSuccessHandler;
 import org.vaadin.spring.security.shared.VaadinSessionClosingLogoutHandler;
 import org.vaadin.spring.security.shared.VaadinUrlAuthenticationSuccessHandler;
 import org.vaadin.spring.security.web.VaadinRedirectStrategy;
+import org.vaadin.spring.sidebar.SideBarUtils;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -52,7 +63,7 @@ import javax.persistence.PersistenceUnit;
         repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
 )
 
-@EnableTransactionManagement
+@EnableTransactionManagement(proxyTargetClass=true)
 public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
     public static String RememberMeKey = "myAppKey";
@@ -143,6 +154,27 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     ApplicationContextUtils applicationContextUtils(){
         return new ApplicationContextUtils();
+    }
+
+    @Bean
+    public BSideBarUtils bSideBarUtils(ApplicationContext applicationContext, I18N i18n){
+        return new BSideBarUtils(applicationContext,i18n);
+    }
+
+    @Bean
+    @UIScope
+    public BSideBar bSideBar (BSideBarUtils sideBarUtils){
+        return new BSideBar(sideBarUtils);
+    }
+
+    @Bean
+    public I18NService i18NService(){
+        return  new I18NServiceImpl();
+    }
+
+    @Bean
+    public UISystemService uiSystemService(){
+        return new UISystemServiceImpl();
     }
 
 }

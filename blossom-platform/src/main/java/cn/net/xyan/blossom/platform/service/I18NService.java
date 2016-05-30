@@ -10,7 +10,7 @@ import java.util.Locale;
  * Created by zarra on 16/5/14.
  */
 public interface I18NService {
-    void setupLanguage(Locale locale);
+    Language setupLanguage(Locale locale);
     void disableLanguage(Language language);
     void enableLanguage(Language language);
 

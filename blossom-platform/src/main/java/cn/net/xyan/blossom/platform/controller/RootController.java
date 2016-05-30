@@ -6,6 +6,7 @@ import cn.net.xyan.blossom.platform.dao.StatusDao;
 import cn.net.xyan.blossom.platform.entity.dict.UserStatus;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.i18n.Language;
+import cn.net.xyan.blossom.platform.service.UISystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,26 +31,30 @@ public class RootController {
     @Autowired
     I18NStringDao stringDao;
 
+    @Autowired
+    UISystemService uiSystemService;
+
     @PostConstruct
     public void setup(){
-        langDao.saveAndFlush(new Language(Locale.US));
-        langDao.saveAndFlush(new Language(Locale.SIMPLIFIED_CHINESE));
-        langDao.saveAndFlush(new Language(Locale.TRADITIONAL_CHINESE));
-
-        I18NString string = new I18NString("string.test","test");
-
-        string.putValue(Locale.SIMPLIFIED_CHINESE,"测试");
-
-        stringDao.saveAndFlush(string);
-
-
-        statusDao.saveAndFlush(new UserStatus(1,"active"));
+//        langDao.saveAndFlush(new Language(Locale.US));
+//        langDao.saveAndFlush(new Language(Locale.SIMPLIFIED_CHINESE));
+//        langDao.saveAndFlush(new Language(Locale.TRADITIONAL_CHINESE));
+//
+//        I18NString string = new I18NString("string.test","test");
+//
+//        string.putValue(Locale.SIMPLIFIED_CHINESE,"测试");
+//
+//        stringDao.saveAndFlush(string);
+//
+//
+//        statusDao.saveAndFlush(new UserStatus(1,"active"));
 
 
     }
 
-    //@RequestMapping("/")
+    @RequestMapping("/test")
     public @ResponseBody String indexPage(){
+        uiSystemService.deleteAllPage();
         return "index";
     }
 }

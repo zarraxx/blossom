@@ -6,6 +6,7 @@ package cn.net.xyan.blossom.core.utils;
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import org.apache.commons.beanutils.BeanUtils;
+import org.reflections.Reflections;
 
 import java.beans.BeanInfo;
 
@@ -15,8 +16,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by xiashenpin on 16/1/19.
@@ -137,6 +141,19 @@ public class ReflectUtils {
         Constructor<T> constructor = type.getConstructor();
         return constructor.newInstance();
 
+    }
+
+    public static  <T> Set< Class<? extends T> > scanPackages(Class<T> tClass,String ... packages){
+        Reflections reflections = new Reflections(packages);
+
+        Set<Class<? extends T>> classes = reflections.getSubTypesOf(tClass);
+        Set<Class<? extends T>> result = new HashSet<>();
+        for (Class<? extends T> cls : classes) {
+            if (!cls.isInterface() && !Modifier.isAbstract(cls.getModifiers())) {
+                result.add(cls);
+            }
+        }
+        return result;
     }
 }
 

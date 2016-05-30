@@ -8,7 +8,9 @@ import java.util.Locale;
 public class TR {
 
 
-    public static String Login = "ui.button.Login";
+    final public static String Login = "ui.button.Login";
+
+    final public static String Logout = "ui.button.Logout";
 
     public static String m(String key,String defaultValue,Object ... objs){
         return defaultValue;
