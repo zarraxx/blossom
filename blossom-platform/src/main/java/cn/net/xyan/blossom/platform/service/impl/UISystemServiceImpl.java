@@ -29,6 +29,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
@@ -40,7 +41,7 @@ import java.util.Set;
 /**
  * Created by zarra on 16/5/30.
  */
-public class UISystemServiceImpl implements UISystemService, InitializingBean {
+public class UISystemServiceImpl implements UISystemService {
     @Autowired
     UIPageDao pageDao;
 
@@ -64,13 +65,6 @@ public class UISystemServiceImpl implements UISystemService, InitializingBean {
 
     public void setScanPackages(List<String> scanPackages) {
         this.scanPackages = scanPackages;
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllPage() {
-        pageDao.deleteAll();
-        //throw  new StatusAndMessageError(-1,"error");
     }
 
     @Override
@@ -124,9 +118,6 @@ public class UISystemServiceImpl implements UISystemService, InitializingBean {
                 catalog.getModules().add(module);
                 catalogDao.saveAndFlush(catalog);
             }
-
-
-
         }
         return module;
     }
@@ -161,11 +152,10 @@ public class UISystemServiceImpl implements UISystemService, InitializingBean {
             }
         }
 
-        String adminClass = AdminUI.class.getName();
-        UIPage admingPage = pageDao.findByUiClassName(adminClass);
+        UIPage admingPage = pageByClass(AdminUI.class);
 
-        Catalog security = setupCatalog(CatalogSecurity, "Security", admingPage);
-        Catalog i18n = setupCatalog(CatalogI18n, "Internationalization", admingPage);
+        Catalog security = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage);
+        Catalog i18n = setupCatalog(UISystemService.CatalogI18n, "Internationalization", admingPage);
 
         for (Class<? extends View> viewClass : views) {
             SpringView springView = viewClass.getAnnotation(SpringView.class);
@@ -183,32 +173,5 @@ public class UISystemServiceImpl implements UISystemService, InitializingBean {
     }
 
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
 
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        JpaTransactionManager transactionManager = new JpaTransactionManager(entityManagerFactory);
-        try {
-            TransactionSynchronizationManager.bindResource(entityManagerFactory, new EntityManagerHolder(entityManager));
-        }catch (Throwable e){
-
-        }
-
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();//事务定义类
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        TransactionStatus status = transactionManager.getTransaction(def);
-
-        try {
-            setup();
-        }catch (Throwable throwable){
-            transactionManager.rollback(status);
-            throw  throwable;
-        } finally{
-            EntityManagerHolder emHolder = (EntityManagerHolder)
-                    TransactionSynchronizationManager.unbindResource(entityManagerFactory);
-            EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager());
-        }
-
-
-    }
 }

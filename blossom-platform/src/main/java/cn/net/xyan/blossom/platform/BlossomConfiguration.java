@@ -62,8 +62,7 @@ import javax.persistence.PersistenceUnit;
                 "cn.net.xyan.blossom.platform.dao"},
         repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
 )
-
-@EnableTransactionManagement(proxyTargetClass=true)
+@EnableTransactionManagement
 public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
     public static String RememberMeKey = "myAppKey";

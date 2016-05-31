@@ -7,6 +7,8 @@ import cn.net.xyan.blossom.platform.entity.dict.UserStatus;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.i18n.Language;
 import cn.net.xyan.blossom.platform.service.UISystemService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,27 +36,21 @@ public class RootController {
     @Autowired
     UISystemService uiSystemService;
 
+    Logger logger = LoggerFactory.getLogger(RootController.class);
+
     @PostConstruct
     public void setup(){
-//        langDao.saveAndFlush(new Language(Locale.US));
-//        langDao.saveAndFlush(new Language(Locale.SIMPLIFIED_CHINESE));
-//        langDao.saveAndFlush(new Language(Locale.TRADITIONAL_CHINESE));
-//
-//        I18NString string = new I18NString("string.test","test");
-//
-//        string.putValue(Locale.SIMPLIFIED_CHINESE,"测试");
-//
-//        stringDao.saveAndFlush(string);
-//
-//
-//        statusDao.saveAndFlush(new UserStatus(1,"active"));
-
+        logger.info("abc");
 
     }
 
     @RequestMapping("/test")
     public @ResponseBody String indexPage(){
-        uiSystemService.deleteAllPage();
+//        try {
+//            //uiSystemService.deleteAllPage();
+//        }catch (Throwable e){
+//
+//        }
         return "index";
     }
 }

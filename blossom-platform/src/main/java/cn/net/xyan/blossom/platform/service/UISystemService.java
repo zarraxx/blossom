@@ -29,5 +29,5 @@ public interface UISystemService {
     void setScanPackages(List<String> scanPackages);
 
 
-    void deleteAllPage();
+    void setup();
 }
