@@ -1,6 +1,7 @@
 package cn.net.xyan.blossom.platform.ui.action;
 
 import cn.net.xyan.blossom.core.i18n.TR;
+import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.view.Sections;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -13,7 +14,7 @@ import org.vaadin.spring.sidebar.annotation.SideBarItem;
  * Created by zarra on 16/5/30.
  */
 @SpringComponent
-@SideBarItem(sectionId = Sections.OPERATIONS, captionCode = TR.Logout)
+@SideBarItem(sectionId = UISystemService.CatalogOperation, captionCode = TR.Logout)
 @FontAwesomeIcon(FontAwesome.POWER_OFF)
 public class LogoutOperation implements Runnable {
 

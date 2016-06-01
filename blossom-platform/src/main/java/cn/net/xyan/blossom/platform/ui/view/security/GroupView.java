@@ -2,7 +2,6 @@ package cn.net.xyan.blossom.platform.ui.view.security;
 
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.platform.service.UISystemService;
-import cn.net.xyan.blossom.platform.ui.view.Sections;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -14,18 +13,18 @@ import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
 /**
- * Created by zarra on 16/5/30.
+ * Created by zarra on 16/6/1.
  */
-@SpringView(name = "security.user")
-@SideBarItem(sectionId = UISystemService.CatalogSecurity, caption = "User", order = 0)
-@FontAwesomeIcon(FontAwesome.USER)
-public class UserView  extends VerticalLayout implements View {
+@SpringView(name = "security.group")
+@SideBarItem(sectionId = UISystemService.CatalogSecurity, caption = "Group", order = 1)
+@FontAwesomeIcon(FontAwesome.GROUP)
+public class GroupView extends VerticalLayout implements View {
 
-    public UserView (){
+    public GroupView(){
         setSpacing(true);
         setMargin(true);
 
-        Label header = new Label(TR.m("view.user.caption","Manager user!"));
+        Label header = new Label(TR.m("view.user.caption","Manager Group!"));
         header.addStyleName(ValoTheme.LABEL_H1);
         addComponent(header);
     }

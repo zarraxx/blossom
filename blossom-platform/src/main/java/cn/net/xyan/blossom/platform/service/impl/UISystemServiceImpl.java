@@ -1,6 +1,7 @@
 package cn.net.xyan.blossom.platform.service.impl;
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
+import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.core.utils.ReflectUtils;
 import cn.net.xyan.blossom.platform.dao.CatalogDao;
 import cn.net.xyan.blossom.platform.dao.UIModuleDao;
@@ -10,38 +11,29 @@ import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.service.I18NService;
+import cn.net.xyan.blossom.platform.service.Installer;
+import cn.net.xyan.blossom.platform.service.InstallerAdaptor;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.AdminUI;
 import cn.net.xyan.blossom.platform.ui.ContentUI;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.annotation.SpringView;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.orm.jpa.EntityManagerHolder;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
+
+
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by zarra on 16/5/30.
  */
-public class UISystemServiceImpl implements UISystemService {
+public class UISystemServiceImpl extends InstallerAdaptor implements UISystemService {
     @Autowired
     UIPageDao pageDao;
 
@@ -54,17 +46,48 @@ public class UISystemServiceImpl implements UISystemService {
     @Autowired
     I18NService i18NService;
 
-    @PersistenceUnit
-    EntityManagerFactory entityManagerFactory;
+    @Override
+    public List<UIPage> setupPages() {
+        List<UIPage> pages = new LinkedList<>();
 
-    List<String> scanPackages;
+        List< Class<? extends ContentUI> > contentUIs = ApplicationContextUtils.beanTypesForType(ContentUI.class);
 
-    public List<String> getScanPackages() {
-        return scanPackages;
+        for (Class<? extends ContentUI> uiClass : contentUIs) {
+            SpringUI springUI = uiClass.getAnnotation(SpringUI.class);
+            if (springUI != null) {
+                String path = springUI.path();
+                UIPage page = setupPage(path, uiClass);
+                pages.add(page);
+            }
+        }
+        return pages;
     }
 
-    public void setScanPackages(List<String> scanPackages) {
-        this.scanPackages = scanPackages;
+    @Override
+    public List<Module> setupModules() {
+        List<Module> modules = new LinkedList<>();
+
+         String[] beanNames = ApplicationContextUtils.beanNamesForAnnotation(SideBarItem.class);
+
+        for (String beanName:beanNames) {
+            Class<?> viewClass = ApplicationContextUtils.beanTypeForBeanName(beanName);
+            SideBarItem sideBarItem = viewClass.getAnnotation(SideBarItem.class);
+
+            String viewName = beanName;
+            String catalogID = sideBarItem.sectionId();
+            Catalog catalog = catalogByCode(catalogID);
+
+            String title = sideBarItem.caption();
+
+            SpringView springView = viewClass.getAnnotation(SpringView.class);
+            if (springView != null && View.class.isAssignableFrom(viewClass)) {
+                viewName = springView.name();
+            }
+
+            Module module = setupModule(beanName,viewName, title, viewClass, catalog);
+            modules.add(module);
+        }
+        return modules;
     }
 
     @Override
@@ -102,11 +125,11 @@ public class UISystemServiceImpl implements UISystemService {
 
     @Override
     @Transactional
-    public Module setupModule(String viewName, String title, Class<? extends View> viewClass, Catalog catalog) {
-        Module module = moduleDao.findOne(viewName);
+    public Module setupModule(String beanName,String viewName, String title, Class<?> viewClass, Catalog catalog) {
+        Module module = moduleDao.findOne(beanName);
         if (module == null) {
             module = new Module();
-            module.setCode(viewName);
+            module.setCode(beanName);
             module.setViewName(viewName);
             module.setViewClassName(viewClass.getName());
             String key = String.format("ui.module.%s.title", viewName);
@@ -132,46 +155,25 @@ public class UISystemServiceImpl implements UISystemService {
         return catalogDao.findOne(code);
     }
 
+    @Override
     @Transactional
-    public void setup(){
-        List<String> packages = Arrays.asList("cn.net.xyan.blossom");
-
-        if (getScanPackages()!=null)
-            packages.addAll(getScanPackages());
-
-        Set< Class<? extends ContentUI>> contentUIs = ReflectUtils.scanPackages(ContentUI.class,packages.toArray(new String[0]));
-
-        Set< Class<? extends View>> views = ReflectUtils.scanPackages(View.class,packages.toArray(new String[0]));
-
-
-        for (Class<? extends ContentUI> uiClass : contentUIs) {
-            SpringUI springUI = uiClass.getAnnotation(SpringUI.class);
-            if (springUI != null) {
-                String path = springUI.path();
-                setupPage(path, uiClass);
-            }
-        }
-
+    public void doSetupCatalog() {
         UIPage admingPage = pageByClass(AdminUI.class);
 
-        Catalog security = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage);
-        Catalog i18n = setupCatalog(UISystemService.CatalogI18n, "Internationalization", admingPage);
-
-        for (Class<? extends View> viewClass : views) {
-            SpringView springView = viewClass.getAnnotation(SpringView.class);
-            SideBarItem sideBarItem = viewClass.getAnnotation(SideBarItem.class);
-            if (springView != null && sideBarItem != null) {
-                String viewName = springView.name();
-                String catalogID = sideBarItem.sectionId();
-                Catalog catalog = catalogByCode(catalogID);
-
-                String title = sideBarItem.caption();
-                setupModule(viewName, title, viewClass, catalog);
-
-            }
-        }
+        Catalog security  = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage);
+        Catalog i18n      = setupCatalog(UISystemService.CatalogI18n, "Internationalization", admingPage);
+        Catalog operation = setupCatalog(UISystemService.CatalogOperation, "Operation", admingPage);
     }
 
+    @Override
+    @Transactional
+    public void doSetupModule() {
+        setupModules();
+    }
 
-
+    @Override
+    @Transactional
+    public void doSetupPage() {
+        setupPages();
+    }
 }

@@ -2,6 +2,7 @@ package cn.net.xyan.blossom.platform.entity.i18n;
 
 
 import cn.net.xyan.blossom.platform.entity.Constant;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import javax.persistence.*;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class I18NString {
     }
 
     public String value(){
-        Locale locale = Locale.getDefault();
+        Locale locale = LocaleContextHolder.getLocale();
         return value(locale);
     }
 }

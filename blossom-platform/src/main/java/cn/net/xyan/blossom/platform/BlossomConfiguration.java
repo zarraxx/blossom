@@ -42,6 +42,7 @@ import org.vaadin.spring.sidebar.SideBarUtils;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
+import javax.servlet.Filter;
 
 /**
  * Created by zarra on 16/5/13.
@@ -151,11 +152,6 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    ApplicationContextUtils applicationContextUtils(){
-        return new ApplicationContextUtils();
-    }
-
-    @Bean
     public BSideBarUtils bSideBarUtils(ApplicationContext applicationContext, I18N i18n){
         return new BSideBarUtils(applicationContext,i18n);
     }
@@ -174,6 +170,11 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public UISystemService uiSystemService(){
         return new UISystemServiceImpl();
+    }
+
+    @Bean
+    public Filter jpaFilter(){
+        return new org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter();
     }
 
 }

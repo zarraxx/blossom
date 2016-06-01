@@ -13,21 +13,20 @@ import java.util.List;
 public interface UISystemService {
     String CatalogSecurity = "security";
     String CatalogI18n = "i18n";
+    String CatalogOperation = "operation";
 
     UIPage setupPage(String path, Class<? extends ContentUI> uiClass);
 
     Catalog setupCatalog(String code, String title, UIPage page);
 
-    Module setupModule(String viewName, String title, Class<? extends com.vaadin.navigator.View> viewClass, Catalog catalog);
+    Module setupModule(String beanName,String viewName, String title, Class<?> viewClass, Catalog catalog);
 
     UIPage pageByClass(Class<? extends ContentUI> uiClass);
 
     Catalog catalogByCode(String code);
 
-    List<String> getScanPackages();
+    List<UIPage> setupPages();
 
-    void setScanPackages(List<String> scanPackages);
+    List<Module> setupModules();
 
-
-    void setup();
 }
