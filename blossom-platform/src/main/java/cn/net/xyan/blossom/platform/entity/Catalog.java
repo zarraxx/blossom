@@ -2,7 +2,6 @@ package cn.net.xyan.blossom.platform.entity;
 
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
-import com.sun.org.apache.xml.internal.security.utils.I18n;
 
 import javax.persistence.*;
 import java.util.LinkedList;
