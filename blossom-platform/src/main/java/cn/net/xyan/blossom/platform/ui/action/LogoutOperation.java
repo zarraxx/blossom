@@ -14,7 +14,7 @@ import org.vaadin.spring.sidebar.annotation.SideBarItem;
  * Created by zarra on 16/5/30.
  */
 @SpringComponent
-@SideBarItem(sectionId = UISystemService.CatalogOperation, captionCode = TR.Logout)
+@SideBarItem(sectionId = UISystemService.CatalogOperation, caption = "Logout")
 @FontAwesomeIcon(FontAwesome.POWER_OFF)
 public class LogoutOperation implements Runnable {
 

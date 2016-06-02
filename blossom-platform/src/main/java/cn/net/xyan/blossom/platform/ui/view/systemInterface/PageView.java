@@ -1,9 +1,9 @@
-package cn.net.xyan.blossom.platform.ui.view.security;
+package cn.net.xyan.blossom.platform.ui.view.systemInterface;
 
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
+import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
-import cn.net.xyan.blossom.platform.entity.security.User;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.navigator.View;
@@ -18,37 +18,43 @@ import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
 /**
- * Created by zarra on 16/5/30.
+ * Created by zarra on 16/6/2.
  */
-@SpringView(name = "security.user")
-@SideBarItem(sectionId = UISystemService.CatalogSecurity, caption = "User", order = 0)
-@FontAwesomeIcon(FontAwesome.USER)
-public class UserView  extends VerticalLayout implements View {
+@SpringView(name = "interface.page")
+@SideBarItem(sectionId = UISystemService.CatalogI18n, caption = "Page", order = 1)
+@FontAwesomeIcon(FontAwesome.COG)
+public class PageView  extends VerticalLayout implements View {
 
-    JPAContainer<User> container;
-
+    JPAContainer<UIPage> container;
     Table table;
-
-    public UserView (){
+    public PageView(){
+        setSizeFull();
         setSpacing(true);
         setMargin(true);
 
-        Label header = new Label(TR.m("view.user.caption","Manager user!"));
+        Label header = new Label(TR.m("view.i18n.string.caption","Manager I18NString!"));
         header.addStyleName(ValoTheme.LABEL_H1);
         addComponent(header);
 
-        table = new Table("entity");
+        table = new Table();
+
+        container = EntityContainerFactory.jpaContainer(UIPage.class);
+
+
+
 
         addComponent(table);
 
         setExpandRatio(table,1);
+
     }
 
     @Override
     public void attach() {
+
         super.attach();
-        container = EntityContainerFactory.jpaContainerReadOnly(User.class);
         table.setContainerDataSource(container);
+
     }
 
     @Override

@@ -13,22 +13,20 @@ import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
 /**
- * Created by zarra on 16/6/1.
+ * Created by zarra on 16/6/2.
  */
-@SpringView(name = "security.group")
-@SideBarItem(sectionId = UISystemService.CatalogSecurity, caption = "Group", order = 2)
-@FontAwesomeIcon(FontAwesome.GROUP)
-public class GroupView extends VerticalLayout implements View {
-
-    public GroupView(){
+@SpringView(name = "security.permission")
+@SideBarItem(sectionId = UISystemService.CatalogSecurity, caption = "Permission", order = 1)
+@FontAwesomeIcon(FontAwesome.CERTIFICATE)
+public class PermissionView extends VerticalLayout implements View {
+    public PermissionView(){
         setSpacing(true);
         setMargin(true);
 
-        Label header = new Label(TR.m("view.user.caption","Manager Group!"));
+        Label header = new Label(TR.m("view.permission.caption","Manager Permission!"));
         header.addStyleName(ValoTheme.LABEL_H1);
         addComponent(header);
     }
-
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
 

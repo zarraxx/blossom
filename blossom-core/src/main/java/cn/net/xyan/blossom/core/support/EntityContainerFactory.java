@@ -4,6 +4,8 @@ import com.vaadin.addon.jpacontainer.EntityProvider;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.CachingMutableLocalEntityProvider;
+import com.vaadin.addon.jpacontainer.provider.LocalEntityProvider;
+import com.vaadin.addon.jpacontainer.provider.MutableLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.util.HibernateLazyLoadingDelegate;
 
 /**
@@ -27,7 +29,7 @@ public class EntityContainerFactory {
 
     static public <T> JPAContainer<T> jpaContainer(Class<T> tClass){
 
-        CachingMutableLocalEntityProvider<T> entityProvider = new CachingMutableLocalEntityProvider<>(tClass);
+        MutableLocalEntityProvider<T> entityProvider = new CachingMutableLocalEntityProvider<>(tClass);
         initEntityProviderInnel(entityProvider);
         return makeJPAContainer(tClass,entityProvider);
 
@@ -35,7 +37,8 @@ public class EntityContainerFactory {
 
     static public <T> JPAContainer<T> jpaContainerReadOnly(Class<T> tClass){
 
-        CachingLocalEntityProvider<T> entityProvider = new CachingLocalEntityProvider(tClass);
+        //LocalEntityProvider<T> entityProvider = new CachingLocalEntityProvider(tClass);
+        LocalEntityProvider<T> entityProvider = new LocalEntityProvider(tClass);
         initEntityProviderInnel(entityProvider);
         return makeJPAContainer(tClass,entityProvider);
     }

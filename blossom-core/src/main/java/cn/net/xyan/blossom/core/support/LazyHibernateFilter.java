@@ -1,11 +1,23 @@
 package cn.net.xyan.blossom.core.support;
 
 import com.vaadin.addon.jpacontainer.EntityManagerProvider;
+import org.hibernate.Session;
+import org.hibernate.StatelessSession;
+import org.hibernate.internal.SessionFactoryImpl;
+import org.hibernate.jpa.HibernateEntityManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
+import org.springframework.orm.jpa.EntityManagerHolder;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceUnit;
 import javax.servlet.*;
 import java.io.IOException;
@@ -18,8 +30,6 @@ public class LazyHibernateFilter implements Filter {
     public static class LazyHibernateEntityManagerProvider implements EntityManagerProvider {
 
         static ThreadLocal<EntityManager> entityManagerThreadLocal = new ThreadLocal<>();
-
-        public static LazyHibernateFilter lazyHibernateFilter;
 
         @Override
         public EntityManager getEntityManager() {
@@ -45,10 +55,12 @@ public class LazyHibernateFilter implements Filter {
 
 
     EntityManagerFactory emf;
+    //JpaTransactionManager transactionManager;
 
     @PersistenceUnit
     public void setEmf(EntityManagerFactory emf) {
         this.emf = emf;
+       // transactionManager = new JpaTransactionManager(emf);
     }
 
     @Override
@@ -62,9 +74,34 @@ public class LazyHibernateFilter implements Filter {
         try {
             em = emf.createEntityManager();
 
+//            try {
+//                TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
+//            }catch (Throwable e){
+//                throw  e;
+//            }
+//
+//            DefaultTransactionDefinition def = new DefaultTransactionDefinition();//事务定义类
+//            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+//            TransactionStatus status = transactionManager.getTransaction(def);
+//
             LazyHibernateEntityManagerProvider.setCurrentEntityManager(em);
+           // Session session = em.unwrap(Session.class);
 
-            filterChain.doFilter(servletRequest, servletResponse);
+            try {
+               // session.beginTransaction();
+                filterChain.doFilter(servletRequest, servletResponse);
+               // session.getTransaction().commit();
+            }catch (Throwable e){
+                //et.rollback();
+               // session.getTransaction().rollback();
+                //transactionManager.rollback(status);
+                throw  e;
+            }finally{
+               //session.close();
+//                EntityManagerHolder emHolder = (EntityManagerHolder)
+//                        TransactionSynchronizationManager.unbindResource(emf);
+//                EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager());
+            }
 
         } finally {
             if (em != null && em.isOpen()) {
