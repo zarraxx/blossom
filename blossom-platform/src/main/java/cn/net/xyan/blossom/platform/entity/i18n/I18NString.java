@@ -40,6 +40,7 @@ public class I18NString {
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
+    //@ElementCollection
     @CollectionTable(schema = Constant.Schema,name = "i18n_values")
     @MapKeyColumn(name = "ex_lang")
     @Column(name = "ex_value")

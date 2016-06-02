@@ -17,11 +17,15 @@ import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zarra on 16/6/2.
@@ -40,6 +44,9 @@ public class I18NView extends VerticalLayout implements View {
 
     Logger logger = LoggerFactory.getLogger(I18NView.class);
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     public I18NView(){
 
         setSizeFull();
@@ -52,7 +59,7 @@ public class I18NView extends VerticalLayout implements View {
 
         table = new Table();
 
-        container = EntityContainerFactory.jpaContainer(I18NString.class);
+
 
 
 
@@ -68,8 +75,16 @@ public class I18NView extends VerticalLayout implements View {
 
     @Override
     public void attach() {
-
         super.attach();
+
+        I18NString string = entityManager.find(I18NString.class,"ui.catalog.i18n.title");
+
+        Map<?,?> map = string.getValues();
+        entityManager.detach(string);
+
+        logger.info(""+map);
+
+        container = EntityContainerFactory.jpaContainer(I18NString.class);
         table.setContainerDataSource(container);
 
     }

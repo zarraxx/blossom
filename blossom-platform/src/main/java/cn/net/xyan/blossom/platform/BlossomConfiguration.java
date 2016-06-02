@@ -2,6 +2,7 @@ package cn.net.xyan.blossom.platform;
 
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.LazyHibernateFilter;
+import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.service.I18NService;
@@ -40,7 +41,9 @@ import org.vaadin.spring.security.shared.VaadinUrlAuthenticationSuccessHandler;
 import org.vaadin.spring.security.web.VaadinRedirectStrategy;
 import org.vaadin.spring.sidebar.SideBarUtils;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.servlet.Filter;
 
@@ -70,6 +73,9 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
     EntityManagerFactory emf;
 
+
+    EntityManager entityManager;
+
     public EntityManagerFactory getEmf() {
         return emf;
     }
@@ -77,6 +83,11 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     @PersistenceUnit
     public void setEmf(EntityManagerFactory emf) {
         this.emf = emf;
+    }
+
+    @PersistenceContext
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -175,6 +186,13 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public Filter jpaFilter(){
         return new org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter();
+    }
+
+    @Bean
+    public SpringEntityManagerProviderFactory springEntityManagerProviderFactory(){
+        SpringEntityManagerProviderFactory factory = new SpringEntityManagerProviderFactory();
+        factory.setEntityManager(entityManager);
+        return factory;
     }
 
 }

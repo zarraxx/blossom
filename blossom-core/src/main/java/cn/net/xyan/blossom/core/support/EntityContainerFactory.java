@@ -1,7 +1,10 @@
 package cn.net.xyan.blossom.core.support;
 
+import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import com.vaadin.addon.jpacontainer.EntityManagerProvider;
 import com.vaadin.addon.jpacontainer.EntityProvider;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.LazyLoadingDelegate;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.CachingMutableLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.LocalEntityProvider;
@@ -14,8 +17,11 @@ import com.vaadin.addon.jpacontainer.util.HibernateLazyLoadingDelegate;
 public class EntityContainerFactory {
     static protected void initEntityProviderInnel(EntityProvider<?> entityProvider){
 
-        LazyHibernateFilter.LazyHibernateEntityManagerProvider provider = new LazyHibernateFilter.LazyHibernateEntityManagerProvider();
-        HibernateLazyLoadingDelegate hibernateLazyLoadingDelegate  = new HibernateLazyLoadingDelegate();
+        SpringEntityManagerProviderFactory factory = ApplicationContextUtils.getBean(SpringEntityManagerProviderFactory.class);
+        EntityManagerProvider provider = factory.create();
+        //LazyHibernateFilter.LazyHibernateEntityManagerProvider provider = new LazyHibernateFilter.LazyHibernateEntityManagerProvider();
+        LazyLoadingDelegate hibernateLazyLoadingDelegate  = new BlossomHibernateLazyLoadingDelegate();
+        //LazyLoadingDelegate hibernateLazyLoadingDelegate  = new HibernateLazyLoadingDelegate();
         entityProvider.setLazyLoadingDelegate(hibernateLazyLoadingDelegate);
         entityProvider.setEntityManagerProvider(provider);
 
@@ -37,8 +43,8 @@ public class EntityContainerFactory {
 
     static public <T> JPAContainer<T> jpaContainerReadOnly(Class<T> tClass){
 
-        //LocalEntityProvider<T> entityProvider = new CachingLocalEntityProvider(tClass);
-        LocalEntityProvider<T> entityProvider = new LocalEntityProvider(tClass);
+        LocalEntityProvider<T> entityProvider = new CachingLocalEntityProvider(tClass);
+        //LocalEntityProvider<T> entityProvider = new LocalEntityProvider(tClass);
         initEntityProviderInnel(entityProvider);
         return makeJPAContainer(tClass,entityProvider);
     }
