@@ -23,6 +23,10 @@ public class Module {
 
     List<Permission> essentialPermission = new LinkedList<>();
 
+    public static String moduleMessageKey(String code){
+        return String.format("ui.module.%s.title", code);
+    }
+
     @Id
     public String getCode() {
         return code;

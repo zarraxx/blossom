@@ -5,12 +5,15 @@ import cn.net.xyan.blossom.platform.entity.Catalog;
 import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.model.CatalogSideBarSectionDescriptor;
+import cn.net.xyan.blossom.platform.service.I18NService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.ContentUI;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.vaadin.spring.i18n.I18N;
 import org.vaadin.spring.sidebar.SideBarItemDescriptor;
 import org.vaadin.spring.sidebar.SideBarSectionDescriptor;
@@ -19,16 +22,53 @@ import org.vaadin.spring.sidebar.SideBarUtils;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by zarra on 16/5/30.
  */
 public class BSideBarUtils extends SideBarUtils {
 
+    public  class ViewItemDescriptor extends SideBarItemDescriptor.ViewItemDescriptor{
+
+        String beanName;
+        public ViewItemDescriptor(String beanName, ApplicationContext applicationContext) {
+            super(beanName, applicationContext);
+            this.beanName = beanName;
+        }
+
+        @Override
+        public String getCaption() {
+            String key = Module.moduleMessageKey(beanName);
+            Locale locale = LocaleContextHolder.getLocale();
+            return i18NService.i18nMessage(key,locale);
+        }
+    }
+
+    public  class ActionItemDescriptor extends SideBarItemDescriptor.ActionItemDescriptor{
+
+        String beanName;
+        public ActionItemDescriptor(String beanName, ApplicationContext applicationContext) {
+            super(beanName, applicationContext);
+            this.beanName = beanName;
+        }
+
+        @Override
+        public String getCaption() {
+            String key = Module.moduleMessageKey(beanName);
+            Locale locale = LocaleContextHolder.getLocale();
+            return i18NService.i18nMessage(key,locale);
+        }
+    }
+
+
     ApplicationContext applicationContext;
 
     @Autowired
     UISystemService uiSystemService;
+
+    @Autowired
+    I18NService i18NService;
 
     public BSideBarUtils(ApplicationContext applicationContext, I18N i18n) {
         super(applicationContext, i18n);
@@ -47,9 +87,9 @@ public class BSideBarUtils extends SideBarUtils {
                 String beanName = module.getCode();
                 Class<?> beanType = ApplicationContextUtils.beanTypeForBeanName(beanName);
                 if (View.class.isAssignableFrom(beanType)) {
-                    items.add(new SideBarItemDescriptor.ViewItemDescriptor(beanName, applicationContext));
+                    items.add(new ViewItemDescriptor(beanName, applicationContext));
                 }else if (Runnable.class.isAssignableFrom(beanType)){
-                    items.add(new SideBarItemDescriptor.ActionItemDescriptor(beanName, applicationContext));
+                    items.add(new ActionItemDescriptor(beanName, applicationContext));
                 }
             }
 

@@ -23,6 +23,10 @@ public class Catalog {
 
     List<Permission> essentialPermission = new LinkedList<>();
 
+    public static String catalogMessageKey(String code){
+        return String.format("ui.catalog.%s.title", code);
+    }
+
     @Id
     public String getCode() {
         return code;

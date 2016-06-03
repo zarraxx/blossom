@@ -64,6 +64,20 @@ public class I18NView extends VerticalLayout implements View {
         item.put(language,value);
     }
 
+    private void setTableEditable(boolean editable){
+        if (editable){
+            bSave.setEnabled(true);
+            bEdit.setCaption(TR.m(TR.Cancel,"Cancel"));
+            bEdit.setIcon(FontAwesome.REMOVE);
+        }else{
+            bSave.setEnabled(false);
+            bEdit.setCaption(TR.m(TR.Edit,"Edit"));
+            bEdit.setIcon(FontAwesome.EDIT);
+        }
+
+        table.setEditable(editable);
+    }
+
     public I18NView(){
 
         setSizeFull();
@@ -76,8 +90,17 @@ public class I18NView extends VerticalLayout implements View {
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 
-        bEdit = new Button(TR.m("ui.button.edit","Edit"));
-        bSave = new Button(TR.m("ui.button.save","Save"));
+        horizontalLayout.setSpacing(true);
+
+        bEdit = new Button(TR.m(TR.Edit,"Edit"));
+        bSave = new Button(TR.m(TR.Save,"Save"));
+
+        bEdit.setIcon(FontAwesome.EDIT);
+        bSave.setIcon(FontAwesome.SAVE);
+        bSave.setEnabled(false);
+
+        bEdit.setStyleName(ValoTheme.BUTTON_PRIMARY);
+        bSave.setStyleName(ValoTheme.BUTTON_PRIMARY);
 
         horizontalLayout.addComponent(bEdit);
         horizontalLayout.addComponent(bSave);
@@ -86,7 +109,10 @@ public class I18NView extends VerticalLayout implements View {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 boolean editable = table.isEditable();
-                table.setEditable(!editable);
+                editable = !editable;
+
+                setTableEditable(editable);
+
             }
         });
 
@@ -116,7 +142,7 @@ public class I18NView extends VerticalLayout implements View {
                 container.refresh();
                 dirtyCache.clear();
 
-                table.setEditable(false);
+                setTableEditable(false);
 
             }
         });
@@ -134,6 +160,11 @@ public class I18NView extends VerticalLayout implements View {
                 String tag = propertyId.toString();
                 String key = itemId.toString();
                 Locale locale = Locale.forLanguageTag(tag);
+
+                if ("values".equals(tag)){
+                    return new ComboBox();
+                }
+
                 TextField textField = new TextField();
 
                 textField.setSizeFull();

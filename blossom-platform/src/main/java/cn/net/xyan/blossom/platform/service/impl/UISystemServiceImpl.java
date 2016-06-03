@@ -110,7 +110,7 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
         if (catalog == null) {
             catalog = new Catalog();
             catalog.setCode(code);
-            String key = String.format("ui.catalog.%s.title", code);
+            String key = Catalog.catalogMessageKey(code);
             I18NString string = i18NService.setupMessage(key, title);
             catalog.setTitle(string);
             catalog.getUiPages().add(page);
@@ -132,7 +132,7 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
             module.setCode(beanName);
             module.setViewName(viewName);
             module.setViewClassName(viewClass.getName());
-            String key = String.format("ui.module.%s.title", viewName);
+            String key = Module.moduleMessageKey(beanName);
             I18NString string = i18NService.setupMessage(key, title);
             module.setTitle(string);
             module = moduleDao.saveAndFlush(module);
