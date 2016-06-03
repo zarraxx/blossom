@@ -47,7 +47,10 @@ public class UserView  extends VerticalLayout implements View {
     @Override
     public void attach() {
         super.attach();
-        container = EntityContainerFactory.jpaContainerReadOnly(User.class);
+        User user = new User();
+        user.setLoginName("test");
+        container = EntityContainerFactory.jpaContainer(User.class);
+        container.addEntity(user);
         table.setContainerDataSource(container);
     }
 

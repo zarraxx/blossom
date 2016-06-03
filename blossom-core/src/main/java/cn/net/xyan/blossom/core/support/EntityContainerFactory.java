@@ -35,7 +35,7 @@ public class EntityContainerFactory {
 
     static public <T> JPAContainer<T> jpaContainer(Class<T> tClass){
 
-        MutableLocalEntityProvider<T> entityProvider = new CachingMutableLocalEntityProvider<>(tClass);
+        MutableLocalEntityProvider<T> entityProvider = new SpringMutableLocalEntityProvider<>(tClass);
         initEntityProviderInnel(entityProvider);
         return makeJPAContainer(tClass,entityProvider);
 

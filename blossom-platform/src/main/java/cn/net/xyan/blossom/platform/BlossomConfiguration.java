@@ -1,17 +1,15 @@
 package cn.net.xyan.blossom.platform;
 
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
-import cn.net.xyan.blossom.core.support.LazyHibernateFilter;
 import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
-import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.service.I18NService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.service.impl.I18NServiceImpl;
 import cn.net.xyan.blossom.platform.service.impl.UISystemServiceImpl;
+import cn.net.xyan.blossom.platform.support.I18NMessageProviderImpl;
 import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
 import com.vaadin.spring.annotation.UIScope;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -32,14 +30,12 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.vaadin.spring.http.HttpService;
-import org.vaadin.spring.i18n.I18N;
 import org.vaadin.spring.security.annotation.EnableVaadinSharedSecurity;
 import org.vaadin.spring.security.config.VaadinSharedSecurityConfiguration;
 import org.vaadin.spring.security.shared.VaadinAuthenticationSuccessHandler;
 import org.vaadin.spring.security.shared.VaadinSessionClosingLogoutHandler;
 import org.vaadin.spring.security.shared.VaadinUrlAuthenticationSuccessHandler;
 import org.vaadin.spring.security.web.VaadinRedirectStrategy;
-import org.vaadin.spring.sidebar.SideBarUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -155,16 +151,29 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         return new VaadinUrlAuthenticationSuccessHandler(httpService, vaadinRedirectStrategy, "/");
     }
 
+//    @Bean
+//    LazyHibernateFilter lazyHibernateFilter(){
+//        LazyHibernateFilter lazyHibernateFilter = new LazyHibernateFilter();
+//        lazyHibernateFilter.setEmf(getEmf());
+//        return lazyHibernateFilter;
+//    }
+
     @Bean
-    LazyHibernateFilter lazyHibernateFilter(){
-        LazyHibernateFilter lazyHibernateFilter = new LazyHibernateFilter();
-        lazyHibernateFilter.setEmf(getEmf());
-        return lazyHibernateFilter;
+    public I18NMessageProviderImpl i18NMessageProvider(I18NService i18NService){
+
+        //ApplicationContextUtils.setServletContext(servletContext);
+
+        I18NMessageProviderImpl provider =  new I18NMessageProviderImpl();
+
+        provider.setI18NService(i18NService);
+
+        return provider;
+
     }
 
     @Bean
-    public BSideBarUtils bSideBarUtils(ApplicationContext applicationContext, I18N i18n){
-        return new BSideBarUtils(applicationContext,i18n);
+    public BSideBarUtils bSideBarUtils(ApplicationContext applicationContext){
+        return new BSideBarUtils(applicationContext,null);
     }
 
     @Bean

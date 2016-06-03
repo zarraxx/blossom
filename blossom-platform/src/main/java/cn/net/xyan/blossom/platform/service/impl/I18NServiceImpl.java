@@ -5,6 +5,7 @@ import cn.net.xyan.blossom.platform.dao.LanguageDao;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.i18n.Language;
 import cn.net.xyan.blossom.platform.service.I18NService;
+import cn.net.xyan.blossom.platform.service.InstallerAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,7 @@ import java.util.Locale;
 /**
  * Created by zarra on 16/5/30.
  */
-public class I18NServiceImpl implements I18NService {
+public class I18NServiceImpl extends InstallerAdaptor implements I18NService {
 
     @Autowired
     LanguageDao languageDao;
@@ -32,6 +33,15 @@ public class I18NServiceImpl implements I18NService {
             language = languageDao.saveAndFlush(language);
         }
         return language;
+    }
+
+    @Override
+    public List<Language> allLanguage(boolean onlyEnable) {
+        if (onlyEnable){
+            return languageDao.findByAvailable(true);
+        }else{
+            return languageDao.findAll();
+        }
     }
 
     @Override
@@ -60,6 +70,20 @@ public class I18NServiceImpl implements I18NService {
     }
 
     @Override
+    public String getDefaultMessage(String key) {
+        I18NString string = stringDao.findOne(key);
+        return string.getDefaultValue();
+    }
+
+    @Override
+    @Transactional
+    public void setDefaultMessage(String key, String defaultValue) {
+        I18NString string = stringDao.findOne(key);
+        string.setDefaultValue(defaultValue);
+        stringDao.saveAndFlush(string);
+    }
+
+    @Override
     @Transactional
     public void setLocaleMessage(I18NString message, Language language, String value) {
         message.putValue(language,value);
@@ -67,10 +91,15 @@ public class I18NServiceImpl implements I18NService {
     }
 
     @Override
-    public void setLocaleMessage(String key, Locale locale, String value) {
+    public void setLocaleMessage(String key, Language language, String value) {
         I18NString i18NString = setupMessage(key,value);
-        Language language = setupLanguage(locale);
         setLocaleMessage(i18NString,language,value);
+    }
+
+    @Override
+    public void setLocaleMessage(String key, Locale locale, String value) {
+        Language language = setupLanguage(locale);
+        setLocaleMessage(key,language,value);
     }
 
     @Override
@@ -79,9 +108,26 @@ public class I18NServiceImpl implements I18NService {
     }
 
     @Override
+    public String i18nMessage(String key, Language language) {
+        I18NString string = stringDao.findOne(key);
+        return string.value(language);
+    }
+
+    @Override
     public String i18nMessage(String key, Locale locale) {
         String tag = locale.toLanguageTag();
         I18NString string = stringDao.findOne(key);
         return string.value(locale);
+    }
+
+    @Override
+    public void setupDefaultMessage(String key, String defaultValue) {
+        setupMessage(key,defaultValue);
+    }
+
+    @Override
+    public void beforeSetup() {
+        setupLanguage(Locale.US);
+        setupLanguage(Locale.SIMPLIFIED_CHINESE);
     }
 }

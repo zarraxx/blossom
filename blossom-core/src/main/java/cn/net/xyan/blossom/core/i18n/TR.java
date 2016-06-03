@@ -1,5 +1,10 @@
 package cn.net.xyan.blossom.core.i18n;
 
+import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.vaadin.spring.i18n.I18N;
+
 import java.util.Locale;
 
 /**
@@ -12,8 +17,29 @@ public class TR {
 
     final public static String Logout = "ui.button.Logout";
 
+    private static I18NMessageProvider messageSource;
+
+    private static I18NTools tools;
+
+    public static I18NMessageProvider getI18N(){
+        if (messageSource == null) {
+            messageSource = ApplicationContextUtils.getBean(I18NMessageProvider.class);
+        }
+        return messageSource;
+    }
+
+    public static I18NTools getTools(){
+        if (tools == null) {
+            tools = ApplicationContextUtils.getBean(I18NTools.class);
+        }
+        return tools;
+    }
+
     public static String m(String key,String defaultValue,Object ... objs){
-        return defaultValue;
+        Locale locale = LocaleContextHolder.getLocale();
+        getTools().setupDefaultMessage(key,defaultValue);
+        return getI18N().getMessage(key,objs,defaultValue,locale);
+        //return defaultValue;
     }
 
     public static String localeDisplayName(Locale locale){
