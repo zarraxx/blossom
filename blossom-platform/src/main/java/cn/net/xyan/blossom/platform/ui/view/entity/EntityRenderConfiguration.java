@@ -1,9 +1,13 @@
 package cn.net.xyan.blossom.platform.ui.view.entity;
 
+import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
+import cn.net.xyan.blossom.core.jpa.utils.JPA;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.support.MultiSelectConverter;
+import cn.net.xyan.blossom.platform.ui.view.entity.filter.SingleAttributeSpecification;
+import cn.net.xyan.blossom.platform.ui.view.entity.filter.UISpecification;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
@@ -35,6 +39,8 @@ public class EntityRenderConfiguration<E> {
     List<TableColumnHeaderConfig> tableColumnHeaderConfigs = new LinkedList<>();
 
     List<FormFieldConfig> formFieldConfigs = new LinkedList<>();
+
+    List<UISpecification<E>> specifications = new LinkedList<>();
 
     public static class NullConverter implements Converter {
 
@@ -140,6 +146,25 @@ public class EntityRenderConfiguration<E> {
             return this;
         }
 
+        public FormFieldConfig addFormFieldSetup(final FormFieldSetup formFieldSetup){
+            final FormFieldSetup prev = getFormFieldSetup();
+
+            FormFieldSetup setup = new FormFieldSetup() {
+                @Override
+                public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+                    if (prev != null)
+                        prev.fieldSetup(field,parent,formLayout,fieldGroup);
+
+                    if (formFieldSetup != null)
+                        formFieldSetup.fieldSetup(field,parent,formLayout,fieldGroup);
+                }
+            };
+
+            setFormFieldSetup(setup);
+
+            return this;
+        }
+
         public Class<?> getValueType() {
             return valueType;
         }
@@ -166,6 +191,7 @@ public class EntityRenderConfiguration<E> {
     public void init(){
         configTableColumnHeader();
         configFormFiled();
+        configSpecification();
     }
 
     public Class<E> getEntityCls() {
@@ -190,6 +216,10 @@ public class EntityRenderConfiguration<E> {
 
     public List<FormFieldConfig> getFormFieldConfigs() {
         return formFieldConfigs;
+    }
+
+    public List<UISpecification<E>> getSpecifications() {
+        return specifications;
     }
 
     public String getIdPropertyName(){
@@ -221,7 +251,7 @@ public class EntityRenderConfiguration<E> {
         return formFieldConfig;
     }
 
-    public FormFieldConfig addFormField(@Nonnull Attribute<? super E, ?> attribute){
+    public FormFieldConfig formFieldForAttribute(@Nonnull Attribute<? , ?> attribute,boolean ignoreCollection){
         String field = attribute.getName();
         Class<?> valueType = attribute.getJavaType();
 
@@ -240,13 +270,19 @@ public class EntityRenderConfiguration<E> {
         else if (EntityViewServiceImpl.isPrimaryType(valueType)){
             fieldType = TextField.class;
         }
-        else if (attribute instanceof  PluralAttribute){
-            fieldType = TwinColSelect.class;
+        else if (attribute instanceof  PluralAttribute ){
+
             PluralAttribute<? super E,?,?> pluralAttribute = (PluralAttribute<? super E, ?, ?>) attribute;
 
             Class<?> componentType = pluralAttribute.getElementType().getJavaType();
             jpaContainer = EntityContainerFactory.jpaContainerReadOnly(componentType);
-            isCollection = true;
+
+            if (ignoreCollection){
+                fieldType = ComboBox.class;
+            }else {
+                fieldType = TwinColSelect.class;
+                isCollection = true;
+            }
         }else if (metamodel.entity(valueType)!= null){
             fieldType = ComboBox.class;
             jpaContainer = EntityContainerFactory.jpaContainerReadOnly(valueType);
@@ -256,7 +292,7 @@ public class EntityRenderConfiguration<E> {
         final boolean isCollectionInner = isCollection;
 
         if (field!=null) {
-            FormFieldConfig formFieldConfig = addFormField(field, valueType, fieldType);
+            FormFieldConfig formFieldConfig = new FormFieldConfig(field, valueType, fieldType);
 
             if (TextField.class.isAssignableFrom(fieldType)){
                 formFieldConfig.setFormFieldSetup(new FormFieldConfig.FormFieldSetup() {
@@ -290,6 +326,30 @@ public class EntityRenderConfiguration<E> {
             return formFieldConfig;
         }
         return null;
+    }
+
+    public FormFieldConfig addFormField(@Nonnull Attribute<? super E, ?> attribute){
+        FormFieldConfig formFieldConfig = formFieldForAttribute(attribute,false);
+        if (formFieldConfig != null)
+            getFormFieldConfigs().add(formFieldConfig);
+        return formFieldConfig;
+    }
+
+    public UISpecification<E> addSpecification(JPA.Operator operator,Attribute<?,?> ... attributes){
+        List<Attribute<?,?>> attributeList = Arrays.asList(attributes);
+        Attribute<?,?> last = null ;
+        if (attributeList.size()>0){
+            last = attributeList.get(attributeList.size()-1);
+        }else{
+            throw new StatusAndMessageError(-9,"attributes length must > 0");
+        }
+        Class<?> valueType = SingleAttributeSpecification.valueTypeForAttribute(last);
+        UISpecification<E> uiSpecification =  new SingleAttributeSpecification<>(getEntityCls(),valueType,attributeList,operator);
+
+        getSpecifications().add(uiSpecification);
+
+        return uiSpecification;
+
     }
 
     public Component tableDisplayComponent(@Nonnull E entity){
@@ -328,5 +388,9 @@ public class EntityRenderConfiguration<E> {
             if (!name.equals(idName))
                 addFormField(attribute);
         }
+    }
+
+    public void configSpecification(){
+
     }
 }

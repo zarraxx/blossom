@@ -4,18 +4,27 @@ import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import net.jodah.typetools.TypeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.sliderpanel.SliderPanel;
+import org.vaadin.sliderpanel.SliderPanelBuilder;
+import org.vaadin.sliderpanel.SliderPanelStyles;
+import org.vaadin.sliderpanel.client.SliderMode;
+import org.vaadin.sliderpanel.client.SliderTabPosition;
 
 /**
  * Created by zarra on 16/6/2.
@@ -83,6 +92,8 @@ public class EntityView<E>  extends VerticalLayout implements View {
 
     protected Button bRemove;
 
+    protected SliderPanel pFilter;
+
     EntityViewService entityViewService;
 
     public EntityView(String title){
@@ -98,7 +109,9 @@ public class EntityView<E>  extends VerticalLayout implements View {
     public void initView(){
 
         setSpacing(true);
-        setMargin(true);
+        //setMargin(true);
+
+        setMargin(new MarginInfo(false,true,true,true));
         setSizeFull();
 
         Label header = new Label(getTitle());
@@ -136,6 +149,10 @@ public class EntityView<E>  extends VerticalLayout implements View {
 
         buttonLayout.addComponent(bRemove);
 
+        bEdit.setEnabled(false);
+
+        bRemove.setEnabled(false);
+
         bAdd.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -143,11 +160,27 @@ public class EntityView<E>  extends VerticalLayout implements View {
             }
         });
 
+        bEdit.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                onClickEdit();
+            }
+        });
+
+        bRemove.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                onClickRemove();
+            }
+        });
+
+
+
         return buttonLayout;
     }
 
-    public void showEntityForm(E entity, EntityEditFrom.FormStatus status){
-        EntityEditFrom<E> form = entityViewService.createEntityForm(entity,status);
+    public void showEntityForm(EntityItem<E> item, EntityEditFrom.FormStatus status){
+        EntityEditFrom<E> form = entityViewService.createEntityForm(item,status);
 
         EntityFormWindow formWindow = EntityFormWindow.displayEntityForm(form, new EntityEditFrom.EntityFormListener() {
             @Override
@@ -166,10 +199,50 @@ public class EntityView<E>  extends VerticalLayout implements View {
     public void onClickAdd(){
         try {
             E entity = getEntityCls().newInstance();
-            showEntityForm(entity, EntityEditFrom.FormStatus.Add);
+
+            EntityItem<E> item = getContainer().createEntityItem(entity);
+            showEntityForm(item, EntityEditFrom.FormStatus.Add);
         }catch (Throwable e){
             throw  new StatusAndMessageError(-9,e);
         }
+    }
+
+    public void onClickEdit(){
+        Object itemId =  table.getValue();
+
+        EntityItem<E> item = getContainer().getItem(itemId);
+
+        showEntityForm(item, EntityEditFrom.FormStatus.Edit);
+    }
+
+    public void onClickRemove(){
+        ConfirmDialog.show(UI.getCurrent(),
+                TR.m(TR.Confirm,"Confirm"),
+                TR.m("ui.view.entity.confirm.remove", "Are you sure to Delete?"),
+                TR.m(TR.OK,"OK"),
+                TR.m(TR.Cancel,"Cancel"),
+                new ConfirmDialog.Listener() {
+            @Override
+            public void onClose(ConfirmDialog confirmDialog) {
+                if (confirmDialog.isConfirmed()){
+                    container.removeItem(table.getValue());
+                    setModificationsEnabled(false);
+                }
+            }
+        });
+
+    }
+
+    public void onClickFilter(){
+        EntityFilterForm<E> filterForm = entityViewService.createEntityFilter(this);
+        Window window = new Window();
+        window.setContent(filterForm);
+        UI.getCurrent().addWindow(window);
+    }
+
+    public void setModificationsEnabled(boolean b){
+        bEdit.setEnabled(b);
+        bRemove.setEnabled(b);
     }
 
     public Class<E> getEntityCls() {
@@ -212,6 +285,14 @@ public class EntityView<E>  extends VerticalLayout implements View {
     public Table createTable(){
         table = new Table();
         table.setSizeFull();
+
+        table.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+
+                EntityView.this.setModificationsEnabled(event.getProperty().getValue() != null);
+            }
+        });
         return table;
     }
 
@@ -230,6 +311,21 @@ public class EntityView<E>  extends VerticalLayout implements View {
             table.setContainerDataSource(container);
 
             entityViewService.setupEntityViewTable(this);
+
+            EntityRenderConfiguration<E> renderConfiguration = entityViewService.entityRenderConfiguration(getEntityCls());
+
+            if (renderConfiguration!=null && renderConfiguration.getSpecifications().size()>0){
+                EntityFilterForm<E> filterForm = entityViewService.createEntityFilter(this);
+                pFilter = new SliderPanelBuilder(filterForm)
+                        .expanded(false)
+                        .style(SliderPanelStyles.COLOR_BLUE)
+                        .mode(SliderMode.TOP)
+                        .caption(TR.m(TR.Filter,"Filter"))
+                        .tabPosition(SliderTabPosition.END)
+                        .build();
+
+                addComponentAsFirst(pFilter);
+            }
         }
     }
 

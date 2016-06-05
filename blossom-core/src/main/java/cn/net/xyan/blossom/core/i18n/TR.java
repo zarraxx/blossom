@@ -29,6 +29,8 @@ public class TR {
 
     final public static String Delete = "ui.button.delete";
 
+    final public static String Filter = "ui.button.filter";
+
     final public static String OK = "ui.button.ok";
 
     final public static String Cancel = "ui.button.cancel";
@@ -36,6 +38,8 @@ public class TR {
     final public static String Close = "ui.button.close";
 
     final public static String View = "ui.action.view";
+
+    final public static String Confirm = "ui.view.title.confirm";
 
     private static I18NMessageProvider messageSource;
 

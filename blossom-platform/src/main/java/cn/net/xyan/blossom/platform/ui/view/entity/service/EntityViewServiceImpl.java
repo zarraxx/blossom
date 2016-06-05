@@ -7,6 +7,8 @@ import cn.net.xyan.blossom.platform.ui.view.entity.EntityColumnGenerator;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditFrom;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityView;
+import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
+import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
@@ -100,6 +102,21 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
         EntityRenderConfiguration<E> renderConfiguration = (EntityRenderConfiguration<E>) entityConfigurationCache.get(eClass);
         EntityEditFrom<E> from = new EntityEditFrom<>(entity,renderConfiguration,status);
         return from;
+    }
+
+    @Override
+    public <E> EntityEditFrom<E> createEntityForm(@Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status) {
+        Class<E> eClass = (Class<E>) entityItem.getEntity().getClass();
+        EntityRenderConfiguration<E> renderConfiguration = (EntityRenderConfiguration<E>) entityConfigurationCache.get(eClass);
+        EntityEditFrom<E> from = new EntityEditFrom<>(entityItem,renderConfiguration,status);
+        return from;
+    }
+
+    @Override
+    public <E> EntityFilterForm<E> createEntityFilter(@Nonnull EntityView<E> entityView) {
+        EntityRenderConfiguration<E> entityRenderConfiguration = entityRenderConfiguration(entityView);
+        EntityFilterForm<E> filterForm = new EntityFilterForm<>(entityRenderConfiguration,entityView.getContainer());
+        return filterForm;
     }
 
     @Override

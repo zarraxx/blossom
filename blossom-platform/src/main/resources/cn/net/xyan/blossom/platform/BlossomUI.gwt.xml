@@ -4,5 +4,8 @@
 <module>
     <inherits name="com.vaadin.DefaultWidgetSet"/>
     <inherits name="org.vaadin.tepi.listbuilder.widgetset.ListBuilderWidgetset"/>
+    <inherits name="de.datenhahn.vaadin.componentrenderer.ComponentRendererWidgetSet"/>
+    <inherits name="org.vaadin.alump.labelbutton.WidgetSet"/>
+    <inherits name="org.vaadin.sliderpanel.WidgetSet"/>
     <!--<inherits name="com.vaadin.addon.touchkit.gwt.TouchKitWidgetSet"/>-->
 </module>

@@ -19,4 +19,15 @@
   .v-button-borderless:after{
     display: none;
   }
+
+  $tableSelectionColor : #46906c;
+  //$tableSelectionColor : #000;
+  $tableFontColor :#FFFFFF;
+  .v-table .v-selected[class*="-row"] {
+    background-color: $tableSelectionColor;
+    background-image: none;
+    background-origin: border-box;
+    color: $tableFontColor;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
+  }
 }

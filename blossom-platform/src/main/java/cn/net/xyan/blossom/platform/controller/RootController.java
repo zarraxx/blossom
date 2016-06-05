@@ -38,11 +38,6 @@ public class RootController {
 
     Logger logger = LoggerFactory.getLogger(RootController.class);
 
-    @PostConstruct
-    public void setup(){
-        logger.info("abc");
-
-    }
 
     @RequestMapping("/test")
     public @ResponseBody String indexPage(){
