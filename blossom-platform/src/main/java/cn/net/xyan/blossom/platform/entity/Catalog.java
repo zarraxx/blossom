@@ -2,26 +2,28 @@ package cn.net.xyan.blossom.platform.entity;
 
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortNatural;
+import org.hibernate.annotations.SortType;
 
 import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by zarra on 16/5/13.
  */
 @Entity
 @Table(name = "ui_catalog")
-public class Catalog {
+public class Catalog extends ComparableEntity<Catalog>{
     String code;
     I18NString title;
     String describe;
 
-    List<UIPage> uiPages = new LinkedList<>();
+    SortedSet<UIPage> uiPages = new TreeSet<>();
 
-    List<Module> modules = new LinkedList<>();
+    SortedSet<Module> modules = new TreeSet<>();
 
-    List<Permission> essentialPermission = new LinkedList<>();
+    SortedSet<Permission> essentialPermission = new TreeSet<>();
 
     public static String catalogMessageKey(String code){
         return String.format("ui.catalog.%s.title", code);
@@ -59,20 +61,25 @@ public class Catalog {
             joinColumns = {@JoinColumn(name = "c_catalog")},
             inverseJoinColumns = {@JoinColumn(name = "c_permission")}
     )
-    public List<Permission> getEssentialPermission() {
+    @OrderColumn(name="c_index")
+    //@OrderBy("name ASC")
+    @SortNatural
+    public SortedSet<Permission> getEssentialPermission() {
         return essentialPermission;
     }
 
-    public void setEssentialPermission(List<Permission> essentialPermission) {
+    public void setEssentialPermission(SortedSet<Permission> essentialPermission) {
         this.essentialPermission = essentialPermission;
     }
 
     @ManyToMany(mappedBy = "catalogs",cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH})
-    public List<UIPage> getUiPages() {
+    //@OrderBy("name ASC")
+    @SortNatural
+    public SortedSet<UIPage> getUiPages() {
         return uiPages;
     }
 
-    public void setUiPages(List<UIPage> uiPages) {
+    public void setUiPages(SortedSet<UIPage> uiPages) {
         this.uiPages = uiPages;
     }
 
@@ -82,12 +89,27 @@ public class Catalog {
             ,inverseJoinColumns = @JoinColumn(name = "c_module")
     )
     @OrderColumn(name="c_index")
-    public List<Module> getModules() {
+    //@OrderBy("name ASC")
+    @SortNatural
+    public SortedSet<Module> getModules() {
         return modules;
     }
 
-    public void setModules(List<Module> modules) {
+    public void setModules(SortedSet<Module> modules) {
         this.modules = modules;
     }
 
+    @Override
+    public int compareTo(Catalog o) {
+        int value =  super.compareTo(o);
+        if (value == 0)
+            value =  getCode().compareTo(o.getCode());
+
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return getCode();
+    }
 }

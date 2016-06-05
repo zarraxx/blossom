@@ -5,6 +5,7 @@ import cn.net.xyan.blossom.core.support.EntityContainerFactory;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.service.UISystemService;
+import cn.net.xyan.blossom.platform.ui.view.entity.EntityView;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -23,42 +24,11 @@ import org.vaadin.spring.sidebar.annotation.SideBarItem;
 @SpringView(name = "interface.page")
 @SideBarItem(sectionId = UISystemService.CatalogI18n, caption = "Page", order = 1)
 @FontAwesomeIcon(FontAwesome.COG)
-public class PageView  extends VerticalLayout implements View {
+public class PageView  extends EntityView<UIPage> {
 
-    JPAContainer<UIPage> container;
-    Table table;
+
     public PageView(){
-        setSizeFull();
-        setSpacing(true);
-        setMargin(true);
-
-        Label header = new Label(TR.m("view.i18n.string.caption","Manager I18NString!"));
-        header.addStyleName(ValoTheme.LABEL_H1);
-        addComponent(header);
-
-        table = new Table();
-
-        container = EntityContainerFactory.jpaContainer(UIPage.class);
-
-
-
-
-        addComponent(table);
-
-        setExpandRatio(table,1);
-
+        super("Page");
     }
 
-    @Override
-    public void attach() {
-
-        super.attach();
-        table.setContainerDataSource(container);
-
-    }
-
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-
-    }
 }

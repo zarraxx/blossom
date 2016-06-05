@@ -2,26 +2,29 @@ package cn.net.xyan.blossom.platform.entity;
 
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
+import org.hibernate.annotations.SortNatural;
 
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by zarra on 16/5/13.
  */
 @Entity
 @Table(name = "ui_module")
-public class Module {
+public class Module extends ComparableEntity<Module>{
     String code;
     I18NString title;
 
     String viewName;
     String viewClassName;
 
-    List<Catalog> catalogs = new LinkedList<>();
+    SortedSet<Catalog> catalogs = new TreeSet<>();
 
-    List<Permission> essentialPermission = new LinkedList<>();
+    SortedSet<Permission> essentialPermission = new TreeSet<>();
 
     public static String moduleMessageKey(String code){
         return String.format("ui.module.%s.title", code);
@@ -69,21 +72,34 @@ public class Module {
             joinColumns = {@JoinColumn(name = "c_module")},
             inverseJoinColumns = {@JoinColumn(name = "c_permission")}
     )
-    public List<Permission> getEssentialPermission() {
+    //@OrderBy("name ASC")
+    @SortNatural
+    public SortedSet<Permission> getEssentialPermission() {
         return essentialPermission;
     }
 
-    public void setEssentialPermission(List<Permission> essentialPermission) {
+    public void setEssentialPermission(SortedSet<Permission> essentialPermission) {
         this.essentialPermission = essentialPermission;
     }
 
     @ManyToMany(mappedBy = "modules",cascade = {CascadeType.PERSIST})
-    public List<Catalog> getCatalogs() {
+    //@OrderBy("name ASC")
+    @SortNatural
+    public SortedSet<Catalog> getCatalogs() {
         return catalogs;
     }
 
-    public void setCatalogs(List<Catalog> catalogs) {
+    public void setCatalogs(SortedSet<Catalog> catalogs) {
         this.catalogs = catalogs;
     }
 
+    @Override
+    public int compareTo(Module o) {
+        int value =  super.compareTo(o);
+        if (value == 0){
+            value =  getCode().compareTo(o.getCode());
+        }
+
+        return value;
+    }
 }

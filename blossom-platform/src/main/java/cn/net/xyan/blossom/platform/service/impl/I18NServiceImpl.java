@@ -108,8 +108,18 @@ public class I18NServiceImpl extends InstallerAdaptor implements I18NService {
     }
 
     @Override
+    public String i18nMessage(String key) {
+        I18NString string = stringDao.findOne(key);
+        if (string == null)
+            return null;
+        return string.value();
+    }
+
+    @Override
     public String i18nMessage(String key, Language language) {
         I18NString string = stringDao.findOne(key);
+        if (string == null)
+            return null;
         return string.value(language);
     }
 
@@ -117,6 +127,8 @@ public class I18NServiceImpl extends InstallerAdaptor implements I18NService {
     public String i18nMessage(String key, Locale locale) {
         String tag = locale.toLanguageTag();
         I18NString string = stringDao.findOne(key);
+        if (string == null)
+            return null;
         return string.value(locale);
     }
 

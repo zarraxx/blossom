@@ -1,15 +1,19 @@
 package cn.net.xyan.blossom.platform.entity.security;
 
+import cn.net.xyan.blossom.platform.entity.ComparableEntity;
+import org.hibernate.annotations.SortNatural;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Created by zarra on 16/5/13.
  */
 @Entity
 @Table(name = "sys_security_user")
-public class User {
+public class User extends ComparableEntity<User> {
 
     String loginName;
     String realName;
@@ -17,8 +21,8 @@ public class User {
     Date   createDate;
     Date   lastLogin;
 
-    List<Permission> permissions;
-    List<Group> groups;
+    SortedSet<Permission> permissions;
+    SortedSet<Group> groups;
 
     @Temporal(TemporalType.TIMESTAMP)
     public Date getCreateDate() {
@@ -70,11 +74,12 @@ public class User {
             },
             inverseJoinColumns = @JoinColumn(name = "c_group")
     )
-    public List<Group> getGroups() {
+    @SortNatural
+    public SortedSet<Group> getGroups() {
         return groups;
     }
 
-    public void setGroups(List<Group> groups) {
+    public void setGroups(SortedSet<Group> groups) {
         this.groups = groups;
     }
 
@@ -85,11 +90,28 @@ public class User {
             },
             inverseJoinColumns = @JoinColumn(name = "c_permission")
     )
-    public List<Permission> getPermissions() {
+    @SortNatural
+    public SortedSet<Permission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<Permission> permissions) {
+    public void setPermissions(SortedSet<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    @Override
+    public int compareTo(User o) {
+         int value = super.compareTo(o);
+        if (value ==0 ){
+            if (getCreateDate() != null)
+                value = getCreateDate().compareTo(o.getCreateDate());
+
+        }
+
+        if (value == 0)
+            value = getLoginName().compareTo(o.getLoginName());
+
+        return value;
+
     }
 }

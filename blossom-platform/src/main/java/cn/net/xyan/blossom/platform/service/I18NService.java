@@ -29,6 +29,7 @@ public interface I18NService extends I18NTools {
 
     List<I18NString> allMessage();
 
+    String i18nMessage(String key);
     String i18nMessage(String key,Language language);
     //String i18nMessage(String key,Locale locale);
 }

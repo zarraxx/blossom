@@ -1,7 +1,9 @@
 package cn.net.xyan.blossom.platform.ui.view.security;
 
 import cn.net.xyan.blossom.core.i18n.TR;
+import cn.net.xyan.blossom.platform.entity.security.Permission;
 import cn.net.xyan.blossom.platform.service.UISystemService;
+import cn.net.xyan.blossom.platform.ui.view.entity.EntityView;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -18,17 +20,9 @@ import org.vaadin.spring.sidebar.annotation.SideBarItem;
 @SpringView(name = "security.permission")
 @SideBarItem(sectionId = UISystemService.CatalogSecurity, caption = "Permission", order = 1)
 @FontAwesomeIcon(FontAwesome.CERTIFICATE)
-public class PermissionView extends VerticalLayout implements View {
+public class PermissionView extends EntityView<Permission>{
     public PermissionView(){
-        setSpacing(true);
-        setMargin(true);
-
-        Label header = new Label(TR.m("view.permission.caption","Manager Permission!"));
-        header.addStyleName(ValoTheme.LABEL_H1);
-        addComponent(header);
+       super(TR.m("ui.view.security.permission.caption","Permission"));
     }
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
 
-    }
 }

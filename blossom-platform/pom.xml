@@ -19,15 +19,27 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-client-compiler</artifactId>
+        <scope>provided</scope>
+        </dependency>
+
         <!--<dependency>-->
-        <!--<groupId>com.vaadin</groupId>-->
-        <!--<artifactId>vaadin-client-compiler</artifactId>-->
-        <!--<scope>provided</scope>-->
+            <!--<groupId>com.vaadin</groupId>-->
+            <!--<artifactId>vaadin-client-compiled</artifactId>-->
         <!--</dependency>-->
 
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client-compiled</artifactId>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>listbuilder</artifactId>
+            <version>0.7.3.v7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin.addon</groupId>
+            <artifactId>vaadin-touchkit-agpl</artifactId>
+            <version>4.1.0</version>
         </dependency>
 
         <dependency>
@@ -72,6 +84,88 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>2.2.4</version>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <processors>
+                                <!--<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>-->
+                                <processor>cn.net.xyan.blossom.tools.annotation.processor.JPAMetaModelProcessor</processor>
+                            </processors>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>cn.net.xyan.blossom</groupId>
+                        <artifactId>blossom-build-tools</artifactId>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.6.1</version>
+                <!-- Clean up also any pre-compiled themes -->
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>src/main/resources/VAADIN/themes</directory>
+                            <includes>
+                                <include>**/addons.scss</include>
+                                <include>**/styles.css</include>
+                                <include>**/styles.scss.cache</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>src/main/java</directory>
+                            <includes>
+                                <include>**/*.xml</include>
+                                <include>**/styles.css</include>
+                                <include>**/styles.scss.cache</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>7.6.3</version>
+                <configuration>
+                    <!--<theme>sidebar</theme>-->
+                    <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+                    <draftCompile>false</draftCompile>
+                    <compileReport>false</compileReport>
+                    <style>OBF</style>
+                    <strict>true</strict>
+                    <webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
+                    <warSourceDirectory>${basedir}/src/main/resources</warSourceDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>update-theme</goal>
+                            <goal>update-widgetset</goal>
+                            <goal>compile</goal>
+                            <!-- Comment out compile-theme goal to use on-the-fly theme compilation -->
+                            <goal>compile-theme</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

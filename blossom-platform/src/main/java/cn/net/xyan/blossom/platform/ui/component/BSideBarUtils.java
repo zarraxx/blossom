@@ -19,10 +19,7 @@ import org.vaadin.spring.sidebar.SideBarItemDescriptor;
 import org.vaadin.spring.sidebar.SideBarSectionDescriptor;
 import org.vaadin.spring.sidebar.SideBarUtils;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Created by zarra on 16/5/30.
@@ -81,7 +78,7 @@ public class BSideBarUtils extends SideBarUtils {
             CatalogSideBarSectionDescriptor catalogSideBarSectionDescriptor = (CatalogSideBarSectionDescriptor) descriptor;
             List<SideBarItemDescriptor> items  = new LinkedList<>();
 
-            List<Module> modules = catalogSideBarSectionDescriptor.getCatalog().getModules();
+            SortedSet<Module> modules = catalogSideBarSectionDescriptor.getCatalog().getModules();
 
             for (Module module:modules){
                 String beanName = module.getCode();
@@ -110,11 +107,13 @@ public class BSideBarUtils extends SideBarUtils {
             UIPage page = uiSystemService.pageByClass((Class<? extends ContentUI>) uiClass);
 
             if (page != null) {
-                List<Catalog> catalogs = page.getCatalogs();
+                SortedSet<Catalog> catalogs = page.getCatalogs();
                 if (catalogs != null) {
-                    for (int i = 0; i < catalogs.size(); i++) {
-                        Catalog catalog = catalogs.get(i);
+                    int i = 0;
+                    for (Catalog catalog:catalogs) {
+
                         result.add(CatalogSideBarSectionDescriptor.create(catalog, i));
+                        i++;
                     }
                 }
             }

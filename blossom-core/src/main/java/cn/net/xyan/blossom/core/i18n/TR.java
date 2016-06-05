@@ -17,11 +17,25 @@ public class TR {
 
     final public static String Logout = "ui.button.Logout";
 
+    final public static String Add = "ui.button.add";
+
+    final public static String New = "ui.button.new";
+
     final public static String Edit = "ui.button.edit";
 
     final public static String Save = "ui.button.save";
 
+    final public static String Remove = "ui.button.remove";
+
+    final public static String Delete = "ui.button.delete";
+
+    final public static String OK = "ui.button.ok";
+
     final public static String Cancel = "ui.button.cancel";
+
+    final public static String Close = "ui.button.close";
+
+    final public static String View = "ui.action.view";
 
     private static I18NMessageProvider messageSource;
 

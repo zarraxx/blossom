@@ -9,6 +9,8 @@ import cn.net.xyan.blossom.platform.service.impl.I18NServiceImpl;
 import cn.net.xyan.blossom.platform.service.impl.UISystemServiceImpl;
 import cn.net.xyan.blossom.platform.support.I18NMessageProviderImpl;
 import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
+import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
+import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
 import com.vaadin.spring.annotation.UIScope;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.ApplicationContext;
@@ -96,7 +98,10 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable(); // Use Vaadin's built-in CSRF protection instead
-        http.authorizeRequests().antMatchers("/login/**").anonymous()
+        http.authorizeRequests().antMatchers("/ui/login/**").anonymous()
+                .antMatchers("/login/**").anonymous()
+                .antMatchers("/ui/UIDL/**").permitAll()
+                .antMatchers("/ui/HEARTBEAT/**").permitAll()
                 .antMatchers("/vaadinServlet/UIDL/**").permitAll()
                 .antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll()
                 .anyRequest().authenticated();
@@ -105,8 +110,8 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         http.formLogin().disable();
         // Remember to add the VaadinSessionClosingLogoutHandler
         http.logout().addLogoutHandler(new VaadinSessionClosingLogoutHandler()).logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout").permitAll();
-        http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
+                .logoutSuccessUrl("/ui/login?logout").permitAll();
+        http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/ui/login"));
         // Instruct Spring Security to use the same RememberMeServices as Vaadin4Spring. Also remember the key.
         http.rememberMe().rememberMeServices(rememberMeServices()).key(RememberMeKey);
         // Instruct Spring Security to use the same authentication strategy as Vaadin4Spring
@@ -182,6 +187,12 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         return new BSideBar(sideBarUtils);
     }
 
+
+    @Bean
+    public EntityViewService entityViewService(){
+        return new EntityViewServiceImpl();
+    }
+
     @Bean
     public I18NService i18NService(){
         return  new I18NServiceImpl();
@@ -191,6 +202,7 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     public UISystemService uiSystemService(){
         return new UISystemServiceImpl();
     }
+
 
     @Bean
     public Filter jpaFilter(){
@@ -203,5 +215,7 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         factory.setEntityManager(entityManager);
         return factory;
     }
+
+
 
 }

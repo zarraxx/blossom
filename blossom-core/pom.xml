@@ -14,6 +14,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
@@ -100,12 +105,12 @@
             <version>1.9.2</version>
         </dependency>
 
-        <!--<dependency>-->
-        <!--<groupId>com.vaadin</groupId>-->
-        <!--<artifactId>vaadin-client</artifactId>-->
-        <!--<version>7.6.3</version>-->
-        <!--<scope>provided</scope>-->
-        <!--</dependency>-->
+        <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-client</artifactId>
+        <version>7.6.3</version>
+        <scope>provided</scope>
+        </dependency>
         <!--
           Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
 
@@ -113,11 +118,11 @@
           compilation classpath by vaadin-maven-plugin so normally there is no need for an
           explicit dependency.
         -->
-        <!--<dependency>-->
-        <!--<groupId>com.vaadin</groupId>-->
-        <!--<artifactId>vaadin-client-compiler</artifactId>-->
-        <!--<scope>provided</scope>-->
-        <!--</dependency>-->
+        <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-client-compiler</artifactId>
+        <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.vaadin</groupId>

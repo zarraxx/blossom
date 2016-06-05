@@ -9,4 +9,14 @@
     border-radius:10px;
     padding: 40px;
   }
+
+  .v-button-in-table{
+    padding: 2px;
+    border-width: 0px;
+    border: none;
+  }
+
+  .v-button-borderless:after{
+    display: none;
+  }
 }

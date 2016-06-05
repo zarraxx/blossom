@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.AuthenticationException;
 import org.vaadin.spring.security.shared.VaadinSharedSecurity;
+import org.vaadin.spring.security.shared.VaadinUrlAuthenticationSuccessHandler;
 
 import java.util.Locale;
 
@@ -31,6 +32,9 @@ public class LoginUI extends UI {
     @Autowired
     VaadinSharedSecurity vaadinSecurity;
 
+    @Autowired
+    VaadinUrlAuthenticationSuccessHandler authenticationSuccessHandler;
+
     private TextField userName;
 
     private PasswordField passwordField;
@@ -47,6 +51,7 @@ public class LoginUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
+        String refer = request.getHeader("Referer");
         Locale locale = LocaleContextHolder.getLocale();
 
         //UI.getCurrent().setLocale(locale);
@@ -131,6 +136,7 @@ public class LoginUI extends UI {
     }
 
     private void login() {
+       //authenticationSuccessHandler.setUseReferer(true);
         try {
             vaadinSecurity.login(userName.getValue(), passwordField.getValue(), rememberMe.getValue());
         } catch (AuthenticationException ex) {

@@ -12,15 +12,13 @@ import javax.persistence.Id;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by zarra on 16/6/2.
@@ -57,6 +55,22 @@ public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate 
         return name;
     }
 
+    private <E> Attribute<? super E, ?> entityPropertyAttribute(E entity, String prop){
+        EntityManagerFactory emf = entityProvider.getEntityManager().getEntityManagerFactory();
+        Metamodel metamodel = emf.getMetamodel();
+        Class<E> eClass = (Class<E>) entity.getClass();
+        EntityType<E> entityType = metamodel.entity(eClass);
+
+        Attribute<? super E, ?>  attribute = entityType.getAttribute(prop);
+
+        return attribute;
+    }
+
+    private <E> Class<?> entityPropertyType(E entity, String prop){
+        Attribute<? super E, ?>  attribute = entityPropertyAttribute(entity,prop);
+        return attribute.getJavaType();
+    }
+
     /**
      * Builds a query and loads the property value for the entity
      *
@@ -70,7 +84,27 @@ public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate 
         q.select(root.get(prop));
         String id = tryGetEntityIdentifier(entity);
         q.where(cb.equal(root.get(id), cb.literal(tryGetEntityId(entity))));
-        return entityProvider.getEntityManager().createQuery(q).getResultList();
+        Object returnValue =  entityProvider.getEntityManager().createQuery(q).getResultList();
+
+//        Class<?> valueType = entityPropertyType(entity,prop);
+//
+//        if (returnValue instanceof Collection) {
+//            Collection c = (Collection) returnValue;
+//            if (Collection.class.isAssignableFrom(valueType)) {
+//                if (valueType.isAssignableFrom(returnValue.getClass())) {
+//                    //noNothing
+//                } else if (SortedSet.class.isAssignableFrom(valueType)){
+//                    SortedSet<Object> sortedSet = new TreeSet<>();
+//                    for (Object obj:c){
+//                        sortedSet.add(obj);
+//                    }
+//
+//                    returnValue = sortedSet;
+//                }
+//            }
+//        }
+
+        return returnValue;
     }
 
     /**
@@ -213,7 +247,10 @@ public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate 
         if (setter != null) {
             Class<?> parameterType = setter.getParameterTypes()[0];
             if (Collection.class.isAssignableFrom(parameterType)) {
-                if (Set.class.isAssignableFrom(parameterType)) {
+                if (SortedSet.class.isAssignableFrom(parameterType)){
+                    value = new TreeSet((Collection) value);
+                }
+                else if (Set.class.isAssignableFrom(parameterType)) {
                     value = new HashSet((Collection) value);
                 }
             } else if (value instanceof Collection) {

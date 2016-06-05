@@ -9,6 +9,7 @@ import org.vaadin.spring.sidebar.annotation.SideBarSection;
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Created by zarra on 16/6/1.
@@ -57,7 +58,7 @@ public class CatalogSideBarSectionDescriptor extends SideBarSectionDescriptor {
     @Override
     public boolean isAvailableFor(Class<? extends UI> uiClass) {
         String className = uiClass.getName();
-        List<UIPage> pages = catalog.getUiPages();
+        SortedSet<UIPage> pages = catalog.getUiPages();
         List<String> classNames = new LinkedList<>();
         for (UIPage page : pages) {
             classNames.add(page.getUiClassName());

@@ -1,8 +1,12 @@
 package cn.net.xyan.blossom.platform.entity;
 
+import org.hibernate.annotations.SortNatural;
+
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by zarra on 16/5/13.
@@ -12,13 +16,13 @@ import java.util.List;
  */
 @Entity
 @Table(name = "ui_page")
-public class UIPage {
+public class UIPage extends ComparableEntity<UIPage>{
     String code;
     String title;
 
     String uiClassName;
 
-    List<Catalog> catalogs = new LinkedList<>();
+    SortedSet<Catalog> catalogs = new TreeSet<>();
 
     public String getTitle() {
         return title;
@@ -34,11 +38,13 @@ public class UIPage {
             ,inverseJoinColumns = @JoinColumn(name = "c_catalog")
     )
     @OrderColumn(name="c_index")
-    public List<Catalog> getCatalogs() {
+    //@OrderBy("name ASC")
+    @SortNatural
+    public SortedSet<Catalog> getCatalogs() {
         return catalogs;
     }
 
-    public void setCatalogs(List<Catalog> catalogs) {
+    public void setCatalogs(SortedSet<Catalog> catalogs) {
         this.catalogs = catalogs;
     }
 
@@ -58,5 +64,15 @@ public class UIPage {
 
     public void setUiClassName(String uiClassName) {
         this.uiClassName = uiClassName;
+    }
+
+    @Override
+    public int compareTo(UIPage o) {
+        int value =  super.compareTo(o);
+        if (value == 0){
+            value =  getCode().compareTo(o.getCode());
+        }
+
+        return value;
     }
 }
