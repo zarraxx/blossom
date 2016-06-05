@@ -110,6 +110,8 @@ public class Catalog extends ComparableEntity<Catalog>{
 
     @Override
     public String toString() {
+        if (title!=null)
+            return title.value();
         return getCode();
     }
 }

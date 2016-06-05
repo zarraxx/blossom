@@ -1,6 +1,7 @@
 package cn.net.xyan.blossom.platform.ui.view.entity.filter;
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
+import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.jpa.utils.JPA;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
@@ -8,7 +9,9 @@ import cn.net.xyan.blossom.platform.service.I18NService;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import com.vaadin.data.Property;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.*;
 import net.jodah.typetools.TypeResolver;
 
@@ -420,6 +423,37 @@ public class SingleAttributeSpecification<E, V> extends UISpecification<E> {
         }
 
         return predicate;
+    }
+
+    public boolean isFieldOk(AbstractField<V> field,V value){
+
+        field.setComponentError(null);
+        field.setValidationVisible(false);
+
+        if (field.isVisible()){
+            if (value == null) {
+                field.setComponentError(new UserError(TR.m("ui.filter.error.null")));
+                throw  new StatusAndMessageError(-1,"Value can not be null");
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean inputOk() {
+        try{
+            getFieldGroup().commit();
+            if (isActive()){
+                isFieldOk(fieldFirst,firstValue) ;
+                isFieldOk(fieldSecond,secondValue) ;
+            }
+        } catch (FieldGroup.CommitException e) {
+            return false;
+        }catch (Throwable e){
+            return false;
+        }
+        return true;
     }
 
     public Class<E> getEntityCls() {

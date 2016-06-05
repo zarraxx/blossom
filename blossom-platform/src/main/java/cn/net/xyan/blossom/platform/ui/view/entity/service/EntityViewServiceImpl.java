@@ -10,6 +10,7 @@ import cn.net.xyan.blossom.platform.ui.view.entity.EntityView;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Table;
@@ -146,10 +147,15 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
 
             if (attribute!=null && isPrimaryType(attribute.getJavaType())){
                 //doNothing
+
+                Converter<String,?> converter = columnHeaderConfig.getConverter();
+
+                if (converter!=null){
+                    table.setConverter(field,converter);
+                }
+
             }else {
                 field = addGenerateColumn(table,jpaContainer,field);
-
-
             }
             visibleColumns.add(field);
             table.setColumnHeader(field,displayName);

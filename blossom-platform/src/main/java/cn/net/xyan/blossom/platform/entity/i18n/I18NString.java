@@ -57,6 +57,14 @@ public class I18NString {
 
     }
 
+    @Override
+    public String toString() {
+        String value = value();
+        if (value == null)
+            return "NULL";
+        return value;
+    }
+
     public I18NString(String key,String defaultValue){
         setKey(key);
         setDefaultValue(defaultValue);

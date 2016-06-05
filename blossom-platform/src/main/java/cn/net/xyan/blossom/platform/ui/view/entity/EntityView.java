@@ -24,6 +24,7 @@ import org.vaadin.sliderpanel.SliderPanel;
 import org.vaadin.sliderpanel.SliderPanelBuilder;
 import org.vaadin.sliderpanel.SliderPanelStyles;
 import org.vaadin.sliderpanel.client.SliderMode;
+import org.vaadin.sliderpanel.client.SliderPanelListener;
 import org.vaadin.sliderpanel.client.SliderTabPosition;
 
 /**
@@ -323,7 +324,17 @@ public class EntityView<E>  extends VerticalLayout implements View {
                         .caption(TR.m(TR.Filter,"Filter"))
                         .tabPosition(SliderTabPosition.END)
                         .build();
+                pFilter.addListener(new SliderPanelListener() {
+                    @Override
+                    public void onToggle(boolean b) {
+                        logger.info("toggle "+b);
 
+                        if (b == false){
+                            pFilter.setExpanded(true,false);
+                            //throw new StatusAndMessageError(-1,"ad");
+                        }
+                    }
+                });
                 addComponentAsFirst(pFilter);
             }
         }

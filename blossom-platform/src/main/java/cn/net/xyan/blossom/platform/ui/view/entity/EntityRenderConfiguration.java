@@ -70,6 +70,8 @@ public class EntityRenderConfiguration<E> {
     }
 
     static public class TableColumnHeaderConfig{
+
+        Converter<String,?> converter;
         String field;
         String displayTitle;
 
@@ -78,20 +80,31 @@ public class EntityRenderConfiguration<E> {
             this.displayTitle = field;
         }
 
+        public Converter<String, ?> getConverter() {
+            return converter;
+        }
+
+        public TableColumnHeaderConfig setConverter(Converter<String, ?> converter) {
+            this.converter = converter;
+            return this;
+        }
+
         public String getDisplayTitle() {
             return displayTitle;
         }
 
-        public void setDisplayTitle(String displayTitle) {
+        public TableColumnHeaderConfig setDisplayTitle(String displayTitle) {
             this.displayTitle = displayTitle;
+            return this;
         }
 
         public String getField() {
             return field;
         }
 
-        public void setField(String field) {
+        public TableColumnHeaderConfig setField(String field) {
             this.field = field;
+            return this;
         }
     }
 
@@ -335,6 +348,12 @@ public class EntityRenderConfiguration<E> {
         return formFieldConfig;
     }
 
+    public UISpecification<E> addSpecification(UISpecification<E> specification){
+        if (specification!=null)
+            getSpecifications().add(specification);
+        return specification;
+    }
+
     public UISpecification<E> addSpecification(JPA.Operator operator,Attribute<?,?> ... attributes){
         List<Attribute<?,?>> attributeList = Arrays.asList(attributes);
         Attribute<?,?> last = null ;
@@ -346,7 +365,7 @@ public class EntityRenderConfiguration<E> {
         Class<?> valueType = SingleAttributeSpecification.valueTypeForAttribute(last);
         UISpecification<E> uiSpecification =  new SingleAttributeSpecification<>(getEntityCls(),valueType,attributeList,operator);
 
-        getSpecifications().add(uiSpecification);
+        addSpecification(uiSpecification);
 
         return uiSpecification;
 

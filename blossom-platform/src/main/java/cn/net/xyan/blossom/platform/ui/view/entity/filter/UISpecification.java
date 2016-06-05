@@ -44,6 +44,8 @@ public abstract class UISpecification<E> implements Specification<E> {
 
     public abstract Predicate generatePredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder cb);
 
+    public abstract boolean inputOk();
+
     @Override
     public Predicate toPredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         if (isActive)

@@ -1,24 +1,24 @@
 package cn.net.xyan.blossom.platform.ui.view.systemInterface;
 
 import cn.net.xyan.blossom.core.jpa.utils.JPA;
-import cn.net.xyan.blossom.core.support.EntityContainerFactory;
-import cn.net.xyan.blossom.platform.entity.Catalog;
+
 import cn.net.xyan.blossom.platform.entity.Catalog_;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.UIPage_;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditFrom;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
-import com.vaadin.addon.jpacontainer.JPAContainer;
+
+import cn.net.xyan.blossom.platform.ui.view.entity.TableValueConverter;
 import com.vaadin.addon.touchkit.ui.NumberField;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractOrderedLayout;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
 import java.util.Map;
-import java.util.SortedSet;
 
 /**
  * Created by zarra on 16/6/4.
@@ -31,7 +31,12 @@ public class PageConfig extends EntityRenderConfiguration<UIPage> {
     public void configTableColumnHeader() {
         addTableColumn(UIPage_.code).setDisplayTitle("Code");
         addTableColumn(UIPage_.title).setDisplayTitle("Title");
-        addTableColumn(UIPage_.uiClassName).setDisplayTitle("UiClass");
+        addTableColumn(UIPage_.uiClassName).setDisplayTitle("UiClass").setConverter(new TableValueConverter<String>() {
+            @Override
+            public String doConvert(String value, Locale locale) {
+                return "Class:"+value;
+            }
+        });
 
         addTableColumn(UIPage_.catalogs).setDisplayTitle("Catalogs");
 

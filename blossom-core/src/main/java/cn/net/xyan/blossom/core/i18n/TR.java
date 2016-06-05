@@ -59,6 +59,11 @@ public class TR {
         return tools;
     }
 
+    public static String m(String key){
+        return m(key,key);
+        //return defaultValue;
+    }
+
     public static String m(String key,String defaultValue,Object ... objs){
         Locale locale = LocaleContextHolder.getLocale();
         getTools().setupDefaultMessage(key,defaultValue);
