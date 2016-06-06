@@ -1,6 +1,7 @@
 package cn.net.xyan.blossom.platform.entity.security;
 
 import cn.net.xyan.blossom.platform.entity.ComparableEntity;
+import cn.net.xyan.blossom.platform.entity.dict.UserStatus;
 import org.hibernate.annotations.SortNatural;
 
 import javax.persistence.*;
@@ -21,6 +22,8 @@ public class User extends ComparableEntity<User> {
 
     Set<Permission> permissions = new HashSet<>();
     Set<Group> groups = new HashSet<>();
+
+    UserStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
     public Date getCreateDate() {
@@ -93,6 +96,16 @@ public class User extends ComparableEntity<User> {
 
     public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "c_status")
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     @Override

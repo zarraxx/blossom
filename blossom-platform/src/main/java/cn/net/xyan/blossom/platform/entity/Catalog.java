@@ -70,7 +70,7 @@ public class Catalog extends ComparableEntity<Catalog>{
         this.essentialPermission = essentialPermission;
     }
 
-    @ManyToMany(mappedBy = "catalogs",cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "catalogs"/*,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH}*/)
     //@OrderBy("name ASC")
     @SortNatural
     public SortedSet<UIPage> getUiPages() {

@@ -16,6 +16,7 @@ import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
 import com.vaadin.spring.annotation.UIScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -78,6 +79,9 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
     EntityManager entityManager;
 
+    @Autowired
+    SecurityService securityService;
+
     public EntityManagerFactory getEmf() {
         return emf;
     }
@@ -94,9 +98,10 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user").password("user").roles("USER")
-                .and().withUser("admin").password("admin").roles("ADMIN");
+//        auth.inMemoryAuthentication()
+//                .withUser("user").password("user").roles("USER")
+//                .and().withUser("admin").password("admin").roles("ADMIN");
+        auth.userDetailsService(securityService);
     }
 
     @Override

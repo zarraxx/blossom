@@ -192,6 +192,12 @@ public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickLis
             }
 
             fieldGroup.bind(field, config.getField());
+
+            setup = config.getFormFieldAfterBind();
+
+            if (setup!=null){
+                setup.fieldSetup(field,this,formLayout,cache);
+            }
         }
 
         if (this.status == FormStatus.Edit){

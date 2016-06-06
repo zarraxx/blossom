@@ -14,6 +14,7 @@ public interface UISystemService {
     String CatalogSecurity = "security";
     String CatalogInterface = "interface";
     String CatalogOperation = "operation";
+    String CatalogDebug = "debug";
 
     UIPage setupPage(String path, Class<? extends ContentUI> uiClass);
 

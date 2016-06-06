@@ -159,6 +159,8 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
         Catalog security  = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage);
         Catalog i18n      = setupCatalog(UISystemService.CatalogInterface, "Interface", admingPage);
         Catalog operation = setupCatalog(UISystemService.CatalogOperation, "Operation", admingPage);
+
+        Catalog debug     = setupCatalog(UISystemService.CatalogDebug,"Debug",admingPage);
     }
 
     @Override

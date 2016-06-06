@@ -126,6 +126,8 @@ public class EntityRenderConfiguration<E> {
 
         FormFieldSetup formFieldSetup;
 
+        FormFieldSetup formFieldAfterBind;
+
         public FormFieldConfig(String field,Class<?> valueType ,Class<? extends AbstractField> fieldType){
             this.field = field;
             this.fieldType = fieldType;
@@ -160,23 +162,43 @@ public class EntityRenderConfiguration<E> {
             return this;
         }
 
-        public FormFieldConfig addFormFieldSetup(final FormFieldSetup formFieldSetup){
-            final FormFieldSetup prev = getFormFieldSetup();
+        public FormFieldSetup getFormFieldAfterBind() {
+            return formFieldAfterBind;
+        }
 
+        public FormFieldConfig setFormFieldAfterBind(FormFieldSetup formFieldAfterBind) {
+            this.formFieldAfterBind = formFieldAfterBind;
+            return this;
+        }
+
+        protected FormFieldConfig addFormFieldSetupInner(final FormFieldSetup newSetup, FormFieldSetup before,boolean after){
+            final FormFieldSetup prev = before;
             FormFieldSetup setup = new FormFieldSetup() {
                 @Override
                 public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
                     if (prev != null)
                         prev.fieldSetup(field,parent,formLayout,fieldGroup);
 
-                    if (formFieldSetup != null)
-                        formFieldSetup.fieldSetup(field,parent,formLayout,fieldGroup);
+                    if (newSetup != null)
+                        newSetup.fieldSetup(field,parent,formLayout,fieldGroup);
                 }
             };
 
-            setFormFieldSetup(setup);
+            if (after)
+                setFormFieldAfterBind(setup);
+            else{
+               setFormFieldSetup(setup);
+            }
 
             return this;
+        }
+
+        public FormFieldConfig addFormFieldSetup(final FormFieldSetup formFieldSetup){
+            return addFormFieldSetupInner(formFieldSetup,getFormFieldSetup(),false);
+        }
+
+        public FormFieldConfig addFormFieldAfterBind(final FormFieldSetup formFieldSetup){
+            return addFormFieldSetupInner(formFieldSetup,getFormFieldAfterBind(),true);
         }
 
         public Class<?> getValueType() {

@@ -41,7 +41,7 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        String titleKey = String.format("ui.view.entity.%s.title",getClass().getName());
+        String titleKey = String.format("ui.view.entity.%s.title.head",getClass().getName());
          I18NString i18NString = i18NService.setupMessage(titleKey,getTitle());
 
         if (header!=null)

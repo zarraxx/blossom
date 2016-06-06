@@ -17,6 +17,8 @@ public class TR {
 
     final public static String Logout = "ui.button.Logout";
 
+    final public static String Run = "ui.button.run";
+
     final public static String Add = "ui.button.add";
 
     final public static String New = "ui.button.new";

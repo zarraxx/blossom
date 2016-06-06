@@ -77,7 +77,7 @@ public class Module extends ComparableEntity<Module>{
         this.essentialPermission = essentialPermission;
     }
 
-    @ManyToMany(mappedBy = "modules",cascade = {CascadeType.PERSIST})
+    @ManyToMany(mappedBy = "modules"/*,cascade = {CascadeType.PERSIST}*/)
     //@OrderBy("name ASC")
     @SortNatural
     public SortedSet<Catalog> getCatalogs() {

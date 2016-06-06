@@ -12,6 +12,8 @@ public class GroupConfig extends EntityRenderConfiguration<Group> {
     public void configFormFiled() {
         addFormField(Group_.code);
 
+        addFormField(Group_.status);
+
         addFormField(Group_.permissions);
     }
 
@@ -22,6 +24,8 @@ public class GroupConfig extends EntityRenderConfiguration<Group> {
         addTableColumn(Group_.title);
 
         addTableColumn(Group_.describe);
+
+        addFormField(Group_.status);
 
         addTableColumn(Group_.permissions);
     }
