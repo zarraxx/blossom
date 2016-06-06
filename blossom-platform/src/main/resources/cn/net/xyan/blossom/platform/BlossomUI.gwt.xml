@@ -7,5 +7,6 @@
     <inherits name="de.datenhahn.vaadin.componentrenderer.ComponentRendererWidgetSet"/>
     <inherits name="org.vaadin.alump.labelbutton.WidgetSet"/>
     <inherits name="org.vaadin.sliderpanel.WidgetSet"/>
+    <inherits name="org.vaadin.easyuploads.Widgetset"/>
     <!--<inherits name="com.vaadin.addon.touchkit.gwt.TouchKitWidgetSet"/>-->
 </module>

@@ -1,19 +1,18 @@
 package cn.net.xyan.blossom.platform.ui.view.systemInterface;
 
-import cn.net.xyan.blossom.core.jpa.utils.JPA;
 
+import cn.net.xyan.blossom.core.jpa.utils.JPA;
 import cn.net.xyan.blossom.platform.entity.Catalog_;
 import cn.net.xyan.blossom.platform.entity.UIPage;
+
 import cn.net.xyan.blossom.platform.entity.UIPage_;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditFrom;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
 
 import cn.net.xyan.blossom.platform.ui.view.entity.TableValueConverter;
 import com.vaadin.addon.touchkit.ui.NumberField;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractOrderedLayout;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

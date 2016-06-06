@@ -4,6 +4,7 @@ import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.jpa.utils.JPA;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import cn.net.xyan.blossom.core.utils.StringUtils;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.support.MultiSelectConverter;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.SingleAttributeSpecification;
@@ -71,7 +72,7 @@ public class EntityRenderConfiguration<E> {
 
     static public class TableColumnHeaderConfig{
 
-        Converter<String,?> converter;
+        TableValueConverter<?> converter;
         String field;
         String displayTitle;
 
@@ -80,11 +81,11 @@ public class EntityRenderConfiguration<E> {
             this.displayTitle = field;
         }
 
-        public Converter<String, ?> getConverter() {
+        public  TableValueConverter<?> getConverter() {
             return converter;
         }
 
-        public TableColumnHeaderConfig setConverter(Converter<String, ?> converter) {
+        public TableColumnHeaderConfig setConverter( TableValueConverter<?> converter) {
             this.converter = converter;
             return this;
         }
@@ -254,6 +255,22 @@ public class EntityRenderConfiguration<E> {
         return tchc;
     }
 
+    public TableColumnHeaderConfig addTableColumn( Attribute<?, ?> ... attributes){
+        return addTableColumn(Arrays.asList(attributes));
+    }
+
+    public TableColumnHeaderConfig addTableColumn( List<Attribute<? , ?>> attributes){
+        List<String> stringList = new LinkedList<>();
+
+        for (Attribute<? , ?> a :attributes){
+            stringList.add(a.getName());
+        }
+
+        String path = StringUtils.join(stringList,".");
+
+        return addTableColumn(path);
+    }
+
     public TableColumnHeaderConfig addTableColumn(@Nonnull Attribute<? super E, ?> attribute){
         return addTableColumn(attribute.getName());
     }
@@ -322,6 +339,7 @@ public class EntityRenderConfiguration<E> {
                     @Override
                     public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout,Map<String, AbstractField> fieldGroup) {
                         AbstractSelect select = (AbstractSelect) field;
+                        jpaContainerInner.refresh();
                         select.setContainerDataSource(jpaContainerInner);
                         select.setItemCaptionMode(AbstractSelect.ItemCaptionMode.ITEM);
                         if (isCollectionInner){

@@ -32,7 +32,7 @@ public class UIPage extends ComparableEntity<UIPage>{
         this.title = title;
     }
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH})
     @JoinTable(name = "ui_page_catalog"
             ,joinColumns = @JoinColumn(name = "c_page")
             ,inverseJoinColumns = @JoinColumn(name = "c_catalog")
@@ -74,5 +74,12 @@ public class UIPage extends ComparableEntity<UIPage>{
         }
 
         return value;
+    }
+
+    @Override
+    public String toString() {
+        if (title!=null)
+            return title;
+        return getCode();
     }
 }

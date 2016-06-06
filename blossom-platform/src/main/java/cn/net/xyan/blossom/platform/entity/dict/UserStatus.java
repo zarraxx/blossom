@@ -13,7 +13,7 @@ public class UserStatus extends StatusAndType {
 
     }
 
-    public UserStatus(int index,String title){
+    public UserStatus(Integer index,String title){
         super(index,title);
     }
 }

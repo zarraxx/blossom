@@ -5,10 +5,7 @@ import cn.net.xyan.blossom.platform.entity.security.Permission;
 import org.hibernate.annotations.SortNatural;
 
 import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by zarra on 16/5/13.
@@ -24,7 +21,7 @@ public class Module extends ComparableEntity<Module>{
 
     SortedSet<Catalog> catalogs = new TreeSet<>();
 
-    SortedSet<Permission> essentialPermission = new TreeSet<>();
+    Set<Permission> essentialPermission = new HashSet<>();
 
     public static String moduleMessageKey(String code){
         return String.format("ui.module.%s.title", code);
@@ -72,13 +69,11 @@ public class Module extends ComparableEntity<Module>{
             joinColumns = {@JoinColumn(name = "c_module")},
             inverseJoinColumns = {@JoinColumn(name = "c_permission")}
     )
-    //@OrderBy("name ASC")
-    @SortNatural
-    public SortedSet<Permission> getEssentialPermission() {
+    public Set<Permission> getEssentialPermission() {
         return essentialPermission;
     }
 
-    public void setEssentialPermission(SortedSet<Permission> essentialPermission) {
+    public void setEssentialPermission(Set<Permission> essentialPermission) {
         this.essentialPermission = essentialPermission;
     }
 
@@ -101,5 +96,12 @@ public class Module extends ComparableEntity<Module>{
         }
 
         return value;
+    }
+
+    @Override
+    public String toString() {
+        if (title!=null)
+            return title.value();
+        return getCode();
     }
 }

@@ -6,6 +6,7 @@ package cn.net.xyan.blossom.platform.support;
 import java.util.*;
 
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import com.vaadin.addon.jpacontainer.EntityContainer;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -182,12 +183,28 @@ public class MultiSelectConverter<T> implements
             PropertyMetadata property = entityClassMetadata
                     .getProperty(getPropertyDataSource().getPropertyId());
             ManyToMany annotation = property.getAnnotation(ManyToMany.class);
-            if (annotation.mappedBy() != null
-                    && !annotation.mappedBy().isEmpty()) {
-                owningSide = Boolean.FALSE;
-                mappedBy = annotation.mappedBy();
-                return owningSide;
+
+            if (annotation!=null) {
+                if (annotation.mappedBy() != null
+                        && !annotation.mappedBy().isEmpty()) {
+                    owningSide = Boolean.FALSE;
+                    mappedBy = annotation.mappedBy();
+                    return owningSide;
+                }
+            }else {
+
+                OneToMany oneToMany = property.getAnnotation(OneToMany.class);
+
+                if (oneToMany.mappedBy() != null
+                        && !oneToMany.mappedBy().isEmpty()) {
+                    owningSide = Boolean.FALSE;
+                    mappedBy = oneToMany.mappedBy();
+                    return owningSide;
+                }
+
             }
+
+
             owningSide = Boolean.TRUE;
         }
         return owningSide;

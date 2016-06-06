@@ -4,9 +4,7 @@ import cn.net.xyan.blossom.platform.entity.ComparableEntity;
 import org.hibernate.annotations.SortNatural;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
+import java.util.*;
 
 /**
  * Created by zarra on 16/5/13.
@@ -21,8 +19,8 @@ public class User extends ComparableEntity<User> {
     Date   createDate;
     Date   lastLogin;
 
-    SortedSet<Permission> permissions;
-    SortedSet<Group> groups;
+    Set<Permission> permissions = new HashSet<>();
+    Set<Group> groups = new HashSet<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     public Date getCreateDate() {
@@ -74,12 +72,11 @@ public class User extends ComparableEntity<User> {
             },
             inverseJoinColumns = @JoinColumn(name = "c_group")
     )
-    @SortNatural
-    public SortedSet<Group> getGroups() {
+    public Set<Group> getGroups() {
         return groups;
     }
 
-    public void setGroups(SortedSet<Group> groups) {
+    public void setGroups(Set<Group> groups) {
         this.groups = groups;
     }
 
@@ -90,12 +87,11 @@ public class User extends ComparableEntity<User> {
             },
             inverseJoinColumns = @JoinColumn(name = "c_permission")
     )
-    @SortNatural
-    public SortedSet<Permission> getPermissions() {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(SortedSet<Permission> permissions) {
+    public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
     }
 

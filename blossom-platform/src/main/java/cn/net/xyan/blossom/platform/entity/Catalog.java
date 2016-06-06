@@ -23,7 +23,7 @@ public class Catalog extends ComparableEntity<Catalog>{
 
     SortedSet<Module> modules = new TreeSet<>();
 
-    SortedSet<Permission> essentialPermission = new TreeSet<>();
+    Set<Permission> essentialPermission = new HashSet<>();
 
     public static String catalogMessageKey(String code){
         return String.format("ui.catalog.%s.title", code);
@@ -56,19 +56,17 @@ public class Catalog extends ComparableEntity<Catalog>{
         this.title = title;
     }
 
-    @OneToMany
+    @ManyToMany
     @JoinTable(name = "ui_catalog_permissions",
             joinColumns = {@JoinColumn(name = "c_catalog")},
             inverseJoinColumns = {@JoinColumn(name = "c_permission")}
     )
     @OrderColumn(name="c_index")
-    //@OrderBy("name ASC")
-    @SortNatural
-    public SortedSet<Permission> getEssentialPermission() {
+    public Set<Permission> getEssentialPermission() {
         return essentialPermission;
     }
 
-    public void setEssentialPermission(SortedSet<Permission> essentialPermission) {
+    public void setEssentialPermission(Set<Permission> essentialPermission) {
         this.essentialPermission = essentialPermission;
     }
 

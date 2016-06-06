@@ -3,10 +3,7 @@ package cn.net.xyan.blossom.platform.ui.view.entity.service;
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
 import cn.net.xyan.blossom.core.utils.ReflectUtils;
 import cn.net.xyan.blossom.platform.service.InstallerAdaptor;
-import cn.net.xyan.blossom.platform.ui.view.entity.EntityColumnGenerator;
-import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditFrom;
-import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
-import cn.net.xyan.blossom.platform.ui.view.entity.EntityView;
+import cn.net.xyan.blossom.platform.ui.view.entity.*;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
@@ -78,10 +75,10 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
         return null;
     }
 
-    public <E> String addGenerateColumn(Table table, JPAContainer<E> jpaContainer,String path){
+    public <E> String addGenerateColumn(Table table, JPAContainer<E> jpaContainer,String path,TableValueConverter<?> converter){
         String newFieldName = "__gen__"+path;
 
-        table.addGeneratedColumn(newFieldName, new EntityColumnGenerator<>(this,jpaContainer,path));
+        table.addGeneratedColumn(newFieldName, new EntityColumnGenerator<>(this,jpaContainer,path,converter));
 
 
         return newFieldName;
@@ -143,19 +140,23 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
             String field = columnHeaderConfig.getField();
             String displayName = columnHeaderConfig.getDisplayTitle();
 
-            Attribute<? super E, ?> attribute =  entityType.getAttribute(field);
+            Attribute<? super E, ?> attribute =  null ;
+            try {
+                attribute = entityType.getAttribute(field);
+            }catch (IllegalArgumentException e){
+
+            }
+
+            TableValueConverter<?> converter = columnHeaderConfig.getConverter();
 
             if (attribute!=null && isPrimaryType(attribute.getJavaType())){
-                //doNothing
-
-                Converter<String,?> converter = columnHeaderConfig.getConverter();
 
                 if (converter!=null){
                     table.setConverter(field,converter);
                 }
 
             }else {
-                field = addGenerateColumn(table,jpaContainer,field);
+                field = addGenerateColumn(table,jpaContainer,field,converter);
             }
             visibleColumns.add(field);
             table.setColumnHeader(field,displayName);

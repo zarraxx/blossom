@@ -33,7 +33,7 @@ public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate 
     }
 
     public <E> E ensureLazyPropertyLoaded(E entity, String propertyName) {
-        logger.info("ensureLazyPropertyLoaded:"+propertyName);
+        //logger.info("ensureLazyPropertyLoaded:"+propertyName);
         String prop = getRootPropertyName(propertyName);
         try {
             Object value = lazilyLoadPropertyValue(entity, prop);

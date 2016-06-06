@@ -4,6 +4,8 @@ import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
+import cn.net.xyan.blossom.platform.service.I18NService;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import com.vaadin.addon.jpacontainer.EntityItem;
@@ -19,6 +21,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import net.jodah.typetools.TypeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.sliderpanel.SliderPanel;
 import org.vaadin.sliderpanel.SliderPanelBuilder;
@@ -30,7 +34,19 @@ import org.vaadin.sliderpanel.client.SliderTabPosition;
 /**
  * Created by zarra on 16/6/2.
  */
-public class EntityView<E>  extends VerticalLayout implements View {
+public class EntityView<E>  extends VerticalLayout implements View,InitializingBean {
+
+    @Autowired
+    I18NService i18NService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        String titleKey = String.format("ui.view.entity.%s.title",getClass().getName());
+         I18NString i18NString = i18NService.setupMessage(titleKey,getTitle());
+
+        if (header!=null)
+            header.setValue(i18NString.value());
+    }
 
     public static class EntityFormWindow extends Window{
         EntityEditFrom<?> entityForm;
@@ -41,7 +57,11 @@ public class EntityView<E>  extends VerticalLayout implements View {
             //setSizeUndefined();
             setWidth("400px");
             setHeight("600px");
-            setContent(entityForm);
+
+            Panel panel = new Panel(entityForm);
+            panel.setSizeFull();
+
+            setContent(panel);
             setCaption("AAA");
         }
 
@@ -95,6 +115,8 @@ public class EntityView<E>  extends VerticalLayout implements View {
 
     protected SliderPanel pFilter;
 
+    protected Label header;
+
     EntityViewService entityViewService;
 
     public EntityView(String title){
@@ -115,7 +137,7 @@ public class EntityView<E>  extends VerticalLayout implements View {
         setMargin(new MarginInfo(false,true,true,true));
         setSizeFull();
 
-        Label header = new Label(getTitle());
+        header = new Label(getTitle());
         header.addStyleName(ValoTheme.LABEL_H1);
 
         addComponent(header);
@@ -191,12 +213,17 @@ public class EntityView<E>  extends VerticalLayout implements View {
                 }else{
                     EntityItem<E> bi = event.getBeanItem();
 
-                    getContainer().addEntity(bi.getEntity());
+                    saveEntity(bi);
 
                 }
             }
         });
     }
+
+    public void saveEntity(EntityItem<E> bi){
+        getContainer().addEntity(bi.getEntity());
+    }
+
     public void onClickAdd(){
         try {
             E entity = getEntityCls().newInstance();
@@ -305,6 +332,7 @@ public class EntityView<E>  extends VerticalLayout implements View {
     @Override
     public void attach() {
         super.attach();
+
         if (entityViewService == null)
             entityViewService = ApplicationContextUtils.getBean(EntityViewService.class);
         if (container == null) {

@@ -32,7 +32,10 @@ public class ComparableEntity<T extends ComparableEntity> implements Comparable<
         }
 
         Integer sortOrder = getSortOrder();
+        Integer sortOrderOther = o.getSortOrder();
 
+        if (sortOrderOther == null)
+            return 1;
         return sortOrder.compareTo(o.getSortOrder());
     }
 }

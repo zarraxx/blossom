@@ -3,9 +3,13 @@ package cn.net.xyan.blossom.platform;
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
+import cn.net.xyan.blossom.platform.service.DictService;
 import cn.net.xyan.blossom.platform.service.I18NService;
+import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
+import cn.net.xyan.blossom.platform.service.impl.DictServiceImpl;
 import cn.net.xyan.blossom.platform.service.impl.I18NServiceImpl;
+import cn.net.xyan.blossom.platform.service.impl.SecurityServiceImpl;
 import cn.net.xyan.blossom.platform.service.impl.UISystemServiceImpl;
 import cn.net.xyan.blossom.platform.support.I18NMessageProviderImpl;
 import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
@@ -156,12 +160,15 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         return new VaadinUrlAuthenticationSuccessHandler(httpService, vaadinRedirectStrategy, "/");
     }
 
-//    @Bean
-//    LazyHibernateFilter lazyHibernateFilter(){
-//        LazyHibernateFilter lazyHibernateFilter = new LazyHibernateFilter();
-//        lazyHibernateFilter.setEmf(getEmf());
-//        return lazyHibernateFilter;
-//    }
+    @Bean
+    public DictService dictService(){
+        return new DictServiceImpl();
+    }
+
+    @Bean
+    public SecurityService securityService(){
+        return new SecurityServiceImpl();
+    }
 
     @Bean
     public I18NMessageProviderImpl i18NMessageProvider(I18NService i18NService){

@@ -3,9 +3,12 @@ package cn.net.xyan.blossom.platform.entity.dict;
 import cn.net.xyan.blossom.core.jpa.utils.sequence.AbstractSequenceFormat;
 import cn.net.xyan.blossom.core.jpa.utils.sequence.TableSequenceGenerator;
 import cn.net.xyan.blossom.platform.entity.Constant;
+import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import org.hibernate.annotations.*;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
@@ -17,7 +20,7 @@ import java.util.Map;
 @Entity
 @Table(schema = Constant.Schema,name = "sys_status_and_type",uniqueConstraints = {
         @UniqueConstraint(columnNames = {"type","index_value"}),
-        @UniqueConstraint(columnNames = {"type","title"})
+        @UniqueConstraint(columnNames = {"type","c_title"})
 })
 @Inheritance(strategy= InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="type",discriminatorType = DiscriminatorType.STRING)
@@ -38,12 +41,12 @@ public abstract class StatusAndType {
         }
     }
 
-    final static String StatusAndTypeID = "cn.net.xyan.blossom.platform.entity.dict.StatusAndTypeID";
+    final static String StatusAndTypeID = "cn.net.xyan.blossom.platform.entity.dict.StatusAndType";
 
     private String uuid;
 
     private Integer index;
-    private String  title;
+    private I18NString title;
 
     private Boolean abandon;
 
@@ -55,13 +58,19 @@ public abstract class StatusAndType {
 
     }
 
+    public static String statusAndTypeTitleKey(@Nonnull  StatusAndType st, @Nonnull Integer index){
+        Class<? extends  StatusAndType> cls = st.getClass();
+
+        return String.format("status.%s.%d",cls.getName(),index);
+    }
+
     public StatusAndType(Integer index,String  title){
         this(index,title,false);
     }
 
     public StatusAndType(Integer index,String  title,Boolean abandon){
         this.index = index;
-        this.title = title;
+        this.title = new I18NString(statusAndTypeTitleKey(this,index),title);
         this.abandon = abandon;
     }
 
@@ -93,11 +102,13 @@ public abstract class StatusAndType {
         this.index = index;
     }
 
-    public String getTitle() {
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "c_title")
+    public I18NString getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(I18NString title) {
         this.title = title;
     }
 
@@ -118,7 +129,7 @@ public abstract class StatusAndType {
         this.type = type;
     }
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(schema = Constant.Schema,name = "sys_status_and_type_ex")
     @MapKeyColumn(name = "ex_name")
     @Column(name = "ex_value")
@@ -128,6 +139,13 @@ public abstract class StatusAndType {
 
     public void setExValues(Map<String, String> exValues) {
         this.exValues = exValues;
+    }
+
+    @Override
+    public String toString() {
+        if (getTitle()!=null)
+            return getTitle().value();
+        return String.format("%s-%d",getClass().getSimpleName(),getIndex());
     }
 }
 

@@ -2,7 +2,6 @@ package cn.net.xyan.blossom.platform.ui.view.systemInterface;
 
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
-import cn.net.xyan.blossom.platform.dao.I18NStringDao;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.i18n.Language;
 import cn.net.xyan.blossom.platform.service.I18NService;
@@ -20,7 +19,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
@@ -32,7 +30,7 @@ import java.util.*;
  * Created by zarra on 16/6/2.
  */
 @SpringView(name = "interface.i18n")
-@SideBarItem(sectionId = UISystemService.CatalogI18n, caption = "I18NString", order = 0)
+@SideBarItem(sectionId = UISystemService.CatalogInterface, caption = "I18NString", order = 0)
 @FontAwesomeIcon(FontAwesome.LANGUAGE)
 public class I18NView extends VerticalLayout implements View {
 

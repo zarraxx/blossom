@@ -1,8 +1,6 @@
 package cn.net.xyan.blossom.platform.service.impl;
 
-import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
-import cn.net.xyan.blossom.core.utils.ReflectUtils;
 import cn.net.xyan.blossom.platform.dao.CatalogDao;
 import cn.net.xyan.blossom.platform.dao.UIModuleDao;
 import cn.net.xyan.blossom.platform.dao.UIPageDao;
@@ -11,7 +9,6 @@ import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.service.I18NService;
-import cn.net.xyan.blossom.platform.service.Installer;
 import cn.net.xyan.blossom.platform.service.InstallerAdaptor;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.AdminUI;
@@ -26,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -161,7 +157,7 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
         UIPage admingPage = pageByClass(AdminUI.class);
 
         Catalog security  = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage);
-        Catalog i18n      = setupCatalog(UISystemService.CatalogI18n, "Internationalization", admingPage);
+        Catalog i18n      = setupCatalog(UISystemService.CatalogInterface, "Interface", admingPage);
         Catalog operation = setupCatalog(UISystemService.CatalogOperation, "Operation", admingPage);
     }
 

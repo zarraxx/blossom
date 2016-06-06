@@ -1,7 +1,12 @@
 package cn.net.xyan.blossom.platform.entity.security;
 
+import cn.net.xyan.blossom.platform.entity.dict.GroupStatus;
+import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by zarra on 16/5/13.
@@ -10,11 +15,21 @@ import java.util.List;
 @Table(name = "sys_group")
 public class Group {
     String code;
-    String title;
-    String describe;
-    List<Permission> permissions;
+    I18NString title;
+    I18NString describe;
 
-    List<User> users;
+    GroupStatus status;
+
+    Set<Permission> permissions = new HashSet<>();
+    Set<User> users  = new HashSet<>();
+
+    public static String i18nTitleKey(Group group){
+        return String.format("group.title.%s",group.getCode());
+    }
+
+    public static String i18nDescribeKey(Group group){
+        return String.format("group.describe.%s",group.getCode());
+    }
 
     @Id
     public String getCode() {
@@ -25,11 +40,13 @@ public class Group {
         this.code = code;
     }
 
-    public String getDescribe() {
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "c_describe")
+    public I18NString getDescribe() {
         return describe;
     }
 
-    public void setDescribe(String describe) {
+    public void setDescribe(I18NString describe) {
         this.describe = describe;
     }
 
@@ -40,28 +57,47 @@ public class Group {
             },
             inverseJoinColumns = @JoinColumn(name = "c_permission")
     )
-    public List<Permission> getPermissions() {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<Permission> permissions) {
+    public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
     }
 
-    public String getTitle() {
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "c_title")
+    public I18NString getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(I18NString title) {
         this.title = title;
     }
 
     @ManyToMany(mappedBy = "groups")
-    public List<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "c_status")
+    public GroupStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(GroupStatus groupStatus) {
+        this.status = groupStatus;
+    }
+
+    @Override
+    public String toString() {
+        if (title!=null)
+            return title.value();
+        return code;
     }
 }

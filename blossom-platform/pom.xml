@@ -31,6 +31,12 @@
         <!--</dependency>-->
 
         <dependency>
+            <groupId>org.vaadin.addon</groupId>
+            <artifactId>easyuploads</artifactId>
+            <version>7.4.3</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>listbuilder</artifactId>
             <version>0.7.3.v7</version>
@@ -127,6 +133,7 @@
                             <goal>process</goal>
                         </goals>
                         <phase>generate-sources</phase>
+                        <!--<phase>validate</phase>-->
                         <configuration>
                             <processors>
                                 <!--<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>-->

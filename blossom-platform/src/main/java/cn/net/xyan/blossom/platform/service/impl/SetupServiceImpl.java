@@ -29,12 +29,6 @@ public class SetupServiceImpl implements InitializingBean {
 
         ApplicationContextUtils.setServletContext(servletContext);
 
-        Byte[] bytes = new Byte[0];
-
-        Class<?> cls = bytes.getClass();
-
-        String name = cls.getName();
-
         for (Installer installer:installers){
             installer.beforeSetup();
         }

@@ -100,6 +100,8 @@ public class ReflectUtils {
     }
 
     public static Object getProperty(Object obj, PropertyDescriptor propertyDescriptorse) {
+        if (obj == null)
+            return null;
         try {
             Method readMethod =propertyDescriptorse.getReadMethod();
 
@@ -113,11 +115,15 @@ public class ReflectUtils {
     }
 
     public static Object getSimpleProperty(Object obj,String propertyName){
+        if (obj == null)
+            return null;
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(obj,propertyName);
         return getProperty(obj,propertyDescriptor);
     }
 
     public static Object getProperty(Object obj,List<String> propertyNames){
+        if (obj == null)
+            return null;
         if (propertyNames.size() > 0){
             Object p =  getSimpleProperty(obj,propertyNames.get(0));
 

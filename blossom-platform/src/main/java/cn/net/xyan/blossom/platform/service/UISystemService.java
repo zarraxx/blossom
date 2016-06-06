@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface UISystemService {
     String CatalogSecurity = "security";
-    String CatalogI18n = "i18n";
+    String CatalogInterface = "interface";
     String CatalogOperation = "operation";
 
     UIPage setupPage(String path, Class<? extends ContentUI> uiClass);
