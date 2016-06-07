@@ -16,6 +16,11 @@
     <name>blossom-parent</name>
     <description>Blossom project</description>
 
+    <scm>
+        <connection>scm:git:https://gogs.xyan.net.cn/zarra/blossom.git</connection>
+        <developerConnection>scm:git:https://gogs.xyan.net.cn/zarra/blossom.git</developerConnection>
+    </scm>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -409,6 +414,11 @@
 
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.1</version>
+                </plugin>
 
             </plugins>
         </pluginManagement>
