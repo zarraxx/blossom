@@ -4,7 +4,7 @@
 
     <groupId>cn.net.xyan.blossom</groupId>
     <artifactId>blossom-parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <modules>
         <module>blossom-core</module>
         <module>blossom-platform</module>
@@ -18,7 +18,7 @@
     <scm>
         <connection>scm:git:https://gogs.xyan.net.cn/zarra/blossom.git</connection>
         <developerConnection>scm:git:https://gogs.xyan.net.cn/zarra/blossom.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>blossom-parent-0.0.2</tag>
   </scm>
 
     <parent>
@@ -45,7 +45,7 @@
     <distributionManagement>
         <repository>
             <id>xyan-releases</id>
-            <url>http://repo.xyan.net.cn/content/repositories/snapshots/</url>
+            <url>http://repo.xyan.net.cn/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>xyan-snapshots</id>
