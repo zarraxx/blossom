@@ -64,7 +64,7 @@ public class Module extends ComparableEntity<Module>{
         this.viewName = viewName;
     }
 
-    @OneToMany
+    @ManyToMany
     @JoinTable(name = "ui_module_permissions",
             joinColumns = {@JoinColumn(name = "c_module")},
             inverseJoinColumns = {@JoinColumn(name = "c_permission")}

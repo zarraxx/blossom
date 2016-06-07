@@ -1,12 +1,13 @@
 package cn.net.xyan.blossom.core.support;
 
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import com.vaadin.addon.jpacontainer.EntityManagerProvider;
 import com.vaadin.addon.jpacontainer.EntityProvider;
 import com.vaadin.addon.jpacontainer.LazyLoadingDelegate;
-import com.vaadin.addon.jpacontainer.util.HibernateLazyLoadingDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -24,12 +25,30 @@ import java.util.*;
  * Created by zarra on 16/6/2.
  */
 public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate {
-    private EntityProvider<?> entityProvider;
+
+    private EntityProvider<?> _entityProvider;
+
+    EntityManagerProvider entityManagerProvider;
+
+
 
     Logger logger = LoggerFactory.getLogger(BlossomHibernateLazyLoadingDelegate.class);
 
     public void setEntityProvider(EntityProvider<?> ep) {
-        entityProvider = ep;
+        _entityProvider = ep;
+    }
+
+    public void setEntityManagerProvider(EntityManagerProvider entityManagerProvider) {
+        this.entityManagerProvider = entityManagerProvider;
+    }
+
+    public EntityManager fetchEntityManager(){
+        if (_entityProvider!=null)
+            return _entityProvider.getEntityManager();
+        else if (entityManagerProvider!=null){
+            return entityManagerProvider.getEntityManager();
+        }
+        throw new NullPointerException();
     }
 
     public <E> E ensureLazyPropertyLoaded(E entity, String propertyName) {
@@ -56,7 +75,10 @@ public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate 
     }
 
     private <E> Attribute<? super E, ?> entityPropertyAttribute(E entity, String prop){
-        EntityManagerFactory emf = entityProvider.getEntityManager().getEntityManagerFactory();
+        //EntityManagerFactory emf = entityProvider.getEntityManager().getEntityManagerFactory();
+
+        EntityManagerFactory emf = fetchEntityManager().getEntityManagerFactory();
+
         Metamodel metamodel = emf.getMetamodel();
         Class<E> eClass = (Class<E>) entity.getClass();
         EntityType<E> entityType = metamodel.entity(eClass);
@@ -77,14 +99,18 @@ public class BlossomHibernateLazyLoadingDelegate implements LazyLoadingDelegate 
      * @return the result list from the query.
      */
     private <E> Object lazilyLoadPropertyValue(E entity, String prop) {
-        CriteriaBuilder cb = entityProvider.getEntityManager()
+        //CriteriaBuilder cb = entityProvider.getEntityManager()
+        CriteriaBuilder cb = fetchEntityManager()
                 .getCriteriaBuilder();
         CriteriaQuery<Object> q = cb.createQuery();
         Root<? extends Object> root = q.from(entity.getClass());
         q.select(root.get(prop));
         String id = tryGetEntityIdentifier(entity);
         q.where(cb.equal(root.get(id), cb.literal(tryGetEntityId(entity))));
-        Object returnValue =  entityProvider.getEntityManager().createQuery(q).getResultList();
+        Object returnValue =
+                //entityProvider.getEntityManager()
+        fetchEntityManager()
+                        .createQuery(q).getResultList();
 
 //        Class<?> valueType = entityPropertyType(entity,prop);
 //

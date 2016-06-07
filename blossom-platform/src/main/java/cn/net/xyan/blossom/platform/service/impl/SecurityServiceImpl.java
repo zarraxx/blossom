@@ -1,8 +1,9 @@
 package cn.net.xyan.blossom.platform.service.impl;
 
-import cn.net.xyan.blossom.platform.dao.GroupDao;
-import cn.net.xyan.blossom.platform.dao.PermissionDao;
-import cn.net.xyan.blossom.platform.dao.UserDao;
+import cn.net.xyan.blossom.platform.dao.*;
+import cn.net.xyan.blossom.platform.entity.Catalog;
+import cn.net.xyan.blossom.platform.entity.Module;
+import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.dict.GroupStatus;
 import cn.net.xyan.blossom.platform.entity.dict.UserStatus;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
@@ -45,6 +46,12 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
 
     @Autowired
     PermissionDao permissionDao;
+
+    @Autowired
+    UIModuleDao moduleDao;
+
+    @Autowired
+    CatalogDao catalogDao;
 
     @Override
     public void beforeSetup() {
@@ -167,6 +174,8 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
         }
     }
 
+
+
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
@@ -200,5 +209,39 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
 
         return userDetails;
 
+    }
+
+
+
+    @Override
+    public Boolean checkCatalogPermitForUser(Catalog catalog, User user) {
+        List<Permission> permissions = queryPermissionForUser(user);
+        int n = catalogDao.countPermissionInCatalogNotExistInCollection(catalog,permissions);
+        return n == 0;
+    }
+
+    @Override
+    public Boolean checkModulePermitForUser(Module module, User user) {
+        List<Permission> permissions = queryPermissionForUser(user);
+        int n = moduleDao.countPermissionInModuleNotExistInCollection(module,permissions);
+        return n == 0;
+    }
+
+    @Override
+    public List<Catalog> catalogsPermitInPageForUser(UIPage page, User user) {
+        List<Permission> permissions = queryPermissionForUser(user);
+        return catalogDao.queryPermitCatalogInPageForUser(page,permissions);
+    }
+
+    @Override
+    public List<Module> modulePermitInPageForUser(UIPage page, User user) {
+        List<Permission> permissions = queryPermissionForUser(user);
+        return moduleDao.queryPermitModuleInPageForUser(page,permissions);
+    }
+
+    @Override
+    public List<Module> modulePermitInCatalogForUser(Catalog catalog, User user) {
+        List<Permission> permissions = queryPermissionForUser(user);
+        return moduleDao.queryPermitModuleInCatalogForUser(catalog,permissions);
     }
 }

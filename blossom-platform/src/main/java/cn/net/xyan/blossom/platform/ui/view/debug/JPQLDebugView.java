@@ -2,8 +2,14 @@ package cn.net.xyan.blossom.platform.ui.view.debug;
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.i18n.TR;
+import cn.net.xyan.blossom.core.support.BlossomHibernateLazyLoadingDelegate;
+import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
+import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import cn.net.xyan.blossom.core.utils.ReflectUtils;
 import cn.net.xyan.blossom.platform.service.UISystemService;
-import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
+import com.vaadin.addon.jpacontainer.EntityManagerProvider;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.LazyLoadingDelegate;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.AbstractContainer;
@@ -26,6 +32,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Tuple;
 import javax.persistence.TupleElement;
 import javax.persistence.TypedQuery;
+import javax.persistence.metamodel.EntityType;
+import java.beans.PropertyDescriptor;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,16 +55,43 @@ public class JPQLDebugView extends VerticalLayout implements View {
     @Autowired
     EntityManager entityManager;
 
-    public static class TupleBeanItem<E> extends TupleItem{
+    public static class TupleBeanItem<E> extends TupleItem {
 
         E entity;
 
+        LazyLoadingDelegate lazyLoadingDelegate;
+
         BeanItem<E> beanItem;
 
-        public TupleBeanItem(E e,TupleElement<? super  E> tupleElement) {
+        public TupleBeanItem(E e, TupleElement<? super E> tupleElement, LazyLoadingDelegate lazyLoadingDelegate) {
             super(null);
             this.entity = e;
-            this.beanItem = new BeanItem<E>(entity);
+            this.lazyLoadingDelegate = lazyLoadingDelegate;
+            if (entity != null) {
+                this.beanItem = new BeanItem<>(entity);
+
+                ensureLazyLoad();
+
+                if (lazyLoadingDelegate instanceof BlossomHibernateLazyLoadingDelegate){
+                    BlossomHibernateLazyLoadingDelegate bld = (BlossomHibernateLazyLoadingDelegate) lazyLoadingDelegate;
+                    bld.fetchEntityManager().detach(entity);
+                }
+            }
+            else
+                this.beanItem = new BeanItem<E>(null, (Class<E>)tupleElement.getJavaType());
+
+        }
+
+        public void ensureLazyLoad() {
+            PropertyDescriptor[] propertyDescriptors = ReflectUtils.getPropertyDescriptors(entity);
+            for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+                Class<?> type = propertyDescriptor.getPropertyType();
+                if (Collection.class.isAssignableFrom(type)) {
+                    if (lazyLoadingDelegate != null) {
+                        lazyLoadingDelegate.ensureLazyPropertyLoaded(entity, propertyDescriptor.getName());
+                    }
+                }
+            }
         }
 
         @Override
@@ -74,45 +109,71 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
         Tuple tuple;
 
-        public TupleItem(Tuple tuple){
-
+        public TupleItem(Tuple tuple) {
             this.tuple = tuple;
         }
 
+        public static Item createEntityItem(Tuple tuple, EntityManagerProvider entityManagerProvider, LazyLoadingDelegate lazyLoadingDelegate) {
+            EntityManager em = entityManagerProvider.getEntityManager();
 
+            TupleElement<?> tupleElement = tuple.getElements().get(0);
 
-        public static  boolean isEntityTuple(Tuple tuple){
-            List<TupleElement<?>> tupleElements = tuple.getElements();
-            if (tupleElements.size() ==1){
-                TupleElement tupleElement = tupleElements.get(0);
+            return new TupleBeanItem<>(tuple.get(0), (TupleElement<? super Object>) tupleElement, lazyLoadingDelegate);
 
-                Class<?> cls = tupleElement.getJavaType();
-
-                if ( ! EntityViewServiceImpl.isPrimaryType(cls)){
-                    return true;
-                }
-            }
-            return false;
         }
 
-        public static TupleItem createItem(Tuple tuple){
-            if(isEntityTuple(tuple)){
-                TupleElement<?> tupleElement = tuple.getElements().get(0);
-
-                return new TupleBeanItem<Object>(tuple.get(0), (TupleElement<Object>) tupleElement);
-            }else {
+        public static Item createItem(Tuple tuple, EntityManagerProvider entityManagerProvider, LazyLoadingDelegate lazyLoadingDelegate) {
+            EntityManager em = entityManagerProvider.getEntityManager();
+            if (isEntityTuple(tuple, em)) {
+                return createEntityItem(tuple,entityManagerProvider,lazyLoadingDelegate);
+            } else {
                 return new TupleItem(tuple);
             }
         }
 
-        protected Class<?> propertyType(String alias){
+        public static boolean isEntityTuple(Tuple tuple, EntityManager em) {
+            List<TupleElement<?>> tupleElements = tuple.getElements();
+            if (tupleElements.size() == 1) {
+                TupleElement tupleElement = tupleElements.get(0);
+
+                Class<?> cls = tupleElement.getJavaType();
+
+                EntityType<?> entityType = null;
+                try {
+                    entityType = em.getMetamodel().entity(cls);
+                } catch (Throwable e) {
+
+                }
+//                if ( ! EntityViewServiceImpl.isPrimaryType(cls)){
+//                    return true;
+//                }
+                if (entityType != null) return true;
+            }
+            return false;
+        }
+
+        public static Class<?> typeForEntityTuple(Tuple tuple, EntityManager em) {
+            List<TupleElement<?>> tupleElements = tuple.getElements();
+            if (tupleElements.size() == 1) {
+                TupleElement tupleElement = tupleElements.get(0);
+
+                Class<?> cls = tupleElement.getJavaType();
+
+                return cls;
+
+            }
+            return null;
+        }
+
+
+        protected Class<?> propertyType(String alias) {
 
             if (alias == null) throw new NullPointerException();
 
             List<TupleElement<?>> tupleElements = tuple.getElements();
 
-            for (TupleElement tupleElement :tupleElements){
-                if(alias.equals(tupleElement.getAlias())){
+            for (TupleElement tupleElement : tupleElements) {
+                if (alias.equals(tupleElement.getAlias())) {
                     return tupleElement.getJavaType();
                 }
             }
@@ -120,7 +181,7 @@ public class JPQLDebugView extends VerticalLayout implements View {
             return null;
         }
 
-        protected Class<?> propertyType(Integer id){
+        protected Class<?> propertyType(Integer id) {
 
             if (id == null) throw new NullPointerException();
 
@@ -135,11 +196,11 @@ public class JPQLDebugView extends VerticalLayout implements View {
         public Property getItemProperty(Object id) {
             Object value = null;
             Class<?> type = null;
-            if (id instanceof Integer){
+            if (id instanceof Integer) {
                 Integer iid = (Integer) id;
                 value = tuple.get(iid);
                 type = propertyType(iid);
-            }else if (id instanceof String){
+            } else if (id instanceof String) {
                 String alias = id.toString();
                 value = tuple.get(alias);
                 type = propertyType(alias);
@@ -147,14 +208,14 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
             if (type == null) throw new NullPointerException();
 
-            return new ObjectProperty(value,type,true);
+            return new ObjectProperty(value, type, true);
         }
 
         @Override
         public Collection<?> getItemPropertyIds() {
             int size = tuple.getElements().size();
             List<Integer> pids = new LinkedList<>();
-            for (int i=0;i<size;i++){
+            for (int i = 0; i < size; i++) {
                 pids.add(i);
             }
             return pids;
@@ -171,39 +232,33 @@ public class JPQLDebugView extends VerticalLayout implements View {
         }
     }
 
-    public static class TupleContainer extends AbstractContainer{
+    public static class SimpleContainer<ITEM extends Item> extends AbstractContainer {
 
-        Collection<Tuple> tuples;
+        List<ITEM> items;
 
-        TupleItem tupleItem ;
+        ITEM first;
 
-        List<TupleItem> tupleItems = new LinkedList<>();
-
-        public TupleContainer(Collection<Tuple> tuples){
-            this.tuples = tuples;
-            for (Tuple tuple : tuples){
-
-
-                TupleItem item =  TupleItem.createItem(tuple);
-                tupleItems.add(item);
-
-                if (tupleItem == null) tupleItem = item;
+        public SimpleContainer(Collection<ITEM> collection) {
+            items = new LinkedList<>();
+            items.addAll(collection);
+            if (items != null && items.size() > 0) {
+                first = items.get(0);
             }
         }
 
         @Override
         public Item getItem(Object itemId) {
-            if (itemId instanceof Integer){
+            if (itemId instanceof Integer) {
                 Integer id = (Integer) itemId;
-                return tupleItems.get(id);
+                return items.get(id);
             }
             return null;
         }
 
         @Override
         public Collection<?> getContainerPropertyIds() {
-            if (size()>0){
-                return tupleItem.getItemPropertyIds();
+            if (size() > 0) {
+                return first.getItemPropertyIds();
             }
             return new LinkedList<Object>();
         }
@@ -211,7 +266,7 @@ public class JPQLDebugView extends VerticalLayout implements View {
         @Override
         public Collection<?> getItemIds() {
             List<Integer> ids = new LinkedList<>();
-            for (int i=0;i<size();i++){
+            for (int i = 0; i < size(); i++) {
                 ids.add(i);
             }
             return ids;
@@ -225,19 +280,19 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
         @Override
         public Class<?> getType(Object propertyId) {
-            return tupleItem.getItemProperty(propertyId).getType();
+            return first.getItemProperty(propertyId).getType();
         }
 
         @Override
         public int size() {
-            return tupleItems.size();
+            return items.size();
         }
 
         @Override
         public boolean containsId(Object itemId) {
-            if (itemId instanceof Integer){
+            if (itemId instanceof Integer) {
                 Integer id = (Integer) itemId;
-                return id<size();
+                return id < size();
             }
             return false;
         }
@@ -273,12 +328,12 @@ public class JPQLDebugView extends VerticalLayout implements View {
         }
     }
 
-    public JPQLDebugView(){
+    public JPQLDebugView() {
         setSizeFull();
         setSpacing(true);
         setMargin(true);
 
-        Label header = new Label(TR.m("view.debug.jpql.caption","JPQL Debug"));
+        Label header = new Label(TR.m("view.debug.jpql.caption", "JPQL Debug"));
         header.addStyleName(ValoTheme.LABEL_H1);
         addComponent(header);
 
@@ -290,7 +345,7 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
         textArea.setWidth("100%");
 
-        bRun = new Button(TR.m(TR.Run,"Run"));
+        bRun = new Button(TR.m(TR.Run, "Run"));
 
         addComponent(textArea);
 
@@ -302,7 +357,7 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
         addComponent(table);
 
-        setExpandRatio(table,1);
+        setExpandRatio(table, 1);
 
         bRun.addClickListener(new Button.ClickListener() {
             @Override
@@ -315,30 +370,66 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
     }
 
+    public String parseSQL(String jpql){
+        String[] lines = jpql.split("\n");
+        StringBuffer stringBuffer = new StringBuffer();
+        for (String line:lines){
+            line = line.trim();
+            if (line.startsWith("--") || line.startsWith("#") || line.startsWith("//")){
+                continue;
+            }
+            stringBuffer.append(line);
+            stringBuffer.append(" ");
+        }
+
+        return stringBuffer.toString();
+    }
+
     @Transactional
-    public void runSQL(String jpql){
-        try{
+    public void runSQL(String jpql) {
+        String sql = parseSQL(jpql);
+        try {
             bRun.setComponentError(null);
             TypedQuery<Tuple> query =
-                    entityManager.createQuery(jpql, Tuple.class);
+                    entityManager.createQuery(sql, Tuple.class);
 
             List<Tuple> results = query.getResultList();
 
-            TupleContainer tupleContainer = new TupleContainer(results);
+
+            SpringEntityManagerProviderFactory factory = ApplicationContextUtils.getBean(SpringEntityManagerProviderFactory.class);
+            EntityManagerProvider provider = factory.create();
+            //LazyHibernateFilter.LazyHibernateEntityManagerProvider provider = new LazyHibernateFilter.LazyHibernateEntityManagerProvider();
+            BlossomHibernateLazyLoadingDelegate hibernateLazyLoadingDelegate = new BlossomHibernateLazyLoadingDelegate();
+
+            hibernateLazyLoadingDelegate.setEntityManagerProvider(provider);
+
+            List<Item> items = new LinkedList<>();
+
+            if (results.size() > 0) {
+                Tuple tuple = results.get(0);
+                boolean isEntity = TupleItem.isEntityTuple(tuple, entityManager);
+                for (Tuple t : results) {
+                    if (isEntity)
+                        items.add(TupleItem.createEntityItem(t,provider,hibernateLazyLoadingDelegate));
+                    else
+                        items.add(new TupleItem(t));
+                }
+            }
+
+            SimpleContainer tupleContainer = new SimpleContainer(items);
 
             table.setContainerDataSource(tupleContainer);
 
 
-
             table.refreshRowCache();
 
-        }catch (Throwable e){
+        } catch (Throwable e) {
 
             String msg = e.getMessage();
 
-            Notification.show("ERROR",msg,Notification.Type.ERROR_MESSAGE);
+            Notification.show("ERROR", msg, Notification.Type.ERROR_MESSAGE);
 
-            throw new StatusAndMessageError(-100,e);
+            throw new StatusAndMessageError(-100, e);
         }
     }
 

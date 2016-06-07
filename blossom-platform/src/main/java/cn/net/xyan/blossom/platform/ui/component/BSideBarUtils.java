@@ -84,20 +84,22 @@ public class BSideBarUtils extends SideBarUtils {
             CatalogSideBarSectionDescriptor catalogSideBarSectionDescriptor = (CatalogSideBarSectionDescriptor) descriptor;
             List<SideBarItemDescriptor> items  = new LinkedList<>();
 
-            SortedSet<Module> modules = catalogSideBarSectionDescriptor.getCatalog().getModules();
             User user = securityService.currentUser();
+            Catalog catalog = catalogSideBarSectionDescriptor.getCatalog();
+            Collection<Module> modules = securityService.modulePermitInCatalogForUser(catalog,user);
+
 
             for (Module module:modules){
                 String beanName = module.getCode();
                 Class<?> beanType = ApplicationContextUtils.beanTypeForBeanName(beanName);
 
-                List<Permission> permissionList = new LinkedList<>();
-                permissionList.addAll(module.getEssentialPermission());
-                if (permissionList.size()>0){
-                    if (!securityService.checkPermissionForUser(user,permissionList)){
-                        continue;
-                    }
-                }
+//                List<Permission> permissionList = new LinkedList<>();
+//                permissionList.addAll(module.getEssentialPermission());
+//                if (permissionList.size()>0){
+//                    if (!securityService.checkPermissionForUser(user,permissionList)){
+//                        continue;
+//                    }
+//                }
 
 
                 if (View.class.isAssignableFrom(beanType)) {
@@ -127,17 +129,10 @@ public class BSideBarUtils extends SideBarUtils {
             UIPage page = uiSystemService.pageByClass((Class<? extends ContentUI>) uiClass);
 
             if (page != null) {
-                SortedSet<Catalog> catalogs = page.getCatalogs();
+                Collection<Catalog> catalogs = securityService.catalogsPermitInPageForUser(page,user);
                 if (catalogs != null) {
                     int i = 0;
                     for (Catalog catalog:catalogs) {
-                        List<Permission> permissionList = new LinkedList<>();
-                        permissionList.addAll(catalog.getEssentialPermission());
-                        if (permissionList.size()>0){
-                            if (!securityService.checkPermissionForUser(user,permissionList)){
-                                continue;
-                            }
-                        }
                         result.add(CatalogSideBarSectionDescriptor.create(catalog, i));
                         i++;
                     }

@@ -1,5 +1,8 @@
 package cn.net.xyan.blossom.platform.service;
 
+import cn.net.xyan.blossom.platform.entity.Catalog;
+import cn.net.xyan.blossom.platform.entity.Module;
+import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.security.Group;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
 import cn.net.xyan.blossom.platform.entity.security.User;
@@ -18,8 +21,9 @@ public interface SecurityService extends Installer,UserDetailsService {
     String PermissionAdmin = "admin";
 
     Integer ActiveStatus = 1;
-    Integer InActiveStatus = 2;
+    Integer InActiveStatus = -1;
 
+    //Core api
     Permission setupPermission(String permissionCode,String title);
 
     Group setupGroup(String groupCode,String title,Permission ... permissions);
@@ -39,4 +43,13 @@ public interface SecurityService extends Installer,UserDetailsService {
 
     List<Permission> queryPermissionForUser(User user);
 
+    //For UI api
+
+    Boolean checkCatalogPermitForUser(Catalog catalog,User user);
+    Boolean checkModulePermitForUser(Module module, User user);
+
+    List<Catalog> catalogsPermitInPageForUser(UIPage page,User user);
+
+    List<Module> modulePermitInPageForUser(UIPage page,User user);
+    List<Module> modulePermitInCatalogForUser(Catalog catalog,User user);
 }
