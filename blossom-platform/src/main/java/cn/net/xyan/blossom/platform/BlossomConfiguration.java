@@ -129,26 +129,19 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/VAADIN/**");
     }
 
-    /**
-     * The {@link AuthenticationManager} must be available as a Spring bean for Vaadin4Spring.
-     */
+
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-    /**
-     * The {@link RememberMeServices} must be available as a Spring bean for Vaadin4Spring.
-     */
+
     @Bean
     public RememberMeServices rememberMeServices() {
         return new TokenBasedRememberMeServices(RememberMeKey, userDetailsService());
     }
 
-    /**
-     * The {@link SessionAuthenticationStrategy} must be available as a Spring bean for Vaadin4Spring.
-     */
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new SessionFixationProtectionStrategy();

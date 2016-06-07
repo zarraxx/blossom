@@ -12,7 +12,7 @@ import java.util.TreeSet;
  * Created by zarra on 16/5/13.
  *
  *
- * Page -> Catalog -> Module
+ * Page - Catalog - Module
  */
 @Entity
 @Table(name = "ui_page")
