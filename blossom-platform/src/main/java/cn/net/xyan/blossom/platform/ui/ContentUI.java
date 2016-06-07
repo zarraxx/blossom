@@ -1,18 +1,24 @@
 package cn.net.xyan.blossom.platform.ui;
 
 import cn.net.xyan.blossom.core.ui.BSideBar;
+import cn.net.xyan.blossom.platform.entity.security.User;
+import cn.net.xyan.blossom.platform.service.PlatformInfoService;
+import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.ui.view.AccessDeniedView;
 import cn.net.xyan.blossom.platform.ui.view.ErrorView;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.navigator.SpringViewProvider;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.*;
+
+import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.security.VaadinSecurity;
-import org.vaadin.spring.sidebar.components.ValoSideBar;
+
 import org.vaadin.spring.sidebar.security.VaadinSecurityItemFilter;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by zarra on 16/5/13.
@@ -26,12 +32,74 @@ public abstract class ContentUI extends UI {
     SpringViewProvider springViewProvider;
 
     @Autowired
+    SecurityService securityService;
+
+    @Autowired
+    PlatformInfoService platformInfoService;
+
+    @Autowired
     BSideBar sideBar;
+
+    Label time;
 
     @Override
     protected void init(VaadinRequest request) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
+
+        User user = securityService.currentUser();
+
+
+
+        VerticalLayout head = new VerticalLayout();
+
+        VerticalLayout footer = new VerticalLayout();
+
+        String logoString = "Blossom";
+
+        Label title = new Label(logoString);
+
+        title.setStyleName(ValoTheme.LABEL_H3);
+
+        head.addComponent(title);
+
+        head.setComponentAlignment(title,Alignment.TOP_CENTER);
+
+        cn.net.xyan.blossom.platform.service.PlatformInfoService.ArtifactInfo artifactInfo
+                = platformInfoService.platformArtifactInfo();
+
+        if (artifactInfo!=null && artifactInfo.getVersion()!=null){
+            Label version = new Label(artifactInfo.getVersion());
+            head.addComponent(version);
+            head.setComponentAlignment(version,Alignment.BOTTOM_CENTER);
+        }
+
+
+        //sideBar.setLogo(logo);
+        Label username = new Label();
+        if (user.getRealName()!=null)
+            username.setValue(user.getRealName());
+        else
+            username.setValue(user.getLoginName());
+        footer.addComponent(username);
+
+        footer.setComponentAlignment(username,Alignment.BOTTOM_CENTER);
+
+        time = new Label();
+
+        Date now = new Date();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        time.setValue(sdf.format(now));
+
+        footer.addComponent(time);
+
+        sideBar.setHeader(head);
+        sideBar.setFooter(footer);
+
+
+        //sideBar.set
 
         // By adding a security item filter, only views that are accessible to the user will show up in the side bar.
         sideBar.setItemFilter(new VaadinSecurityItemFilter(vaadinSecurity));

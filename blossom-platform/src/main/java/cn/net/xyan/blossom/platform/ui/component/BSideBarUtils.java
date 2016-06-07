@@ -4,8 +4,11 @@ import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.entity.Catalog;
 import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
+import cn.net.xyan.blossom.platform.entity.security.Permission;
+import cn.net.xyan.blossom.platform.entity.security.User;
 import cn.net.xyan.blossom.platform.model.CatalogSideBarSectionDescriptor;
 import cn.net.xyan.blossom.platform.service.I18NService;
+import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.ContentUI;
 import com.vaadin.navigator.View;
@@ -67,6 +70,9 @@ public class BSideBarUtils extends SideBarUtils {
     @Autowired
     I18NService i18NService;
 
+    @Autowired
+    SecurityService securityService;
+
     public BSideBarUtils(ApplicationContext applicationContext, I18N i18n) {
         super(applicationContext, i18n);
         this.applicationContext = applicationContext;
@@ -79,10 +85,21 @@ public class BSideBarUtils extends SideBarUtils {
             List<SideBarItemDescriptor> items  = new LinkedList<>();
 
             SortedSet<Module> modules = catalogSideBarSectionDescriptor.getCatalog().getModules();
+            User user = securityService.currentUser();
 
             for (Module module:modules){
                 String beanName = module.getCode();
                 Class<?> beanType = ApplicationContextUtils.beanTypeForBeanName(beanName);
+
+                List<Permission> permissionList = new LinkedList<>();
+                permissionList.addAll(module.getEssentialPermission());
+                if (permissionList.size()>0){
+                    if (!securityService.checkPermissionForUser(user,permissionList)){
+                        continue;
+                    }
+                }
+
+
                 if (View.class.isAssignableFrom(beanType)) {
                     items.add(new ViewItemDescriptor(beanName, applicationContext));
                 }else if (Runnable.class.isAssignableFrom(beanType)){
@@ -100,6 +117,9 @@ public class BSideBarUtils extends SideBarUtils {
     @Override
     public Collection<SideBarSectionDescriptor> getSideBarSections(Class<? extends UI> uiClass) {
 
+        User user = securityService.currentUser();
+
+
         if (ContentUI.class.isAssignableFrom(uiClass)) {
 
             List<SideBarSectionDescriptor> result = new LinkedList<>();
@@ -111,7 +131,13 @@ public class BSideBarUtils extends SideBarUtils {
                 if (catalogs != null) {
                     int i = 0;
                     for (Catalog catalog:catalogs) {
-
+                        List<Permission> permissionList = new LinkedList<>();
+                        permissionList.addAll(catalog.getEssentialPermission());
+                        if (permissionList.size()>0){
+                            if (!securityService.checkPermissionForUser(user,permissionList)){
+                                continue;
+                            }
+                        }
                         result.add(CatalogSideBarSectionDescriptor.create(catalog, i));
                         i++;
                     }

@@ -8,8 +8,10 @@ import cn.net.xyan.blossom.platform.entity.Catalog;
 import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
+import cn.net.xyan.blossom.platform.entity.security.Permission;
 import cn.net.xyan.blossom.platform.service.I18NService;
 import cn.net.xyan.blossom.platform.service.InstallerAdaptor;
+import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.AdminUI;
 import cn.net.xyan.blossom.platform.ui.ContentUI;
@@ -41,6 +43,9 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
 
     @Autowired
     I18NService i18NService;
+
+    @Autowired
+    SecurityService securityService;
 
     @Override
     public List<UIPage> setupPages() {
@@ -100,8 +105,18 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
     }
 
     @Override
-    @Transactional
     public Catalog setupCatalog(String code, String title, UIPage page) {
+        return setupCatalog(code,title,page,null);
+    }
+
+    @Override
+    public Module setupModule(String beanName,String viewName, String title, Class<?> viewClass, Catalog catalog) {
+        return setupModule(beanName,viewName,title,viewClass,catalog,null);
+    }
+
+    @Override
+    @Transactional
+    public Catalog setupCatalog(String code, String title, UIPage page, Permission permission) {
         Catalog catalog = catalogDao.findOne(code);
         if (catalog == null) {
             catalog = new Catalog();
@@ -110,6 +125,10 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
             I18NString string = i18NService.setupMessage(key, title);
             catalog.setTitle(string);
             catalog.getUiPages().add(page);
+
+            if (permission!=null){
+                catalog.getEssentialPermission().add(permission);
+            }
             catalog = catalogDao.saveAndFlush(catalog);
 
             page.getCatalogs().add(catalog);
@@ -121,7 +140,7 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
 
     @Override
     @Transactional
-    public Module setupModule(String beanName,String viewName, String title, Class<?> viewClass, Catalog catalog) {
+    public Module setupModule(String beanName, String viewName, String title, Class<?> viewClass, Catalog catalog, Permission permission) {
         Module module = moduleDao.findOne(beanName);
         if (module == null) {
             module = new Module();
@@ -131,6 +150,10 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
             String key = Module.moduleMessageKey(beanName);
             I18NString string = i18NService.setupMessage(key, title);
             module.setTitle(string);
+
+            if (permission!=null)
+                module.getEssentialPermission().add(permission);
+
             module = moduleDao.saveAndFlush(module);
             if (catalog != null) {
                 module.getCatalogs().add(catalog);
@@ -156,11 +179,15 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
     public void doSetupCatalog() {
         UIPage admingPage = pageByClass(AdminUI.class);
 
-        Catalog security  = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage);
-        Catalog i18n      = setupCatalog(UISystemService.CatalogInterface, "Interface", admingPage);
+        Permission superPermission = securityService.setupPermission(SecurityService.PermissionAdmin,SecurityService.PermissionAdmin);
+
+        Catalog security  = setupCatalog(UISystemService.CatalogSecurity, "Security", admingPage,superPermission);
+        Catalog i18n      = setupCatalog(UISystemService.CatalogInterface, "Interface", admingPage,superPermission);
         Catalog operation = setupCatalog(UISystemService.CatalogOperation, "Operation", admingPage);
 
-        Catalog debug     = setupCatalog(UISystemService.CatalogDebug,"Debug",admingPage);
+        Catalog debug     = setupCatalog(UISystemService.CatalogDebug,"Debug",admingPage,superPermission);
+
+        Catalog system     = setupCatalog(UISystemService.CatalogSystem,"System",admingPage,superPermission);
     }
 
     @Override

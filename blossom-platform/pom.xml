@@ -11,7 +11,6 @@
 
     <artifactId>blossom-platform</artifactId>
 
-
     <dependencies>
         <dependency>
             <groupId>cn.net.xyan.blossom</groupId>
@@ -29,6 +28,12 @@
             <!--<groupId>com.vaadin</groupId>-->
             <!--<artifactId>vaadin-client-compiled</artifactId>-->
         <!--</dependency>-->
+
+        <dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>popupbutton</artifactId>
+            <version>2.6.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.vaadin.addon</groupId>
@@ -115,6 +120,24 @@
         <!--</plugin>-->
         <!--</plugins>-->
 
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.yml</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
 
         <plugins>
             <plugin>
@@ -176,6 +199,19 @@
                         </fileset>
                     </filesets>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

@@ -105,7 +105,14 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
     @Override
     public <E> EntityEditFrom<E> createEntityForm(@Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status) {
         Class<E> eClass = (Class<E>) entityItem.getEntity().getClass();
+       return createEntityForm(eClass,entityItem,status);
+    }
+
+    @Override
+    public <E> EntityEditFrom<E> createEntityForm(@Nonnull Class<E> eClass, @Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status) {
         EntityRenderConfiguration<E> renderConfiguration = (EntityRenderConfiguration<E>) entityConfigurationCache.get(eClass);
+        if (renderConfiguration == null)
+            throw new NullPointerException();
         EntityEditFrom<E> from = new EntityEditFrom<>(entityItem,renderConfiguration,status);
         return from;
     }

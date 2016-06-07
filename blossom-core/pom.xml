@@ -106,10 +106,10 @@
         </dependency>
 
         <dependency>
-        <groupId>com.vaadin</groupId>
-        <artifactId>vaadin-client</artifactId>
-        <version>7.6.3</version>
-        <scope>provided</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client</artifactId>
+            <version>7.6.3</version>
+            <scope>provided</scope>
         </dependency>
         <!--
           Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
@@ -119,9 +119,9 @@
           explicit dependency.
         -->
         <dependency>
-        <groupId>com.vaadin</groupId>
-        <artifactId>vaadin-client-compiler</artifactId>
-        <scope>provided</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client-compiler</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -150,6 +150,25 @@
     </dependencies>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.yml</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,7 +189,8 @@
                         <configuration>
                             <processors>
                                 <!--<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>-->
-                                <processor>cn.net.xyan.blossom.tools.annotation.processor.JPAMetaModelProcessor</processor>
+                                <processor>cn.net.xyan.blossom.tools.annotation.processor.JPAMetaModelProcessor
+                                </processor>
                             </processors>
                         </configuration>
                     </execution>
@@ -182,6 +202,19 @@
                         <version>0.0.1-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

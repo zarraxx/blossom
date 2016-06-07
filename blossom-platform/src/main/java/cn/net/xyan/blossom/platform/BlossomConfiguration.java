@@ -3,14 +3,8 @@ package cn.net.xyan.blossom.platform;
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
-import cn.net.xyan.blossom.platform.service.DictService;
-import cn.net.xyan.blossom.platform.service.I18NService;
-import cn.net.xyan.blossom.platform.service.SecurityService;
-import cn.net.xyan.blossom.platform.service.UISystemService;
-import cn.net.xyan.blossom.platform.service.impl.DictServiceImpl;
-import cn.net.xyan.blossom.platform.service.impl.I18NServiceImpl;
-import cn.net.xyan.blossom.platform.service.impl.SecurityServiceImpl;
-import cn.net.xyan.blossom.platform.service.impl.UISystemServiceImpl;
+import cn.net.xyan.blossom.platform.service.*;
+import cn.net.xyan.blossom.platform.service.impl.*;
 import cn.net.xyan.blossom.platform.support.I18NMessageProviderImpl;
 import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
@@ -215,6 +209,10 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         return new UISystemServiceImpl();
     }
 
+    @Bean
+    public PlatformInfoService platformInfoService(){
+        return new PlatformInfoServiceImpl();
+    }
 
     @Bean
     public Filter jpaFilter(){

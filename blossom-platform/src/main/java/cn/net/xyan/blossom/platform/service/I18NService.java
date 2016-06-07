@@ -23,6 +23,9 @@ public interface I18NService extends I18NTools {
     String getDefaultMessage(String key);
     void setDefaultMessage(String key,String defaultValue);
 
+    void setupLocaleMessage(I18NString message,Language language,String value);
+    void setupLocaleMessage(String key,Language language,String value);
+
     void setLocaleMessage(I18NString message,Language language,String value);
     void setLocaleMessage(String key,Language language,String value);
     //void setLocaleMessage(String key,Locale locale,String value);

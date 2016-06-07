@@ -203,7 +203,7 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
     }
 
     public void showEntityForm(EntityItem<E> item, EntityEditFrom.FormStatus status){
-        EntityEditFrom<E> form = entityViewService.createEntityForm(item,status);
+        EntityEditFrom<E> form = entityViewService.createEntityForm(getEntityCls(),item,status);
 
         EntityFormWindow formWindow = EntityFormWindow.displayEntityForm(form, new EntityEditFrom.EntityFormListener() {
             @Override

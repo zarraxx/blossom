@@ -18,6 +18,9 @@ import java.util.List;
 public class BSideBar extends AbstractSideBar<CssLayout> {
 
     private Layout headerLayout;
+
+    private Layout footerLayout;
+
     private Component logo;
     private boolean largeIcons = false;
 
@@ -43,6 +46,9 @@ public class BSideBar extends AbstractSideBar<CssLayout> {
         if (headerLayout != null) {
             layout.addComponent(headerLayout);
         }
+//        if (footerLayout!=null){
+//            layout.addComponent(footerLayout);
+//        }
         return layout;
     }
 
@@ -92,6 +98,18 @@ public class BSideBar extends AbstractSideBar<CssLayout> {
                 }
             }
         }
+    }
+
+    public void setFooter(Layout footerLayout){
+        if (getCompositionRoot() != null && this.footerLayout != null) {
+            getCompositionRoot().removeComponent(this.footerLayout);
+        }
+        this.footerLayout = footerLayout;
+        if (footerLayout!=null){
+            footerLayout.addStyleName("side-bar-footer");
+        }
+
+
     }
 
     /**
@@ -266,6 +284,14 @@ public class BSideBar extends AbstractSideBar<CssLayout> {
             } else {
                 return new ItemButton(descriptor);
             }
+        }
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+        if (footerLayout!=null){
+            getCompositionRoot().addComponent(footerLayout);
         }
     }
 }

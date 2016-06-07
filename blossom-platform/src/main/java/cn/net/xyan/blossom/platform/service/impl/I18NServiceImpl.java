@@ -84,6 +84,17 @@ public class I18NServiceImpl extends InstallerAdaptor implements I18NService {
     }
 
     @Override
+    public void setupLocaleMessage(I18NString message, Language language, String value) {
+        //String value = get
+    }
+
+    @Override
+    public void setupLocaleMessage(String key, Language language, String value) {
+        I18NString i18NString = setupMessage(key,value);
+        setupLocaleMessage(i18NString,language,value);
+    }
+
+    @Override
     @Transactional
     public void setLocaleMessage(I18NString message, Language language, String value) {
         message.putValue(language,value);

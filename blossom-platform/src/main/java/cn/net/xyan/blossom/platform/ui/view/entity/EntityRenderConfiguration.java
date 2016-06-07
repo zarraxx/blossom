@@ -316,6 +316,9 @@ public class EntityRenderConfiguration<E> {
         if (Number.class.isAssignableFrom(valueType)){
             fieldType = NumberField.class;
         }
+        else if (Boolean.class.isAssignableFrom(valueType)){
+            fieldType = CheckBox.class;
+        }
         else if (Date.class.isAssignableFrom(valueType)){
             fieldType = DateField.class;
         }

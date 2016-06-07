@@ -22,5 +22,7 @@ public interface EntityViewService extends Installer{
 
     <E> EntityEditFrom<E> createEntityForm(@Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status);
 
+    <E> EntityEditFrom<E> createEntityForm(@Nonnull Class<E> eClass,@Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status);
+
     <E> EntityFilterForm<E> createEntityFilter(@Nonnull EntityView<E> entityView);
 }
