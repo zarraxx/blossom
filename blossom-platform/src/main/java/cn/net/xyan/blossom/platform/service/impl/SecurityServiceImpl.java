@@ -216,6 +216,7 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
     @Override
     public Boolean checkCatalogPermitForUser(Catalog catalog, User user) {
         List<Permission> permissions = queryPermissionForUser(user);
+        if (permissions.size() == 0) return catalog.getEssentialPermission().size() == 0;
         int n = catalogDao.countPermissionInCatalogNotExistInCollection(catalog,permissions);
         return n == 0;
     }
@@ -223,6 +224,7 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
     @Override
     public Boolean checkModulePermitForUser(Module module, User user) {
         List<Permission> permissions = queryPermissionForUser(user);
+        if (permissions.size() == 0) return module.getEssentialPermission().size() == 0;
         int n = moduleDao.countPermissionInModuleNotExistInCollection(module,permissions);
         return n == 0;
     }
@@ -230,18 +232,21 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
     @Override
     public List<Catalog> catalogsPermitInPageForUser(UIPage page, User user) {
         List<Permission> permissions = queryPermissionForUser(user);
+        if (permissions.size() == 0) return catalogDao.publicCatalogInPage(page);
         return catalogDao.queryPermitCatalogInPageForUser(page,permissions);
     }
 
     @Override
     public List<Module> modulePermitInPageForUser(UIPage page, User user) {
         List<Permission> permissions = queryPermissionForUser(user);
+        if (permissions.size() == 0) return moduleDao.publicModuleInPage(page);
         return moduleDao.queryPermitModuleInPageForUser(page,permissions);
     }
 
     @Override
     public List<Module> modulePermitInCatalogForUser(Catalog catalog, User user) {
         List<Permission> permissions = queryPermissionForUser(user);
+        if (permissions.size() == 0) return  moduleDao.publicModuleInCatalog(catalog);
         return moduleDao.queryPermitModuleInCatalogForUser(catalog,permissions);
     }
 }

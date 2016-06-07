@@ -28,9 +28,16 @@ public interface UIModuleDao extends EasyJpaRepository<Module,String> {
             "select  distinct m from UIPage p  join p.catalogs c join c.modules m join m.essentialPermission mp " +
             "where 1=1 " +
             "and p = :PAGE " +
-            "and mp not in ( :PS ) )"
+            "and mp not in ( :PS ) ) " +
+            "order by  M.sortOrder"
             )
     List<Module> queryPermitModuleInPageForUser(@Param("PAGE")UIPage uiPage, @Param("PS")List<Permission> permissions);
+
+
+    @Query("select  distinct m from UIPage p  join p.catalogs c join c.modules m left join m.essentialPermission mp " +
+            "where mp is null  and p = :PAGE ")
+    List<Module> publicModuleInPage(@Param("PAGE")UIPage uiPage);
+
 
     @Query("select M from Module M left join M.catalogs  C where " +
             "1=1 " +
@@ -39,7 +46,14 @@ public interface UIModuleDao extends EasyJpaRepository<Module,String> {
             "select  distinct m from Catalog c join c.modules m  join m.essentialPermission mp " +
             "where 1=1 " +
             "and c = :CATALOG " +
-            "and mp not in ( :PS ) ) "
+            "and mp not in ( :PS ) ) " +
+            "order by  M.sortOrder"
     )
     List<Module> queryPermitModuleInCatalogForUser(@Param("CATALOG")Catalog catalog, @Param("PS")List<Permission> permissions);
+
+    @Query("select  distinct m from Catalog c join c.modules m left join m.essentialPermission mp " +
+            "where mp is null and c = :CATALOG")
+    List<Module> publicModuleInCatalog(@Param("CATALOG")Catalog catalog);
+
+
 }

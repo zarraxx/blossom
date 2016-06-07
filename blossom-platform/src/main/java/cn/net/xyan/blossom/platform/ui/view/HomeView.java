@@ -2,9 +2,12 @@ package cn.net.xyan.blossom.platform.ui.view;
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.i18n.TR;
+import cn.net.xyan.blossom.core.utils.ExceptionUtils;
 import cn.net.xyan.blossom.platform.entity.Catalog;
 import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
+import cn.net.xyan.blossom.platform.entity.security.User;
+import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.platform.ui.ContentUI;
 import com.vaadin.navigator.View;
@@ -22,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
+import java.util.List;
+
 /**
  * Created by zarra on 16/5/30.
  */
@@ -32,6 +37,9 @@ public class HomeView extends VerticalLayout implements View {
 
     @Autowired
     UISystemService uiSystemService;
+
+    @Autowired
+    SecurityService securityService;
 
     Logger logger = LoggerFactory.getLogger(HomeView.class);
 
@@ -64,21 +72,31 @@ public class HomeView extends VerticalLayout implements View {
         if (ContentUI.class.isAssignableFrom(uiClass)){
             Class<? extends ContentUI> contentUIClass = (Class<? extends ContentUI>) uiClass;
             UIPage page = uiSystemService.pageByClass(contentUIClass);
-            if (page.getCatalogs().size()>0){
-                Catalog catalog = page.getCatalogs().first();
-                if (catalog.getModules().size()>0){
-                    Module module = catalog.getModules().first();
-                    String viewName = module.getViewName();
+            User user = securityService.currentUser();
+            List<Catalog> catalogs = securityService.catalogsPermitInPageForUser(page,user);
+            boolean ok = false;
+            for (Catalog catalog: catalogs){
+
+                List<Module> modules = securityService.modulePermitInCatalogForUser(catalog,user);
+                for(Module module : modules) {
+
+                    String clsName = module.getViewClassName();
                     try {
-                        Class<?> cls = Class.forName(module.getViewClassName());
-                        if (View.class.isAssignableFrom(cls)){
-                            event.getNavigator().navigateTo(viewName);
+                        Class<?> cls = Class.forName(clsName);
+                        if (View.class.isAssignableFrom(cls)) {
+                            ok = true;
+                            event.getNavigator().navigateTo(module.getViewName());
+                            break;
                         }
                     } catch (ClassNotFoundException e) {
-                        throw new StatusAndMessageError(-9,e);
+                        ExceptionUtils.traceError(e, logger);
                     }
                 }
+
+                if (ok)
+                    break;;
             }
+
             logger.info(page.getCode());
         }
     }

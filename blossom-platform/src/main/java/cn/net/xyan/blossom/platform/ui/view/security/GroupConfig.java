@@ -25,7 +25,7 @@ public class GroupConfig extends EntityRenderConfiguration<Group> {
 
         addTableColumn(Group_.describe);
 
-        addFormField(Group_.status);
+        addTableColumn(Group_.status);
 
         addTableColumn(Group_.permissions);
     }

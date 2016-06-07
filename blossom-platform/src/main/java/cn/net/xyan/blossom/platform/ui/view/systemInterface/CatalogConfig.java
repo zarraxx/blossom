@@ -23,7 +23,7 @@ public class CatalogConfig extends EntityRenderConfiguration<Catalog> {
     @Override
     public void configFormFiled() {
         addFormField(Catalog_.code);
-        addFormField(Catalog_.title);
+        //addFormField(Catalog_.title);
         addFormField(Catalog_.sortOrder);
         addFormField(Catalog_.modules);
         addFormField(Catalog_.essentialPermission);

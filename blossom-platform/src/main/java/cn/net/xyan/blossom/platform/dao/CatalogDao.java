@@ -25,6 +25,13 @@ public interface CatalogDao extends EasyJpaRepository<Catalog,String> {
             "where cp not in (:PS)\n" +
             "and p = :PAGE " +
             ")" +
-            "and P = :PAGE")
+            "and P = :PAGE " +
+            "order by  C.sortOrder"
+    )
     List<Catalog> queryPermitCatalogInPageForUser(@Param("PAGE") UIPage uiPage, @Param("PS") List<Permission> permissions);
+
+    @Query("select distinct C from Catalog C join C.uiPages P " +
+            "left join C.essentialPermission cp where P = ?1 and cp is null " +
+            "order by C.sortOrder")
+    List<Catalog> publicCatalogInPage(UIPage page);
 }
