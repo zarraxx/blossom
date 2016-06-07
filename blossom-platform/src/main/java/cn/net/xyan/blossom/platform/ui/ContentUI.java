@@ -6,12 +6,18 @@ import cn.net.xyan.blossom.platform.service.PlatformInfoService;
 import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.ui.view.AccessDeniedView;
 import cn.net.xyan.blossom.platform.ui.view.ErrorView;
+import com.vaadin.annotations.Push;
+import com.vaadin.data.Item;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.*;
 
 import com.vaadin.ui.themes.ValoTheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.security.VaadinSecurity;
 
@@ -19,11 +25,16 @@ import org.vaadin.spring.sidebar.security.VaadinSecurityItemFilter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by zarra on 16/5/13.
  */
-public abstract class ContentUI extends UI {
+@Push(transport = Transport.LONG_POLLING)
+public abstract class ContentUI extends UI implements DisposableBean {
 
     @Autowired
     VaadinSecurity vaadinSecurity;
@@ -41,6 +52,28 @@ public abstract class ContentUI extends UI {
     BSideBar sideBar;
 
     Label time;
+
+    protected Logger logger = LoggerFactory.getLogger(ContentUI.class);
+
+    protected static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(2);
+
+    private ScheduledFuture<?> jobHandle;
+
+    protected Runnable updateTimeJob = new Runnable() {
+        public void run() {
+            access(new Runnable() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public void run() {
+                    Date now = new Date();
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                    time.setValue(sdf.format(now));
+                }
+            });
+        }
+    };
 
     @Override
     protected void init(VaadinRequest request) {
@@ -119,5 +152,12 @@ public abstract class ContentUI extends UI {
 
         setContent(layout); // Call this here because the Navigator must have been configured before the Side Bar can be attached to a UI.
 
+        jobHandle = executorService.scheduleWithFixedDelay(updateTimeJob, 500, 1000, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        logger.info("Canceling background job");
+        jobHandle.cancel(true);
     }
 }

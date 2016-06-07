@@ -98,7 +98,7 @@ public class DictServiceImpl implements DictService,InitializingBean {
     @Override
     @Transactional
     public SysVariable setupVariable(String key, Object value) {
-        SysVariable sysVariable = variableDao.findOne(key);
+        SysVariable sysVariable = variableDao.findByTitle(key);
         if (sysVariable == null){
             sysVariable = new SysVariable(key,value);
             sysVariable = variableDao.saveAndFlush(sysVariable);
@@ -120,7 +120,7 @@ public class DictServiceImpl implements DictService,InitializingBean {
 
     @Override
     public <T> T getVariable(Class<T> tClass, String key) {
-        SysVariable sysVariable = variableDao.findOne(key);
+        SysVariable sysVariable = variableDao.findByTitle(key);
         if (sysVariable!=null){
             String value = sysVariable.getValue();
             try {

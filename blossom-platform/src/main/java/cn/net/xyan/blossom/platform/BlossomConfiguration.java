@@ -107,6 +107,7 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/ui/HEARTBEAT/**").permitAll()
                 .antMatchers("/vaadinServlet/UIDL/**").permitAll()
                 .antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll()
+                .antMatchers("/public/**").permitAll()
                 .anyRequest().authenticated();
 
         http.httpBasic().disable();

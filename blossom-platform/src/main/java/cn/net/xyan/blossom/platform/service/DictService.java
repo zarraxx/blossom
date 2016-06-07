@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface DictService {
 
+    String KeyROOTPage = "KeyROOTPage";
+
     <ST extends StatusAndType> ST setupStatus(Class<ST> cls,Integer index,String title);
 
     <ST extends StatusAndType> ST setupStatus(Class<ST> cls,Integer index,String title,boolean abandon);

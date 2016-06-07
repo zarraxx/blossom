@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by zarra on 16/5/30.
  */
-public interface UISystemService {
+public interface UISystemService extends  Installer{
     String CatalogSecurity = "security";
     String CatalogInterface = "interface";
     String CatalogOperation = "operation";

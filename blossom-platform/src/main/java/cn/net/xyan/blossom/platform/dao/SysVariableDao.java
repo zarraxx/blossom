@@ -7,4 +7,5 @@ import cn.net.xyan.blossom.platform.entity.dict.SysVariable;
  * Created by zarra on 16/6/7.
  */
 public interface SysVariableDao extends EasyJpaRepository<SysVariable,String> {
+    SysVariable findByTitle(String title);
 }
