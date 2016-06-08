@@ -30,6 +30,9 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vaadin.spring.http.HttpService;
 import org.vaadin.spring.security.annotation.EnableVaadinSharedSecurity;
 import org.vaadin.spring.security.config.VaadinSharedSecurityConfiguration;
@@ -218,6 +221,19 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         SpringEntityManagerProviderFactory factory = new SpringEntityManagerProviderFactory();
         factory.setEntityManager(entityManager);
         return factory;
+    }
+
+    @Configuration
+    public static class StaticResourceConfiguration extends WebMvcConfigurerAdapter {
+
+        private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
+                "classpath:/META-INF/resources/", "classpath:/resources/",
+                "classpath:/static/", "classpath:/public/" };
+
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+            registry.addResourceHandler("/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+        }
     }
 
 

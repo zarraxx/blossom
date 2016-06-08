@@ -1,14 +1,16 @@
 package cn.net.xyan.blossom.platform.ui.view.debug;
 
+
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.support.BlossomHibernateLazyLoadingDelegate;
 import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
+import cn.net.xyan.blossom.core.utils.ExceptionUtils;
 import cn.net.xyan.blossom.core.utils.ReflectUtils;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import com.vaadin.addon.jpacontainer.EntityManagerProvider;
-import com.vaadin.addon.jpacontainer.JPAContainer;
+
 import com.vaadin.addon.jpacontainer.LazyLoadingDelegate;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -23,8 +25,15 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+
 import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
 import org.vaadin.spring.sidebar.annotation.SideBarItem;
 
@@ -37,6 +46,8 @@ import java.beans.PropertyDescriptor;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by zarra on 16/6/6.
@@ -44,16 +55,18 @@ import java.util.List;
 @SpringView(name = "debug.JPQL")
 @SideBarItem(sectionId = UISystemService.CatalogDebug, caption = "JPQL", order = 1)
 @FontAwesomeIcon(FontAwesome.CODE)
-public class JPQLDebugView extends VerticalLayout implements View {
-
-    TextArea textArea;
-
-    Table table;
-
-    Button bRun;
+public class JPQLDebugView extends VerticalLayout implements View,JPQLForm.RunSQLListener {
 
     @Autowired
     EntityManager entityManager;
+
+    JPQLForm jpqlForm;
+
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    Logger logger = LoggerFactory.getLogger(JPQLDebugView.class);
+
+
 
     public static class TupleBeanItem<E> extends TupleItem {
 
@@ -341,55 +354,55 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
         addComponent(hr);
 
-        textArea = new TextArea("JPQL:");
+        jpqlForm = new JPQLForm();
 
-        textArea.setWidth("100%");
+        jpqlForm.addRunListener(this);
 
-        bRun = new Button(TR.m(TR.Run, "Run"));
+        addComponent(jpqlForm);
 
-        addComponent(textArea);
+        jpqlForm.setSizeFull();
 
-        addComponent(bRun);
+        setExpandRatio(jpqlForm,1);
+    }
 
-        table = new Table("Result:");
-
-        table.setSizeFull();
-
-        addComponent(table);
-
-        setExpandRatio(table, 1);
-
-        bRun.addClickListener(new Button.ClickListener() {
+    @Override
+    public void run(JPQLForm.RunSQLEvent event) {
+        executorService.execute(new Runnable() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-                String sql = textArea.getValue();
+            public void run() {
+                PlatformTransactionManager transactionManager = ApplicationContextUtils.getBean(PlatformTransactionManager.class);
+                TransactionDefinition def = new DefaultTransactionDefinition();
 
-                runSQL(sql);
+                TransactionStatus status = transactionManager.getTransaction( def );
+
+                try{
+                    runSQL(event);
+                    transactionManager.commit( status );
+                }catch (Throwable e){
+                    transactionManager.rollback(status);
+
+                    UI.getCurrent().access(new Runnable() {
+                        @Override
+                        public void run() {
+                            String msg = e.getMessage();
+
+                            Notification.show("ERROR", msg, Notification.Type.ERROR_MESSAGE);
+
+                            ExceptionUtils.traceError(e,logger);
+
+                            event.form.setError(msg);
+                        }
+                    });
+                }
             }
         });
-
     }
 
-    public String parseSQL(String jpql){
-        String[] lines = jpql.split("\n");
-        StringBuffer stringBuffer = new StringBuffer();
-        for (String line:lines){
-            line = line.trim();
-            if (line.startsWith("--") || line.startsWith("#") || line.startsWith("//")){
-                continue;
-            }
-            stringBuffer.append(line);
-            stringBuffer.append(" ");
-        }
 
-        return stringBuffer.toString();
-    }
-
-    @Transactional
-    public void runSQL(String jpql) {
-        String sql = parseSQL(jpql);
+    public void runSQL(JPQLForm.RunSQLEvent event) {
+        String sql = event.sql;
         try {
-            bRun.setComponentError(null);
+            long begin = System.currentTimeMillis();
             TypedQuery<Tuple> query =
                     entityManager.createQuery(sql, Tuple.class);
 
@@ -404,8 +417,8 @@ public class JPQLDebugView extends VerticalLayout implements View {
             hibernateLazyLoadingDelegate.setEntityManagerProvider(provider);
 
             List<Item> items = new LinkedList<>();
-
-            if (results.size() > 0) {
+            int size = results.size();
+            if (size > 0) {
                 Tuple tuple = results.get(0);
                 boolean isEntity = TupleItem.isEntityTuple(tuple, entityManager);
                 for (Tuple t : results) {
@@ -418,18 +431,22 @@ public class JPQLDebugView extends VerticalLayout implements View {
 
             SimpleContainer tupleContainer = new SimpleContainer(items);
 
-            table.setContainerDataSource(tupleContainer);
+            UI.getCurrent().access(new Runnable() {
+                @Override
+                public void run() {
+                    long end = System.currentTimeMillis();
+                    long cost = end - begin;
 
+                    event.form.setResult(tupleContainer,cost);
 
-            table.refreshRowCache();
+                }
+            });
+
 
         } catch (Throwable e) {
 
-            String msg = e.getMessage();
+            throw new StatusAndMessageError(-99,e);
 
-            Notification.show("ERROR", msg, Notification.Type.ERROR_MESSAGE);
-
-            throw new StatusAndMessageError(-100, e);
         }
     }
 
