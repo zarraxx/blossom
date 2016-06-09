@@ -9,6 +9,7 @@
         <module>blossom-core</module>
         <module>blossom-platform</module>
         <module>blossom-build-tools</module>
+        <module>blossom-dynamic-component</module>
     </modules>
     <packaging>pom</packaging>
 

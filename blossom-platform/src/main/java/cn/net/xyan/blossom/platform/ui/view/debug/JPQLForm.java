@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.aceeditor.AceEditor;
 import org.vaadin.aceeditor.AceMode;
-import org.vaadin.addon.borderlayout.BorderLayout;
 
 import java.util.LinkedList;
 import java.util.List;

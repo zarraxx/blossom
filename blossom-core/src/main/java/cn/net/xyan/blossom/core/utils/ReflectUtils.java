@@ -5,22 +5,36 @@ package cn.net.xyan.blossom.core.utils;
  */
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
+import javassist.*;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
 import org.reflections.Reflections;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.access.method.P;
 
 import java.beans.BeanInfo;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+
+
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
+
 
 /**
  * Created by xiashenpin on 16/1/19.
  */
 public class ReflectUtils {
+
+
+
+
+
     static public List<Field> fields(Class<?> cls) {
         List<Field> fields = new LinkedList<>();
         for (Field field : cls.getDeclaredFields()) {
@@ -145,7 +159,7 @@ public class ReflectUtils {
         return getProperty(obj,list);
     }
 
-    public static List<String> propertyNameWithAnnotation(Class<?> beanCls,Class<? extends Annotation>... annotationCls){
+    public static List<String> propertyNameWithAnnotation(Class<?> beanCls, Class<? extends Annotation>... annotationCls){
         List<Method> methods = methods(beanCls,annotationCls);
         List<String> result = new LinkedList<>();
         for (Method method:methods){
@@ -196,5 +210,7 @@ public class ReflectUtils {
         }
         return result;
     }
+
+
 }
 
