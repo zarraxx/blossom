@@ -1,10 +1,7 @@
 package cn.net.xyan.blossom.platform.ui.view.debug;
 
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
-import cn.net.xyan.blossom.declarative.ui.ComponentClassFactory;
-import cn.net.xyan.blossom.declarative.ui.Designer;
-import cn.net.xyan.blossom.declarative.ui.RuntimeContext;
-import cn.net.xyan.blossom.declarative.ui.SimpleComponentClassFactoryImpl;
+import cn.net.xyan.blossom.declarative.ui.*;
 import cn.net.xyan.blossom.declarative.utils.ClassMetaModel;
 import cn.net.xyan.blossom.declarative.utils.DynamicMethodProxy;
 import cn.net.xyan.blossom.platform.service.UISystemService;
@@ -110,12 +107,13 @@ public class DeclarativeDesign extends VerticalLayout implements View,Designer.C
     }
 
     @Override
-    public DynamicMethodProxy methodProxy(ClassMetaModel classMetaModel) {
+    public DynamicMethodProxy methodProxy(ComponentClassMetaModel classMetaModel) {
         return null;
     }
 
     @Override
-    public RuntimeContext createRuntimContext(ClassMetaModel classMetaModel) {
+    public RuntimeContext createRuntimContext(ComponentClassMetaModel classMetaModel) {
         return null;
     }
+
 }
