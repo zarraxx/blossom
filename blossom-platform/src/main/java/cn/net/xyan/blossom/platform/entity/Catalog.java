@@ -86,7 +86,7 @@ public class Catalog extends ComparableEntity<Catalog>{
             ,joinColumns = @JoinColumn(name = "c_catalog")
             ,inverseJoinColumns = @JoinColumn(name = "c_module")
     )
-    @OrderColumn(name="c_index")
+    //@OrderColumn(name="c_index")
     //@OrderBy("name ASC")
     @SortNatural
     public SortedSet<Module> getModules() {

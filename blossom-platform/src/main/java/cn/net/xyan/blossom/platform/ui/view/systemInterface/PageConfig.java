@@ -65,7 +65,8 @@ public class PageConfig extends EntityRenderConfiguration<UIPage> {
 
     @Override
     public void configSpecification() {
-        addSpecification(JPA.Operator.Equal,UIPage_.catalogs, Catalog_.code);
-        addSpecification(JPA.Operator.Equal,UIPage_.catalogs);
+        addFilter(JPA.Operator.Equal,UIPage_.catalogs, Catalog_.code);
+        addFilter(JPA.Operator.Equal,UIPage_.catalogs);
+        addFilter(JPA.Operator.Equal,UIPage_.code);
     }
 }

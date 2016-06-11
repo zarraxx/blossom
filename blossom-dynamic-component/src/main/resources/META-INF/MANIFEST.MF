@@ -1,0 +1,3 @@
+Vaadin-Package-Version: 1
+Implementation-Title: dynamic compile declarative ui to java class
+Implementation-Version: @project.version@

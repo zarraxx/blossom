@@ -119,7 +119,7 @@ public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickLis
 
         setSizeFull();
 
-        String title = renderConfiguration.getEntityTypeTitle();
+        String title = EntityRenderConfiguration.getEntityTypeTitle(entity.getClass());
 
         I18NString string = i18NService.setupMessage(title,entity.getClass().getSimpleName());
         String prefix = null;

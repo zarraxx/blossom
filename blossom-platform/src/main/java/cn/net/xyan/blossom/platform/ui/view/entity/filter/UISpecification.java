@@ -16,7 +16,6 @@ import javax.persistence.criteria.Root;
  */
 public abstract class UISpecification<E> implements Specification<E> {
 
-    boolean isActive;
 
     FieldGroup fieldGroup;
 
@@ -24,13 +23,9 @@ public abstract class UISpecification<E> implements Specification<E> {
         fieldGroup = new FieldGroup();
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
+    public abstract boolean isActive() ;
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
+    public abstract void setActive(boolean active);
 
     public FieldGroup getFieldGroup() {
         return fieldGroup;
@@ -48,7 +43,7 @@ public abstract class UISpecification<E> implements Specification<E> {
 
     @Override
     public Predicate toPredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        if (isActive)
+        if (isActive())
             return generatePredicate(root,query,cb);
         else
             return cb.equal(cb.literal(1),1);

@@ -110,10 +110,12 @@ public abstract class ContentUI extends UI implements DisposableBean {
 
         //sideBar.setLogo(logo);
         Label username = new Label();
-        if (user.getRealName()!=null)
-            username.setValue(user.getRealName());
-        else
-            username.setValue(user.getLoginName());
+        if (user!=null) {
+            if (user.getRealName() != null)
+                username.setValue(user.getRealName());
+            else
+                username.setValue(user.getLoginName());
+        }
         footer.addComponent(username);
 
         footer.setComponentAlignment(username,Alignment.BOTTOM_CENTER);

@@ -15,12 +15,12 @@ import java.util.Map;
 public class DictConfig extends EntityRenderConfiguration<StatusAndType> {
     @Override
     public void configFormFiled() {
-        addFormField(StatusAndType_.type).setFormFieldAfterBind(new FormFieldConfig.FormFieldSetup() {
-            @Override
-            public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
-                field.setReadOnly(true);
-            }
-        });
+//        addFormField(StatusAndType_.type).setFormFieldAfterBind(new FormFieldConfig.FormFieldSetup() {
+//            @Override
+//            public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+//                field.setReadOnly(true);
+//            }
+//        });
         addFormField(StatusAndType_.statusId);
         addFormField(StatusAndType_.index);
         addFormField(StatusAndType_.title);

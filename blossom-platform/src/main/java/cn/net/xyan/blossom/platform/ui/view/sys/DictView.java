@@ -19,8 +19,8 @@ public class DictView extends EntityView<StatusAndType> {
         super("Dictionary");
     }
 
-    @Override
-    public void onClickAdd() {
-        //super.onClickAdd();
-    }
+//    @Override
+//    public void onClickAdd(Class<? extends StatusAndType> eClass ) {
+//        //super.onClickAdd();
+//    }
 }

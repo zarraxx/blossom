@@ -7,8 +7,10 @@ import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.core.utils.StringUtils;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.support.MultiSelectConverter;
+import cn.net.xyan.blossom.platform.ui.view.entity.filter.FilterConfig;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.SingleAttributeSpecification;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.UISpecification;
+import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityUtils;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.fieldfactory.SingleSelectConverter;
@@ -41,7 +43,9 @@ public class EntityRenderConfiguration<E> {
 
     List<FormFieldConfig> formFieldConfigs = new LinkedList<>();
 
-    List<UISpecification<E>> specifications = new LinkedList<>();
+    //List<UISpecification<E>> specifications = new LinkedList<>();
+
+    List<FilterConfig> specifications = new LinkedList<>();
 
     public static class NullConverter implements Converter {
 
@@ -254,7 +258,7 @@ public class EntityRenderConfiguration<E> {
         return formFieldConfigs;
     }
 
-    public List<UISpecification<E>> getSpecifications() {
+    public List<FilterConfig> getSpecificationsConfig() {
         return specifications;
     }
 
@@ -263,10 +267,17 @@ public class EntityRenderConfiguration<E> {
         return entity.getId(idType.getJavaType()).getName();
     }
 
-    public String getEntityTypeTitle(){
-        return String.format("entity.%s",getEntityCls().getName());
+    //title for the entity type
+    public static String getEntityTypeTitle(Class<?> eClass){
+        return String.format("entity.%s",eClass.getName());
     }
 
+    public String getEntityTypeTitle(){
+        return getEntityTypeTitle(getEntityCls());
+    }
+
+
+    //Title for a instance for this entity type
     public String getEntityTitle(@Nonnull E entity){
         return entity.toString();
     }
@@ -303,7 +314,7 @@ public class EntityRenderConfiguration<E> {
         return formFieldConfig;
     }
 
-    public FormFieldConfig formFieldForAttribute(@Nonnull Attribute<? , ?> attribute,boolean ignoreCollection){
+    public static FormFieldConfig formFieldForAttribute(@Nonnull Attribute<? , ?> attribute,boolean ignoreCollection){
         String field = attribute.getName();
         Class<?> valueType = attribute.getJavaType();
 
@@ -327,7 +338,7 @@ public class EntityRenderConfiguration<E> {
         }
         else if (attribute instanceof  PluralAttribute ){
 
-            PluralAttribute<? super E,?,?> pluralAttribute = (PluralAttribute<? super E, ?, ?>) attribute;
+            PluralAttribute<? ,?,?> pluralAttribute = (PluralAttribute<? , ?, ?>) attribute;
 
             Class<?> componentType = pluralAttribute.getElementType().getJavaType();
             jpaContainer = EntityContainerFactory.jpaContainerReadOnly(componentType);
@@ -338,7 +349,7 @@ public class EntityRenderConfiguration<E> {
                 fieldType = TwinColSelect.class;
                 isCollection = true;
             }
-        }else if (metamodel.entity(valueType)!= null){
+        }else if (EntityUtils.metamodel().entity(valueType)!= null){
             fieldType = ComboBox.class;
             jpaContainer = EntityContainerFactory.jpaContainerReadOnly(valueType);
         }
@@ -391,13 +402,20 @@ public class EntityRenderConfiguration<E> {
         return formFieldConfig;
     }
 
-    public UISpecification<E> addSpecification(UISpecification<E> specification){
-        if (specification!=null)
-            getSpecifications().add(specification);
-        return specification;
+    public FilterConfig addFilter(FilterConfig filterConfig){
+        if (filterConfig!=null)
+            specifications.add(filterConfig);
+        return filterConfig;
     }
 
-    public UISpecification<E> addSpecification(JPA.Operator operator,Attribute<?,?> ... attributes){
+    public UISpecification<E> createUISpecification(FilterConfig config){
+        Attribute<?,?> last = config.getAttributes().get(config.getAttributes().size()-1);
+        Class<?> valueType = EntityUtils.valueTypeForAttribute(last);
+        UISpecification<E> uiSpecification =  new SingleAttributeSpecification<>(getEntityCls(),valueType,config.getAttributes(),config.getOperator());
+        return uiSpecification;
+    }
+
+    public FilterConfig addFilter(JPA.Operator operator,Attribute<?,?> ... attributes){
         List<Attribute<?,?>> attributeList = Arrays.asList(attributes);
         Attribute<?,?> last = null ;
         if (attributeList.size()>0){
@@ -405,12 +423,12 @@ public class EntityRenderConfiguration<E> {
         }else{
             throw new StatusAndMessageError(-9,"attributes length must > 0");
         }
-        Class<?> valueType = SingleAttributeSpecification.valueTypeForAttribute(last);
-        UISpecification<E> uiSpecification =  new SingleAttributeSpecification<>(getEntityCls(),valueType,attributeList,operator);
+        //Class<?> valueType = EntityUtils.valueTypeForAttribute(last);
+        //UISpecification<E> uiSpecification =  new SingleAttributeSpecification<>(getEntityCls(),valueType,attributeList,operator);
+        FilterConfig filterConfig = new FilterConfig(attributeList);
+        addFilter(filterConfig);
 
-        addSpecification(uiSpecification);
-
-        return uiSpecification;
+        return filterConfig;
 
     }
 

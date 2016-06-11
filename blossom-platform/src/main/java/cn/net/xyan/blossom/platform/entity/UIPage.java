@@ -37,7 +37,7 @@ public class UIPage extends ComparableEntity<UIPage>{
             ,joinColumns = @JoinColumn(name = "c_page")
             ,inverseJoinColumns = @JoinColumn(name = "c_catalog")
     )
-    @OrderColumn(name="c_index")
+    //@OrderColumn(name="c_index")
     //@OrderBy("name ASC")
     @SortNatural
     public SortedSet<Catalog> getCatalogs() {

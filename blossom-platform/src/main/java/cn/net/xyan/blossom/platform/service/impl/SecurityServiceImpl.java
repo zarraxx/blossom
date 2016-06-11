@@ -151,11 +151,13 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
 
     @Override
     public Boolean checkPermissionForUser(User user, Permission... permissions) {
+        if(user == null) return false;
         return checkPermissionForUser(user, Arrays.asList(permissions));
     }
 
     @Override
     public Boolean checkPermissionForUser(User user, List<Permission> permissions) {
+        if(user == null) return false;
         Permission superPermission = permissionDao.findByCode(PermissionAdmin);
         if ( superPermission !=null && permissionDao.checkUserHasPermission(user,superPermission)!=null){
             return true;
@@ -166,6 +168,7 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
 
     @Override
     public List<Permission> queryPermissionForUser(User user) {
+        if(user == null) return new LinkedList<>();
         Permission superPermission = permissionDao.findByCode(PermissionAdmin);
         if (superPermission !=null && permissionDao.checkUserHasPermission(user,superPermission)!= null){
             return permissionDao.findAll();
@@ -215,6 +218,7 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
 
     @Override
     public Boolean checkCatalogPermitForUser(Catalog catalog, User user) {
+        if(user == null) return false;
         List<Permission> permissions = queryPermissionForUser(user);
         if (permissions.size() == 0) return catalog.getEssentialPermission().size() == 0;
         int n = catalogDao.countPermissionInCatalogNotExistInCollection(catalog,permissions);
@@ -223,6 +227,7 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
 
     @Override
     public Boolean checkModulePermitForUser(Module module, User user) {
+        if(user == null) return false;
         List<Permission> permissions = queryPermissionForUser(user);
         if (permissions.size() == 0) return module.getEssentialPermission().size() == 0;
         int n = moduleDao.countPermissionInModuleNotExistInCollection(module,permissions);

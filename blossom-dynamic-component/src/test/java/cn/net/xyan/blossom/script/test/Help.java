@@ -1,0 +1,44 @@
+package cn.net.xyan.blossom.script.test;
+
+import org.mozilla.javascript.Scriptable;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/**
+ * Created by zarra on 16/6/9.
+ */
+public class Help {
+    static String readLargerTextFileAlternate(URI url) throws IOException {
+
+        StringBuffer sb = new StringBuffer();
+        Path path = Paths.get(url);
+        try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))){
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line+"\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    static String loadScript(String file) throws IOException, URISyntaxException {
+        URL url = Help.class.getClassLoader().getResource(file);
+
+        if (url!=null){
+            return readLargerTextFileAlternate(url.toURI());
+        }
+        return null;
+    }
+
+    static void setupScope(Scriptable scope){
+
+    }
+}

@@ -7,9 +7,11 @@ import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.service.I18NService;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
+import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityUtils;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.navigator.View;
@@ -23,7 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specifications;
 import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.hene.popupbutton.PopupButton;
 import org.vaadin.sliderpanel.SliderPanel;
 import org.vaadin.sliderpanel.SliderPanelBuilder;
 import org.vaadin.sliderpanel.SliderPanelStyles;
@@ -31,12 +35,20 @@ import org.vaadin.sliderpanel.client.SliderMode;
 import org.vaadin.sliderpanel.client.SliderPanelListener;
 import org.vaadin.sliderpanel.client.SliderTabPosition;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
+import java.lang.reflect.Modifier;
+import java.util.List;
+
 /**
  * Created by zarra on 16/6/2.
  */
 public class EntityView<E>  extends VerticalLayout implements View,InitializingBean {
 
-    @Autowired
+    //@Autowired
     I18NService i18NService;
 
     @Override
@@ -122,6 +134,7 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
     public EntityView(String title){
         logger = LoggerFactory.getLogger(this.getClass());
         setTitle(title);
+        i18NService = ApplicationContextUtils.getBean(I18NService.class);
         initView();
     }
 
@@ -159,8 +172,61 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
     public HorizontalLayout initButtonLayout(){
         buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
+        Class<? extends E> eClass = getEntityCls();
 
-        bAdd = new Button(TR.m(TR.Add,"Add"));
+        if (Modifier.isAbstract(eClass.getModifiers())){
+            // add a popup button for abstract entity
+
+            List<EntityType<? extends E>> childTypes = EntityUtils.allEntityTypeInheritClass((Class<E>) eClass);
+
+            if (childTypes.size()>0) {
+
+                PopupButton popupButton = new PopupButton(TR.m(TR.Add, "Add"));
+
+                VerticalLayout popupLayout = new VerticalLayout();
+
+                for(EntityType<? extends E> childType : childTypes){
+                    Class<? extends E> childCls = childType.getJavaType();
+                    I18NString childTypeTitle = i18NService.setupMessage(EntityRenderConfiguration.getEntityTypeTitle(childCls),childCls.getSimpleName());
+
+                    Button button = new Button(childTypeTitle.value());
+
+                    button.setStyleName(ValoTheme.BUTTON_LINK);
+
+                    button.addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent event) {
+                            popupButton.setPopupVisible(false);
+                            onClickAdd(childCls);
+                        }
+                    });
+
+                    popupLayout.addComponent(button);
+                    popupLayout.setComponentAlignment(button,Alignment.TOP_LEFT);
+
+                }
+
+                popupButton.setContent(popupLayout);
+
+
+                bAdd = popupButton;
+            }
+
+        }else {
+            bAdd = new Button(TR.m(TR.Add, "Add"));
+
+            bAdd.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    onClickAdd(getEntityCls());
+                }
+            });
+        }
+
+
+
+
+        //------------------------------------------------
 
         bEdit = new Button(TR.m(TR.Edit,"Edit"));
 
@@ -176,12 +242,6 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
 
         bRemove.setEnabled(false);
 
-        bAdd.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                onClickAdd();
-            }
-        });
 
         bEdit.addClickListener(new Button.ClickListener() {
             @Override
@@ -224,9 +284,9 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
         getContainer().addEntity(bi.getEntity());
     }
 
-    public void onClickAdd(){
+    public void onClickAdd(Class<? extends E> eClass){
         try {
-            E entity = getEntityCls().newInstance();
+            E entity = eClass.newInstance();
 
             EntityItem<E> item = getContainer().createEntityItem(entity);
             showEntityForm(item, EntityEditFrom.FormStatus.Add);
@@ -329,6 +389,34 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
         return container;
     }
 
+
+
+    public void onFilterClose(EntityFilterForm<E> filterForm){
+        if (filterForm.inputOk()){
+            Specifications<E> specifications = filterForm.createSpecifications();
+            container.removeAllContainerFilters();
+            container.setQueryModifierDelegate(new DefaultQueryModifierDelegate(){
+                @Override
+                public void filtersWillBeAdded(CriteriaBuilder criteriaBuilder, CriteriaQuery<?> query, List<Predicate> predicates) {
+                    Root<E> root = (Root<E>) query.getRoots().iterator().next();
+                    Predicate predicate = specifications.toPredicate(root,query,criteriaBuilder);
+                    predicates.add(predicate);
+                }
+            });
+
+            if (filterForm.isActive()){
+                pFilter.setStyleName(SliderPanelStyles.COLOR_GREEN);
+            }else {
+                pFilter.setStyleName(SliderPanelStyles.COLOR_GRAY);
+            }
+            container.refresh();
+        }else {
+            Notification.show(TR.m("entity.filter.input.error.msg"),Notification.Type.ERROR_MESSAGE);
+            pFilter.setExpanded(true, false);
+
+        }
+    }
+
     @Override
     public void attach() {
         super.attach();
@@ -343,11 +431,11 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
 
             EntityRenderConfiguration<E> renderConfiguration = entityViewService.entityRenderConfiguration(getEntityCls());
 
-            if (renderConfiguration!=null && renderConfiguration.getSpecifications().size()>0){
+            if (renderConfiguration!=null && renderConfiguration.getSpecificationsConfig().size()>0){
                 EntityFilterForm<E> filterForm = entityViewService.createEntityFilter(this);
                 pFilter = new SliderPanelBuilder(filterForm)
                         .expanded(false)
-                        .style(SliderPanelStyles.COLOR_BLUE)
+                        .style(SliderPanelStyles.COLOR_GRAY)
                         .mode(SliderMode.TOP)
                         .caption(TR.m(TR.Filter,"Filter"))
                         .tabPosition(SliderTabPosition.END)
@@ -356,11 +444,10 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
                     @Override
                     public void onToggle(boolean b) {
                         logger.info("toggle "+b);
+                        onFilterClose(filterForm);
 
-                        if (b == false){
-                            pFilter.setExpanded(true,false);
                             //throw new StatusAndMessageError(-1,"ad");
-                        }
+
                     }
                 });
                 addComponentAsFirst(pFilter);
