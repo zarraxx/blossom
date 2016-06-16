@@ -1,5 +1,7 @@
 package cn.net.xyan.blossom.declarative.script;
 
+import org.mozilla.javascript.Scriptable;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -9,12 +11,14 @@ import java.util.Set;
  */
 public class RuntimeContext   {
 
-    public static final String KEYForSCOPE = "__scope__";
-    public static final String KEYForWriteable = "__writeable__";
+    //public static final String KEYForSCOPE = "__scope__";
+    //public static final String KEYForWriteable = "__writeable__";
 
     Map<String,Object> root;
 
-    RuntimeContext variables;
+    Map<String,Object>  variables;
+
+    Scriptable scope;
 
 
 
@@ -25,8 +29,8 @@ public class RuntimeContext   {
 
             if (createVariables) {
 
-                variables = new RuntimeContext(cls,false);
-                this.root.put(KEYForWriteable,variables);
+                variables = cls.newInstance();
+                //this.root.put(KEYForWriteable,variables);
             }
 
         } catch (InstantiationException|IllegalAccessException e) {
@@ -66,5 +70,11 @@ public class RuntimeContext   {
         return variables.keySet();
     }
 
+    public Scriptable getScope() {
+        return scope;
+    }
 
+    public void setScope(Scriptable scope) {
+        this.scope = scope;
+    }
 }

@@ -21,7 +21,7 @@ import java.io.InputStream;
 /**
  * Created by zarra on 16/6/10.
  */
-public class ScriptContext {
+public class UIContext {
 
     String source;
 
@@ -33,7 +33,7 @@ public class ScriptContext {
 
     DesignContext dc;
 
-    Logger logger = LoggerFactory.getLogger(ScriptContext.class);
+    Logger logger = LoggerFactory.getLogger(UIContext.class);
 
 
     public static Document parseXML(InputStream html) {

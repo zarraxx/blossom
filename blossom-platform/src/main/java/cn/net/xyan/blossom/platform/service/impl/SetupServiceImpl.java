@@ -6,6 +6,7 @@ import cn.net.xyan.blossom.platform.service.Installer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 import org.vaadin.spring.security.shared.VaadinUrlAuthenticationSuccessHandler;
 
 import javax.servlet.ServletContext;
@@ -22,12 +23,19 @@ public class SetupServiceImpl implements InitializingBean {
     ServletContext servletContext;
 
     @Autowired
+    WebApplicationContext webApplicationContext;
+
+    @Autowired
     List<Installer> installers;
 
     @Override
     public void afterPropertiesSet() throws Exception {
 
         ApplicationContextUtils.setServletContext(servletContext);
+
+        if (webApplicationContext!=null){
+            ApplicationContextUtils.setApplicationContext(webApplicationContext);
+        }
 
         for (Installer installer:installers){
             installer.beforeSetup();

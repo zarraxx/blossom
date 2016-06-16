@@ -3,6 +3,7 @@ package cn.net.xyan.blossom.script.test.proxy;
 import cn.net.xyan.blossom.declarative.script.RhinoInvocationHandler;
 import cn.net.xyan.blossom.declarative.script.RhinoScriptUtils;
 import cn.net.xyan.blossom.declarative.script.RuntimeContext;
+import cn.net.xyan.blossom.declarative.script.ScriptBeanFactory;
 import cn.net.xyan.blossom.script.test.Help;
 import org.junit.Test;
 import org.mozilla.javascript.Scriptable;
@@ -26,7 +27,7 @@ public class DynamicInterfaceTest {
     }
 
     @Test
-    public void doTest() throws IOException {
+    public void doTest() throws Exception {
         InputStream inputStream = Help.loadInputStream("interface.js");
 
         RuntimeContext runtimeContext = new RuntimeContext();
@@ -38,21 +39,20 @@ public class DynamicInterfaceTest {
         runtimeContext.putVariable("i",new Integer(1));
         runtimeContext.putVariable("bean",bean);
 
-        Scriptable scope = RhinoScriptUtils.readScopeFromScript(inputStream);
+       // Scriptable scope = RhinoScriptUtils.readScopeFromScript(inputStream,runtimeContext);
 
-        runtimeContext.put(RuntimeContext.KEYForSCOPE,scope);
-
-
-
-        RhinoInvocationHandler invocationHandler = new RhinoInvocationHandler(runtimeContext);
+       // runtimeContext.setScope(scope);
 
 
-        Runnable runnable = (Runnable) Proxy.newProxyInstance(Runnable.class.getClassLoader(),
-                new Class[] { Runnable.class },
-                invocationHandler);
 
+      //  RhinoInvocationHandler invocationHandler = new RhinoInvocationHandler(runtimeContext);
+
+
+        Runnable runnable = ScriptBeanFactory.createBean(Runnable.class,inputStream,runtimeContext);
 
         runnable.run();
+
+        Scriptable scope = runtimeContext.getScope();
 
         Integer i = (Integer) runtimeContext.getVariable("i");
 

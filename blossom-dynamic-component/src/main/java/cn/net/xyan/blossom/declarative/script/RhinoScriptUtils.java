@@ -22,7 +22,8 @@ public class RhinoScriptUtils {
 
     static Logger logger = LoggerFactory.getLogger(RhinoScriptUtils.class);
 
-    public static Scriptable readScopeFromScript(InputStream in) throws IOException {
+
+    public static Scriptable readScopeFromScript(InputStream in,RuntimeContext runtimeContext) throws IOException {
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
@@ -30,7 +31,12 @@ public class RhinoScriptUtils {
         Scriptable scope = null;
         try {
             scope = cx.initStandardObjects();
+
+            pushContextToScope(runtimeContext,scope);
+
             Object result = cx.evaluateReader(scope, bufferedReader, null, 1, null);
+
+
 
         } finally {
             Context.exit();
@@ -70,7 +76,6 @@ public class RhinoScriptUtils {
             Object scriptReturn = function.call(cx, scope, scope, args);
 
 
-
             if (scriptReturn == Scriptable.NOT_FOUND) {
 
             } else {
@@ -98,43 +103,43 @@ public class RhinoScriptUtils {
 
     public static void pushContextToScope(RuntimeContext runtimeContext, Scriptable scope) {
         for (String name : runtimeContext.keySet()) {
-            if (!RuntimeContext.KEYForSCOPE.equals(name)) {
-                Object v = runtimeContext.get(name);
-                // Object jsObj = Context.javaToJS(v, scope);
-                if (v instanceof RuntimeContext) {
-                    continue;//do not put runtime context
-                } else {
-                    scope.put(name, scope, v);
-                }
-            }
+            Object v = runtimeContext.get(name);
+            // Object jsObj = Context.javaToJS(v, scope)
+            scope.put(name, scope, v);
+        }
+
+        for (String name : runtimeContext.variableKeySet()) {
+            Object v = runtimeContext.getVariable(name);
+            // Object jsObj = Context.javaToJS(v, scope)
+            scope.put(name, scope, v);
         }
     }
 
     public static void popScopeToContext(RuntimeContext runtimeContext, Scriptable scope) {
-        for (String name : runtimeContext.keySet()) {
-            if (!RuntimeContext.KEYForSCOPE.equals(name)) {
-                Class<?> javaType = Object.class;
-                Object v = runtimeContext.get(name);
-                if (v != null) javaType = v.getClass();
+        for (String name : runtimeContext.variableKeySet()) {
 
-                Object jsObj = scope.get(name, scope);
-                Object javaObj = null;
-                if (jsObj instanceof Scriptable)
-                    javaObj = Context.jsToJava(jsObj, javaType);
-                else {
-                    if (jsObj != null) {
-                        Class<?> jsObjType = jsObj.getClass();
-                        if (!javaType.isAssignableFrom(jsObjType)) {
-                            Object convertObj = convertObjectTypeFromRhino(javaType, jsObj.getClass(), jsObj);
-                            if (convertObj != null)
-                                jsObj = convertObj;
-                        }
+            Class<?> javaType = Object.class;
+            Object v = runtimeContext.getVariable(name);
+            if (v != null) javaType = v.getClass();
+
+            Object jsObj = scope.get(name, scope);
+            Object javaObj = null;
+            if (jsObj instanceof Scriptable)
+                javaObj = Context.jsToJava(jsObj, javaType);
+            else {
+                if (jsObj != null) {
+                    Class<?> jsObjType = jsObj.getClass();
+                    if (!javaType.isAssignableFrom(jsObjType)) {
+                        Object convertObj = convertObjectTypeFromRhino(javaType, jsObj.getClass(), jsObj);
+                        if (convertObj != null)
+                            jsObj = convertObj;
                     }
-                    javaObj = jsObj;
                 }
-
-                runtimeContext.put(name, javaObj);
+                javaObj = jsObj;
             }
+
+            runtimeContext.putVariable(name, javaObj);
+
         }
     }
 

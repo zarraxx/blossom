@@ -1,7 +1,7 @@
 package cn.net.xyan.blossom.declarative.ui;
 
 import cn.net.xyan.blossom.declarative.script.RuntimeContext;
-import cn.net.xyan.blossom.declarative.script.ScriptContext;
+import cn.net.xyan.blossom.declarative.script.UIContext;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.declarative.Design;
 import com.vaadin.ui.declarative.DesignContext;
@@ -26,7 +26,7 @@ public class ComponentFactory {
 
         Component c = dc.getRootComponent();
 
-        ScriptContext scriptContext = new ScriptContext();
+        UIContext scriptContext = new UIContext();
 
         scriptContext.setRuntimeContext(runtimeContext);
 

@@ -39,6 +39,10 @@ public class ApplicationContextUtils {
         instance().servletContext = servletContext;
     }
 
+    static public void setApplicationContext(WebApplicationContext webApplicationContext) {
+        instance().webApplicationContext = webApplicationContext;
+    }
+
     public WebApplicationContext getApplicationContext() {
         if (webApplicationContext == null) {
             webApplicationContext = WebApplicationContextUtils
@@ -51,6 +55,12 @@ public class ApplicationContextUtils {
         WebApplicationContext webApplicationContext = instance().getApplicationContext();
 
         return webApplicationContext.getBean(beanClass);
+    }
+
+    public static Object getBean(String beanName){
+        WebApplicationContext webApplicationContext = instance().getApplicationContext();
+
+        return webApplicationContext.getBean(beanName);
     }
 
     static public String[] beanNamesForAnnotation(Class<? extends Annotation> annotation){

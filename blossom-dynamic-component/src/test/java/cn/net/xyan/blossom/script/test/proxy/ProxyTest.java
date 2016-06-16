@@ -2,6 +2,7 @@ package cn.net.xyan.blossom.script.test.proxy;
 
 import cn.net.xyan.blossom.declarative.script.RhinoDynamicMethodProxy;
 import cn.net.xyan.blossom.declarative.script.RhinoScriptUtils;
+import cn.net.xyan.blossom.declarative.script.RuntimeContext;
 import cn.net.xyan.blossom.script.test.Help;
 import org.junit.Test;
 import org.mozilla.javascript.Scriptable;
@@ -75,7 +76,9 @@ public class ProxyTest {
 
         RhinoDynamicMethodProxy proxy = new RhinoDynamicMethodProxy();
 
-        Scriptable scope = RhinoScriptUtils.readScopeFromScript(inputStream);
+        RuntimeContext runtimeContext = new RuntimeContext();
+
+        Scriptable scope = RhinoScriptUtils.readScopeFromScript(inputStream,runtimeContext);
 
         SampleClass s = new SampleClass();
 

@@ -37,7 +37,7 @@ public class RhinoInvocationHandler implements InvocationHandler {
 
         if (runtimeContext == null) throw new NullPointerException("runtimeContext must not null");
 
-        Scriptable scope = (Scriptable) runtimeContext.get(RuntimeContext.KEYForSCOPE);
+        Scriptable scope =  runtimeContext.getScope();
 
         if (scope == null) throw new NullPointerException("scope must not null");
 
@@ -55,18 +55,11 @@ public class RhinoInvocationHandler implements InvocationHandler {
             //push java variable to rhino
             RhinoScriptUtils.pushContextToScope(runtimeContext,scope);
 
-            RuntimeContext writeableRuntimeContext = (RuntimeContext) runtimeContext.get(RuntimeContext.KEYForWriteable);
-            if (writeableRuntimeContext!=null){
-                RhinoScriptUtils.pushContextToScope(writeableRuntimeContext,scope);
-            }
-
-
             returnValue = RhinoScriptUtils.callRhinoFunction(function,args,Object.class,scope,cx);
 
             //pop rhino obj to java
-            if (writeableRuntimeContext!=null){
-                RhinoScriptUtils.popScopeToContext(writeableRuntimeContext,scope);
-            }
+            RhinoScriptUtils.popScopeToContext(runtimeContext,scope);
+
 
         }catch (Throwable e){
            // String msg = e.getMessage();

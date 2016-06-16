@@ -29,14 +29,14 @@ public class RhinoDynamicMethodProxy implements DynamicMethodProxy {
             runtimeContext = new RuntimeContext();
             obj.DynamicMethodAvailableSetRuntimeContext(runtimeContext);
         }
-        runtimeContext.put(RuntimeContext.KEYForSCOPE, scope);
+        runtimeContext.setScope(scope);
         obj.DynamicMethodAvailableSetProxy(this);
     }
 
-    public void bindToObject(DynamicMethodAvailable obj, InputStream in) throws IOException {
-        Scriptable scope = RhinoScriptUtils.readScopeFromScript(in);
-        bindToObject(obj, scope);
-    }
+//    public void bindToObject(DynamicMethodAvailable obj, InputStream in) throws IOException {
+//        Scriptable scope = RhinoScriptUtils.readScopeFromScript(in,obj.DynamicMethodAvailableGetRuntimeContext());
+//        bindToObject(obj, scope);
+//    }
 
     @Override
     public Object invoke(DynamicMethodAvailable from, String methodName, Object[][] params) {
@@ -44,7 +44,7 @@ public class RhinoDynamicMethodProxy implements DynamicMethodProxy {
         Object returnValue = null;
         try {
             Context cx = Context.enter();
-            Scriptable scope = (Scriptable) runtimeContext.get(RuntimeContext.KEYForSCOPE);
+            Scriptable scope = runtimeContext.getScope();
 
             Function function = RhinoScriptUtils.findFunction(methodName, scope);
 
