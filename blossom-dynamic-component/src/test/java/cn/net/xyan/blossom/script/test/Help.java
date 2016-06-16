@@ -4,6 +4,7 @@ import org.mozilla.javascript.Scriptable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -16,7 +17,7 @@ import java.nio.file.Paths;
  * Created by zarra on 16/6/9.
  */
 public class Help {
-    static String readLargerTextFileAlternate(URI url) throws IOException {
+    public static String readLargerTextFileAlternate(URI url) throws IOException {
 
         StringBuffer sb = new StringBuffer();
         Path path = Paths.get(url);
@@ -29,7 +30,7 @@ public class Help {
         return sb.toString();
     }
 
-    static String loadScript(String file) throws IOException, URISyntaxException {
+    public static String loadScript(String file) throws IOException, URISyntaxException {
         URL url = Help.class.getClassLoader().getResource(file);
 
         if (url!=null){
@@ -38,7 +39,16 @@ public class Help {
         return null;
     }
 
-    static void setupScope(Scriptable scope){
+    public static InputStream loadInputStream(String file) throws IOException {
+        URL url = Help.class.getClassLoader().getResource(file);
+
+        if (url!=null){
+            return url.openStream();
+        }
+        return null;
+    }
+
+    public static void setupScope(Scriptable scope){
 
     }
 }

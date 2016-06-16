@@ -1,6 +1,6 @@
 package cn.net.xyan.blossom.declarative.utils;
 
-import cn.net.xyan.blossom.declarative.ui.RuntimeContext;
+import cn.net.xyan.blossom.declarative.script.RuntimeContext;
 
 /**
  * Created by zarra on 16/6/9.

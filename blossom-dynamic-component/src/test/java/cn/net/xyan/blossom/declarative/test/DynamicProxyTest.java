@@ -1,7 +1,7 @@
 package cn.net.xyan.blossom.declarative.test;
 
 
-import cn.net.xyan.blossom.declarative.ui.RuntimeContext;
+import cn.net.xyan.blossom.declarative.script.RuntimeContext;
 import cn.net.xyan.blossom.declarative.utils.*;
 
 import javassist.CtClass;
@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  * Created by zarra on 16/6/9.
@@ -25,7 +24,7 @@ public class DynamicProxyTest {
 
 
         @Override
-        public Object invoke(DynamicMethodAvailable from, String methodName, Map<String, Object> params) {
+        public Object invoke(DynamicMethodAvailable from, String methodName, Object[][] params) {
             System.out.println("-------Dynamic Method -----------");
             System.out.println("you call:" + methodName);
             System.out.println("from:" + from.toString());
@@ -33,11 +32,14 @@ public class DynamicProxyTest {
             Object returnValue = null;
             try {
                 if (params != null) {
-                    String returnTypeName = (String) params.get(ByteCodeUtils.RETURNTypeKey);
+                    Object[] returnInfo = params[0];
+                    String returnTypeName = (String)returnInfo[1];
                     Class<?> returnType = Class.forName(returnTypeName);
-                    for (String key : params.keySet()) {
+
+                    for (int i=1;i<params.length;i++){
+                        String key = (String) params[i][0];
                         System.out.print("key:" + key);
-                        Object v = params.get(key);
+                        Object v = params[i][1];
                         if (v == null)
                             System.out.println("\tvalue:NULL");
                         else
@@ -101,6 +103,13 @@ public class DynamicProxyTest {
 
         ByteCodeUtils.addMethod(ctClass,superMethodWarpInfo);
         ByteCodeUtils.addMethod( ctClass,superMethodWarpInfo2);
+
+
+        MethodMetaModel newMethodMetaModel = new MethodMetaModel("newAdd", Integer.class);
+
+        newMethodMetaModel.addParam("a", Integer.class);
+        newMethodMetaModel.addParam("b", Integer.class);
+        ByteCodeUtils.addMethod( ctClass, newMethodMetaModel);
 
 
         ctClass.debugWriteFile("target");

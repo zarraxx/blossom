@@ -93,7 +93,7 @@ public class MethodMetaModel {
 
     public String generateMethodDeclare(){
         String returnTypeName = "void";
-        if (!getReturnType().equals(Void.TYPE))
+        if (!getReturnType().equals(Void.TYPE) && Void.class!=getReturnType())
             returnTypeName = getReturnType().getName();
 
         String throwString = "";
@@ -130,28 +130,33 @@ public class MethodMetaModel {
     }
 
     public String generateMethodBody(){
-        String format = "{\n\tjava.util.Map p =  new java.util.HashMap();\n%s;\n\t%s  %s.invoke(this,\"%s\",p);\n}";
+        int size = getParamNames().size()+1;
+        String format = "{\n\tObject[][] p =  new Object[%d][2]; \n%s \n\t;\n\t%s%s.invoke(this,\"%s\",p);\n}";
 
         String returnString = "";
 
-        if (!getReturnType().equals(Void.TYPE)) {
+        if (!getReturnType().equals(Void.TYPE) && Void.class!=getReturnType()) {
 
             returnString = String.format("return (%s)", getReturnType().getName());
         }
 
 
         List<String> list = new LinkedList<>();
+
+        list.add(String.format("\tp[0]=new Object[]{\"%s\",\"%s\"}",ByteCodeUtils.RETURNTypeKey,getReturnType().getName()));
+        int index = 1;
         for (String name : getParamNames()){
-            list.add( String.format( "\tp.put(\"%s\",%s)",name,name));
+            list.add( String.format( "\tp[%d]=new Object[]{\"%s\",%s}",index,name,name));
+            index++;
         }
 
 
 
-        list.add(String.format("\tp.put(\"%s\",\"%s\")",ByteCodeUtils.RETURNTypeKey,getReturnType().getName()));
+
 
 
         String setP = join(list,";\n");
 
-        return String.format(format,setP,returnString,ByteCodeUtils.RuntimeProxyFieldName,getMethodName());
+        return String.format(format,size,setP,returnString,ByteCodeUtils.RuntimeProxyFieldName,getMethodName());
     }
 }

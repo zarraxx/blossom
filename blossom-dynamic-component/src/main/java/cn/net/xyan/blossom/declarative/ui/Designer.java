@@ -6,15 +6,27 @@ import cn.net.xyan.blossom.declarative.utils.DynamicMethodProxy;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.Design;
+import com.vaadin.ui.declarative.DesignContext;
 import com.vaadin.ui.themes.ValoTheme;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by zarra on 16/6/9.
  */
 public class Designer extends VerticalLayout {
+
+    Logger logger = LoggerFactory.getLogger(Designer.class);
 
     TextArea textArea;
 
@@ -22,18 +34,12 @@ public class Designer extends VerticalLayout {
 
     ComponentPreviewStrategy renderStrategy;
 
-    ComponentClassFactory classFactory;
+    ComponentFactory componentFactory ;
 
-    ComponentClassMetaModel componentClassMetaModel;
 
     public interface ComponentPreviewStrategy {
         void render(Component c);
 
-        String createClassName();
-
-        DynamicMethodProxy methodProxy(ComponentClassMetaModel classMetaModel);
-
-        RuntimeContext createRuntimContext(ComponentClassMetaModel classMetaModel);
     }
 
     public Button getbPreview() {
@@ -60,14 +66,6 @@ public class Designer extends VerticalLayout {
         this.textArea = textArea;
     }
 
-    public ComponentClassFactory getClassFactory() {
-        return classFactory;
-    }
-
-    public void setClassFactory(ComponentClassFactory classFactory) {
-        this.classFactory = classFactory;
-    }
-
     public Designer() {
         setSizeFull();
         setSpacing(true);
@@ -87,16 +85,20 @@ public class Designer extends VerticalLayout {
 
         textArea = new TextArea("XML");
 
+
+
         textArea.setSizeFull();
 
         addComponent(textArea);
 
         setExpandRatio(textArea, 1);
 
+        componentFactory = new ComponentFactory();
+
         bPreview.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if (getRenderStrategy() != null || getClassFactory() == null) {
+                if (getRenderStrategy() != null ) {
                     String xml = textArea.getValue();
                     doPreview(xml);
                 } else {
@@ -108,13 +110,22 @@ public class Designer extends VerticalLayout {
 
     }
 
+
     protected void doPreview(String xml) {
         try {
-            Class<? extends Component> componentClass = complieXMLToJavaType(xml);
-            Component component = componentClass.newInstance();
-            component = bindComponent(component,xml);
+            Component c = componentFactory.makeFromHtml(xml,null);
 
-            renderStrategy.render(component);
+            renderStrategy.render(c);
+
+//            Button button = new Button();
+//            button.addClickListener(new Button.ClickListener() {
+//                @Override
+//                public void buttonClick(Button.ClickEvent event) {
+//
+//                }
+//            });
+            //button.addClickListener();
+
         } catch (Throwable e) {
             String msg = e.getMessage();
 
@@ -122,51 +133,7 @@ public class Designer extends VerticalLayout {
         }
     }
 
-    protected Component bindComponent(Component c, String xml) {
-        try {
-            byte[] bytes = xml.getBytes();
-            InputStream in = new ByteArrayInputStream(bytes);
-            Design.read(in, c);
 
 
 
-            if (c instanceof DynamicMethodAvailable) {
-                DynamicMethodAvailable dynamicComp = (DynamicMethodAvailable) c;
-                RuntimeContext runtimeContext = renderStrategy.createRuntimContext(componentClassMetaModel);
-                DynamicMethodProxy proxy = renderStrategy.methodProxy(componentClassMetaModel);
-                if (runtimeContext != null) {
-                    runtimeContext.put("meta",componentClassMetaModel);
-                    dynamicComp.DynamicMethodAvailableSetRuntimeContext(runtimeContext);
-                    if (proxy!=null){
-                        dynamicComp.DynamicMethodAvailableSetProxy(proxy);
-                    }
-                }
-
-            }
-
-            return c;
-        } catch (Throwable e) {
-            String msg = e.getMessage();
-
-            Notification.show(msg, Notification.Type.ERROR_MESSAGE);
-        }
-        return null;
-    }
-
-    protected Class complieXMLToJavaType(String xml) {
-        try {
-            byte[] bytes = xml.getBytes();
-            InputStream in = new ByteArrayInputStream(bytes);
-            String classname = renderStrategy.createClassName();
-            ComponentClassMetaModel componentClassMetaModel = classFactory.parse(classname, in);
-            this.componentClassMetaModel = componentClassMetaModel;
-            return classFactory.compileToJavaClass(componentClassMetaModel);
-
-        } catch (Throwable e) {
-            String msg = e.getMessage();
-
-            Notification.show(msg, Notification.Type.ERROR_MESSAGE);
-        }
-        return null;
-    }
 }

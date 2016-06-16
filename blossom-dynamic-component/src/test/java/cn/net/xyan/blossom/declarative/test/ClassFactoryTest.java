@@ -2,7 +2,6 @@ package cn.net.xyan.blossom.declarative.test;
 
 import cn.net.xyan.blossom.declarative.ui.ComponentClassFactory;
 import cn.net.xyan.blossom.declarative.ui.ComponentClassMetaModel;
-import cn.net.xyan.blossom.declarative.ui.SimpleComponentClassFactoryImpl;
 import com.vaadin.annotations.DesignRoot;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.Design;
@@ -55,40 +54,40 @@ public class ClassFactoryTest {
 
 
    // @Test
-    public void doTest() throws Exception {
-
-        ComponentClassFactory componentClassFactory = new SimpleComponentClassFactoryImpl();
-
-        ComponentClassMetaModel metaModel = new ComponentClassMetaModel("cc.c.c.c.dfsdaf.e123", VerticalLayout.class);
-
-        metaModel.addField("table", Table.class);
-
-        metaModel.addField("cb", ComboBox.class);
-
-        Class createClass = componentClassFactory.compileToJavaClass(metaModel);
-
-    }
-
-    @Test
-    public void parseXMLTest() throws Exception {
-        ComponentClassFactory componentClassFactory = new SimpleComponentClassFactoryImpl();
-        byte[] bytes = xml2.getBytes();
-        InputStream in = new ByteArrayInputStream(bytes);
-        ComponentClassMetaModel model = componentClassFactory.parse("test.a.b.c.d.e.f.g",in);
-
-        Class createClass = componentClassFactory.compileToJavaClass(model);
-
-        Component c = (Component) createClass.newInstance();
-
-        in = new ByteArrayInputStream(bytes);
-
-        //c = new CustomComponent();
-
-        DesignRoot designRoot = (DesignRoot) createClass.getAnnotation(DesignRoot.class);
-
-        Assert.assertNotNull(designRoot);
-
-        Design.read(in,c);
-
-    }
+//    public void doTest() throws Exception {
+//
+//        ComponentClassFactory componentClassFactory = new SimpleComponentClassFactoryImpl();
+//
+//        ComponentClassMetaModel metaModel = new ComponentClassMetaModel("cc.c.c.c.dfsdaf.e123", VerticalLayout.class);
+//
+//        metaModel.addField("table", Table.class);
+//
+//        metaModel.addField("cb", ComboBox.class);
+//
+//        Class createClass = componentClassFactory.compileToJavaClass(metaModel);
+//
+//    }
+//
+//    @Test
+//    public void parseXMLTest() throws Exception {
+//        ComponentClassFactory componentClassFactory = new SimpleComponentClassFactoryImpl();
+//        byte[] bytes = xml2.getBytes();
+//        InputStream in = new ByteArrayInputStream(bytes);
+//        ComponentClassMetaModel model = componentClassFactory.parse("test.a.b.c.d.e.f.g",in);
+//
+//        Class createClass = componentClassFactory.compileToJavaClass(model);
+//
+//        Component c = (Component) createClass.newInstance();
+//
+//        in = new ByteArrayInputStream(bytes);
+//
+//        //c = new CustomComponent();
+//
+//        DesignRoot designRoot = (DesignRoot) createClass.getAnnotation(DesignRoot.class);
+//
+//        Assert.assertNotNull(designRoot);
+//
+//        Design.read(in,c);
+//
+//    }
 }

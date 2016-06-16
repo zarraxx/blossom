@@ -7,5 +7,5 @@ import java.util.Map;
  */
 public interface DynamicMethodProxy {
     //Object invoke(DynamicMethodAvailable from,String methodName,Object ... params);
-    Object invoke(DynamicMethodAvailable from,String methodName,Map<String,Object> params);
+    Object invoke(DynamicMethodAvailable from,String methodName,Object[][] params);
 }

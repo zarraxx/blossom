@@ -47,7 +47,7 @@ public class DeclarativeDesign extends VerticalLayout implements View,Designer.C
 
         designer = new Designer();
 
-        designer.setClassFactory(classFactory);
+        //designer.setClassFactory(classFactory);
 
         designer.setRenderStrategy(this);
 
@@ -96,24 +96,6 @@ public class DeclarativeDesign extends VerticalLayout implements View,Designer.C
         UI.getCurrent().addWindow(window);
     }
 
-    @Override
-    public String createClassName() {
-        DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date now = new Date();
 
-        String date = df.format(now);
-
-        return "cn.net.xyan.blossom.declarative.test.TestComponent"+date;
-    }
-
-    @Override
-    public DynamicMethodProxy methodProxy(ComponentClassMetaModel classMetaModel) {
-        return null;
-    }
-
-    @Override
-    public RuntimeContext createRuntimContext(ComponentClassMetaModel classMetaModel) {
-        return null;
-    }
 
 }

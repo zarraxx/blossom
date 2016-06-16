@@ -8,3 +8,4 @@
 *.dylib
 *.jar
 *.war
+/target/**
