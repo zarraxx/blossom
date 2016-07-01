@@ -1,6 +1,7 @@
 package cn.net.xyan.blossom.platform.ui;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.spring.annotation.SpringUI;
 
 /**

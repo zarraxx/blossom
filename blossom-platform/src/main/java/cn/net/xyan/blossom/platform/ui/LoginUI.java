@@ -2,6 +2,7 @@ package cn.net.xyan.blossom.platform.ui;
 
 import cn.net.xyan.blossom.core.i18n.TR;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
