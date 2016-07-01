@@ -22,6 +22,7 @@ import java.util.Locale;
  */
 @SpringUI(path = "/login")
 @Theme("blossom")
+@Widgetset("cn.net.xyan.blossom.platform.BlossomUI")
 public class LoginUI extends UI {
 
 

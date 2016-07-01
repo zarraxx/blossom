@@ -8,5 +8,6 @@ import com.vaadin.spring.annotation.SpringUI;
  */
 @SpringUI(path = "/root")
 @Theme("blossom")
+@Widgetset("cn.net.xyan.blossom.platform.BlossomUI")
 public class IndexUI extends ContentUI {
 }
