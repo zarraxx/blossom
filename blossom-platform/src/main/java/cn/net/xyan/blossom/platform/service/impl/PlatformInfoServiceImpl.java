@@ -33,13 +33,17 @@ public class PlatformInfoServiceImpl extends InstallerAdaptor implements Platfor
             String name = properties.getProperty(PropertyName);
             String version = properties.getProperty(PropertyVersion);
             String timestamp = properties.getProperty(PropertyTimestamp);
+            String title = properties.getProperty(PropertyTitle,name);
 
             if (version == null) version = "unknow";
 
             if (version == null) timestamp = "unknow";
 
             if (name != null){
-                return new ArtifactInfo(name,version,timestamp);
+                ArtifactInfo artifactInfo =  new ArtifactInfo(name,version,timestamp);
+                if (title!=null)
+                    artifactInfo.setArtifactTitle(title);
+                return artifactInfo;
             }
 
         } catch (IOException e) {

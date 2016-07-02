@@ -87,7 +87,12 @@ public abstract class ContentUI extends UI implements DisposableBean {
 
         VerticalLayout footer = new VerticalLayout();
 
-        String logoString = "Blossom";
+
+
+        cn.net.xyan.blossom.platform.service.PlatformInfoService.ArtifactInfo artifactInfo
+                = platformInfoService.platformArtifactInfo();
+
+        String logoString = artifactInfo.getArtifactTitle();
 
         Label title = new Label(logoString);
 
@@ -97,8 +102,7 @@ public abstract class ContentUI extends UI implements DisposableBean {
 
         head.setComponentAlignment(title,Alignment.TOP_CENTER);
 
-        cn.net.xyan.blossom.platform.service.PlatformInfoService.ArtifactInfo artifactInfo
-                = platformInfoService.platformArtifactInfo();
+
 
         if (artifactInfo!=null && artifactInfo.getVersion()!=null){
             Label version = new Label(artifactInfo.getVersion());
