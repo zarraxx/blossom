@@ -4,7 +4,7 @@
 
 	<groupId>org.vaadin.addons</groupId>
 	<artifactId>blossom-dynamic-component</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>blossom-dynamic-component</name>
@@ -13,7 +13,7 @@
 	<parent>
 		<artifactId>blossom-parent</artifactId>
 		<groupId>cn.net.xyan.blossom</groupId>
-		<version>0.0.4</version>
+		<version>0.0.5-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>cn.net.xyan.blossom</groupId>
 			<artifactId>blossom-core</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
