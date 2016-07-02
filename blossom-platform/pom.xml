@@ -25,7 +25,7 @@
         <dependency>
             <groupId>cn.net.xyan.blossom</groupId>
             <artifactId>blossom-client-compiled</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <version>0.0.4</version>
         </dependency>
 
 

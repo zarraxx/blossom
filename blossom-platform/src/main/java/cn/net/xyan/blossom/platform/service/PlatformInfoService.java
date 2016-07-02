@@ -8,6 +8,8 @@ import java.util.Collection;
 public interface PlatformInfoService extends Installer {
     String ArtifactInfo = "/blossom/bls_version.properties";
 
+    String KeyMainArtifactId = "KeyMainArtifactId";
+
     String PlatformArtifactId = "blossom-platform";
 
     String PropertyName = "name";
