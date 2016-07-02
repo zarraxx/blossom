@@ -4,14 +4,13 @@ import cn.net.xyan.blossom.core.ui.BSideBar;
 import cn.net.xyan.blossom.platform.entity.security.User;
 import cn.net.xyan.blossom.platform.service.PlatformInfoService;
 import cn.net.xyan.blossom.platform.service.SecurityService;
+import cn.net.xyan.blossom.platform.support.BlossomViewProvider;
 import cn.net.xyan.blossom.platform.ui.view.AccessDeniedView;
 import cn.net.xyan.blossom.platform.ui.view.ErrorView;
 import com.vaadin.annotations.Push;
-import com.vaadin.data.Item;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ui.Transport;
-import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.*;
 
 import com.vaadin.ui.themes.ValoTheme;
@@ -40,7 +39,7 @@ public abstract class ContentUI extends UI implements DisposableBean {
     VaadinSecurity vaadinSecurity;
 
     @Autowired
-    SpringViewProvider springViewProvider;
+    BlossomViewProvider springViewProvider;
 
     @Autowired
     SecurityService securityService;

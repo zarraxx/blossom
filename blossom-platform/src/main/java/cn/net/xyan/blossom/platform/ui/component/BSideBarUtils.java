@@ -1,9 +1,7 @@
 package cn.net.xyan.blossom.platform.ui.component;
 
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
-import cn.net.xyan.blossom.platform.entity.Catalog;
-import cn.net.xyan.blossom.platform.entity.Module;
-import cn.net.xyan.blossom.platform.entity.UIPage;
+import cn.net.xyan.blossom.platform.entity.*;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
 import cn.net.xyan.blossom.platform.entity.security.User;
 import cn.net.xyan.blossom.platform.model.CatalogSideBarSectionDescriptor;
@@ -31,17 +29,35 @@ public class BSideBarUtils extends SideBarUtils {
 
     public  class ViewItemDescriptor extends SideBarItemDescriptor.ViewItemDescriptor{
 
-        String beanName;
-        public ViewItemDescriptor(String beanName, ApplicationContext applicationContext) {
-            super(beanName, applicationContext);
-            this.beanName = beanName;
+        String viewName;
+        String param;
+        ApplicationContext applicationContext;
+
+        public ViewItemDescriptor(VaadinViewModule module,ApplicationContext applicationContext){
+            super(module.getViewBeanName(),applicationContext);
+            this.viewName = module.getViewName();
+            this.param = module.getViewParameter();
+            this.applicationContext = applicationContext;
         }
 
         @Override
         public String getCaption() {
-            String key = Module.moduleMessageKey(beanName);
+            String key = Module.moduleMessageKey(viewName);
             Locale locale = LocaleContextHolder.getLocale();
             return i18NService.i18nMessage(key,locale);
+        }
+
+        @Override
+        public String getViewName() {
+            return viewName;
+        }
+
+        @Override
+        public void itemInvoked(UI ui) {
+            if (param!=null)
+                ui.getNavigator().navigateTo(viewName+"/"+param);
+            else
+                ui.getNavigator().navigateTo(viewName);
         }
     }
 
@@ -90,7 +106,17 @@ public class BSideBarUtils extends SideBarUtils {
 
 
             for (Module module:modules){
-                String beanName = module.getCode();
+
+                String beanName = null;
+
+                if (module instanceof VaadinViewModule){
+                    VaadinViewModule viewModule = (VaadinViewModule) module;
+                    beanName = viewModule.getViewBeanName();
+                }else if (module instanceof OperationModule){
+                    OperationModule operationModule = (OperationModule) module;
+                    beanName = operationModule.getBeanName();
+                }
+
                 Class<?> beanType = ApplicationContextUtils.beanTypeForBeanName(beanName);
 
 //                List<Permission> permissionList = new LinkedList<>();
@@ -103,7 +129,7 @@ public class BSideBarUtils extends SideBarUtils {
 
 
                 if (View.class.isAssignableFrom(beanType)) {
-                    items.add(new ViewItemDescriptor(beanName, applicationContext));
+                    items.add(new ViewItemDescriptor((VaadinViewModule) module,applicationContext));
                 }else if (Runnable.class.isAssignableFrom(beanType)){
                     items.add(new ActionItemDescriptor(beanName, applicationContext));
                 }

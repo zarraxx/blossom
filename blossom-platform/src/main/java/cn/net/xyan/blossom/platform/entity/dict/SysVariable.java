@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Created by zarra on 16/6/7.
  */
 @Entity
-@Table(name = "variable")
+@Table(name = "sys_variable")
 public class SysVariable {
     String uuid;
     String title;

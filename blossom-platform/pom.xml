@@ -245,6 +245,9 @@
                 <version>7.6.3</version>
                 <configuration>
                     <!--<theme>sidebar</theme>-->
+
+                    <theme>blossom</theme>
+
                     <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
                     <draftCompile>false</draftCompile>
                     <compileReport>false</compileReport>

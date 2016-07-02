@@ -190,23 +190,6 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>vaadin-maven-plugin</artifactId>
-                    <configuration>
-                        <theme>blossom</theme>
-                        <warSourceDirectory>${basedir}/src/main/resources</warSourceDirectory>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>compile-theme</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-
-                <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>2.2.1</version>

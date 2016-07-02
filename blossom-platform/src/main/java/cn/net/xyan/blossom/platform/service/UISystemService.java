@@ -26,11 +26,13 @@ public interface UISystemService extends  Installer{
 
     Catalog setupCatalog(String code, String title, UIPage page, Permission permission);
 
-    Module setupModule(String beanName,String viewName, String title, Class<?> viewClass, Catalog catalog,Permission permission);
+    Module setupModule(String beanName,String viewName, String title, String param,Class<?> viewClass, Catalog catalog,Permission permission);
 
     UIPage pageByClass(Class<? extends ContentUI> uiClass);
 
     Catalog catalogByCode(String code);
+
+    Module moduleByCode(String code);
 
     List<UIPage> setupPages();
 

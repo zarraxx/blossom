@@ -6,9 +6,11 @@ import cn.net.xyan.blossom.core.utils.ExceptionUtils;
 import cn.net.xyan.blossom.platform.entity.Catalog;
 import cn.net.xyan.blossom.platform.entity.Module;
 import cn.net.xyan.blossom.platform.entity.UIPage;
+import cn.net.xyan.blossom.platform.entity.VaadinViewModule;
 import cn.net.xyan.blossom.platform.entity.security.User;
 import cn.net.xyan.blossom.platform.service.SecurityService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
+import cn.net.xyan.blossom.platform.support.BlossomViewProvider;
 import cn.net.xyan.blossom.platform.ui.ContentUI;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -30,7 +32,7 @@ import java.util.List;
 /**
  * Created by zarra on 16/5/30.
  */
-@SpringView(name = "")
+@SpringView(name = BlossomViewProvider.HomeView)
 @SideBarItem(sectionId = Sections.VIEWS, caption = "Home", order = 0)
 @FontAwesomeIcon(FontAwesome.HOME)
 public class HomeView extends VerticalLayout implements View {
@@ -80,21 +82,21 @@ public class HomeView extends VerticalLayout implements View {
                 List<Module> modules = securityService.modulePermitInCatalogForUser(catalog,user);
                 for(Module module : modules) {
 
-                    String clsName = module.getViewClassName();
-                    try {
-                        Class<?> cls = Class.forName(clsName);
-                        if (View.class.isAssignableFrom(cls)) {
+                    //String clsName = module.getViewClassName();
+
+                        //Class<?> cls = Class.forName(clsName);
+                        if (module instanceof VaadinViewModule) {
                             ok = true;
-                            event.getNavigator().navigateTo(module.getViewName());
+                            VaadinViewModule viewModule = (VaadinViewModule) module;
+                            viewModule.navigateTo(event.getNavigator());
+                            //event.getNavigator().navigateTo(module.getViewName());
                             break;
                         }
-                    } catch (ClassNotFoundException e) {
-                        ExceptionUtils.traceError(e, logger);
-                    }
+
                 }
 
                 if (ok)
-                    break;;
+                    break;
             }
 
             logger.info(page.getCode());

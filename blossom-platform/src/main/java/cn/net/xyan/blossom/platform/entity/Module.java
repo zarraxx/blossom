@@ -12,12 +12,14 @@ import java.util.*;
  */
 @Entity
 @Table(name = "ui_module")
-public class Module extends ComparableEntity<Module>{
+@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="type",discriminatorType = DiscriminatorType.STRING)
+public abstract class Module extends ComparableEntity<Module>{
     String code;
     I18NString title;
 
-    String viewName;
-    String viewClassName;
+    //String viewName;
+    //String viewClassName;
 
     SortedSet<Catalog> catalogs = new TreeSet<>();
 
@@ -37,7 +39,7 @@ public class Module extends ComparableEntity<Module>{
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "c_title")
+    @JoinColumn(name = "title")
     public I18NString getTitle() {
         return title;
     }
@@ -46,23 +48,7 @@ public class Module extends ComparableEntity<Module>{
         this.title = title;
     }
 
-    @Column(name = "c_view_class",unique = true)
-    public String getViewClassName() {
-        return viewClassName;
-    }
 
-    public void setViewClassName(String viewClassName) {
-        this.viewClassName = viewClassName;
-    }
-
-    @Column(name = "c_view_name",unique = true)
-    public String getViewName() {
-        return viewName;
-    }
-
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
-    }
 
     @ManyToMany
     @JoinTable(name = "ui_module_permissions",

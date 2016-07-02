@@ -12,7 +12,7 @@ import java.util.Locale;
  * Created by zarra on 16/5/14.
  */
 @Entity
-@Table( schema = Constant.Schema,name = "language")
+@Table( schema = Constant.Schema,name = "ui_language")
 public class Language  {
 
     public final static Locale English = Locale.US;
