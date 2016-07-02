@@ -2,6 +2,8 @@ package cn.net.xyan.blossom.platform.ui.view.debug;
 
 import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
+import cn.net.xyan.blossom.core.utils.ReflectUtils;
+import cn.net.xyan.blossom.core.utils.RequestUtils;
 import com.vaadin.data.Container;
 
 import com.vaadin.ui.*;
@@ -120,9 +122,9 @@ public class JPQLForm extends CustomComponent {
     }
 
     public void setupAceEdit(){
-        textArea.setThemePath("/static/ace");
-        textArea.setModePath("/static/ace");
-        textArea.setWorkerPath("/static/ace");
+        textArea.setThemePath(RequestUtils.absolutePath("/static/ace"));
+        textArea.setModePath(RequestUtils.absolutePath("/static/ace"));
+        textArea.setWorkerPath(RequestUtils.absolutePath("/static/ace"));
 
         textArea.setMode(AceMode.sql);
     }
