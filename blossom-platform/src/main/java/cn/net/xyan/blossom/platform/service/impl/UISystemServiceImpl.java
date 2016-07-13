@@ -4,9 +4,7 @@ import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.platform.dao.CatalogDao;
 import cn.net.xyan.blossom.platform.dao.UIModuleDao;
 import cn.net.xyan.blossom.platform.dao.UIPageDao;
-import cn.net.xyan.blossom.platform.entity.Catalog;
-import cn.net.xyan.blossom.platform.entity.Module;
-import cn.net.xyan.blossom.platform.entity.UIPage;
+import cn.net.xyan.blossom.platform.entity.*;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
 import cn.net.xyan.blossom.platform.service.I18NService;
@@ -111,7 +109,7 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
 
     @Override
     public Module setupModule(String beanName,String viewName, String title, Class<?> viewClass, Catalog catalog) {
-        return setupModule(beanName,viewName,title,viewClass,catalog,null);
+        return setupModule(beanName,viewName,title,null,viewClass,catalog,null);
     }
 
     @Override
@@ -140,14 +138,30 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
 
     @Override
     @Transactional
-    public Module setupModule(String beanName, String viewName, String title, Class<?> viewClass, Catalog catalog, Permission permission) {
+    public Module setupModule(String beanName, String viewName, String title,  String param,Class<?> viewClass, Catalog catalog, Permission permission) {
         Module module = moduleDao.findOne(beanName);
         if (module == null) {
-            module = new Module();
-            module.setCode(beanName);
-            module.setViewName(viewName);
-            module.setViewClassName(viewClass.getName());
-            String key = Module.moduleMessageKey(beanName);
+            if (View.class.isAssignableFrom(viewClass)) {
+                module = new VaadinViewModule();
+                VaadinViewModule viewModule = (VaadinViewModule) module;
+                viewModule.setCode(viewName);
+                viewModule.setViewBeanName(beanName);
+                viewModule.setViewName(viewName);
+                viewModule.setViewClassName(viewClass.getName());
+                viewModule.setViewParameter(param);
+
+            }
+            else if (Runnable.class.isAssignableFrom(viewClass)) {
+                module = new OperationModule();
+                OperationModule operationModule = (OperationModule) module;
+                operationModule.setCode(beanName);
+                operationModule.setBeanName(beanName);
+            }else{
+                throw new UnsupportedOperationException("unknow view class:"+viewClass.getName());
+            }
+
+
+            String key = Module.moduleMessageKey(viewName);
             I18NString string = i18NService.setupMessage(key, title);
             module.setTitle(string);
 
@@ -172,6 +186,11 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
     @Override
     public Catalog catalogByCode(String code) {
         return catalogDao.findOne(code);
+    }
+
+    @Override
+    public Module moduleByCode(String code) {
+        return moduleDao.findOne(code);
     }
 
     @Override

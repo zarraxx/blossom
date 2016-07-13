@@ -11,9 +11,9 @@ public class ModuleConfig extends EntityRenderConfiguration<Module> {
     @Override
     public void configFormFiled() {
         addFormField(Module_.code);
-        addFormField(Module_.viewClassName);
+        //addFormField(Module_.viewClassName);
 
-        addFormField(Module_.viewName);
+        //addFormField(Module_.viewName);
 
         addFormField(Module_.sortOrder);
 
@@ -24,9 +24,9 @@ public class ModuleConfig extends EntityRenderConfiguration<Module> {
     @Override
     public void configTableColumnHeader() {
         addTableColumn(Module_.code);
-        addTableColumn(Module_.viewClassName);
+        //addTableColumn(Module_.viewClassName);
 
-        addTableColumn(Module_.viewName);
+        //addTableColumn(Module_.viewName);
 
         addTableColumn(Module_.catalogs);
 

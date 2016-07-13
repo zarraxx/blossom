@@ -1,8 +1,10 @@
 package cn.net.xyan.blossom.platform.service.impl;
 
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
+import cn.net.xyan.blossom.platform.service.DictService;
 import cn.net.xyan.blossom.platform.service.InstallerAdaptor;
 import cn.net.xyan.blossom.platform.service.PlatformInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
@@ -16,6 +18,8 @@ import java.util.*;
  */
 public class PlatformInfoServiceImpl extends InstallerAdaptor implements PlatformInfoService {
 
+    @Autowired
+    DictService dictService;
 
     Map<String,ArtifactInfo> cache = new HashMap<>();
 
@@ -29,13 +33,17 @@ public class PlatformInfoServiceImpl extends InstallerAdaptor implements Platfor
             String name = properties.getProperty(PropertyName);
             String version = properties.getProperty(PropertyVersion);
             String timestamp = properties.getProperty(PropertyTimestamp);
+            String title = properties.getProperty(PropertyTitle,name);
 
             if (version == null) version = "unknow";
 
             if (version == null) timestamp = "unknow";
 
             if (name != null){
-                return new ArtifactInfo(name,version,timestamp);
+                ArtifactInfo artifactInfo =  new ArtifactInfo(name,version,timestamp);
+                if (title!=null)
+                    artifactInfo.setArtifactTitle(title);
+                return artifactInfo;
             }
 
         } catch (IOException e) {
@@ -61,6 +69,8 @@ public class PlatformInfoServiceImpl extends InstallerAdaptor implements Platfor
                 }
             }
 
+            dictService.setupVariable(KeyMainArtifactId,PlatformArtifactId);
+
 
         } catch (IOException e) {
             ExceptionUtils.errorString(e);
@@ -74,6 +84,9 @@ public class PlatformInfoServiceImpl extends InstallerAdaptor implements Platfor
 
     @Override
     public ArtifactInfo platformArtifactInfo() {
-        return cache.get(PlatformArtifactId);
+
+        String mainArtifactId = dictService.getVariable(KeyMainArtifactId);
+
+        return cache.get(mainArtifactId);
     }
 }

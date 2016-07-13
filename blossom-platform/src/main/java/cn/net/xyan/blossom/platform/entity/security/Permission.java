@@ -97,4 +97,20 @@ public class Permission {
             return code;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Permission that = (Permission) o;
+
+        return code.equals(that.code);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
 }

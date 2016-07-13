@@ -8,9 +8,13 @@ import java.util.Collection;
 public interface PlatformInfoService extends Installer {
     String ArtifactInfo = "/blossom/bls_version.properties";
 
+    String KeyMainArtifactId = "KeyMainArtifactId";
+
     String PlatformArtifactId = "blossom-platform";
 
     String PropertyName = "name";
+
+    String PropertyTitle= "title";
 
     String PropertyVersion = "version";
 
@@ -18,6 +22,7 @@ public interface PlatformInfoService extends Installer {
 
     class ArtifactInfo{
         public String artifactId;
+        public String artifactTitle;
         public String version;
         public String timestamp;
 
@@ -27,6 +32,7 @@ public interface PlatformInfoService extends Installer {
 
         public ArtifactInfo(String artifactId,String version,String timestamp){
             this.artifactId = artifactId;
+            this.artifactTitle = artifactId;
             this.version = version;
             this.timestamp = timestamp;
         }
@@ -53,6 +59,14 @@ public interface PlatformInfoService extends Installer {
 
         public void setVersion(String version) {
             this.version = version;
+        }
+
+        public String getArtifactTitle() {
+            return artifactTitle;
+        }
+
+        public void setArtifactTitle(String artifactTitle) {
+            this.artifactTitle = artifactTitle;
         }
     }
 

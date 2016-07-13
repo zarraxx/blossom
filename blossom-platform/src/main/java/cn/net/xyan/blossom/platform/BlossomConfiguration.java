@@ -5,14 +5,21 @@ import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
 import cn.net.xyan.blossom.platform.service.*;
 import cn.net.xyan.blossom.platform.service.impl.*;
+import cn.net.xyan.blossom.platform.support.BlossomViewProvider;
 import cn.net.xyan.blossom.platform.support.I18NMessageProviderImpl;
 import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
 import com.vaadin.spring.annotation.UIScope;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -67,7 +74,7 @@ import javax.servlet.Filter;
         repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
 )
 @EnableTransactionManagement
-public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
+public class BlossomConfiguration extends WebSecurityConfigurerAdapter  {
 
     public static String RememberMeKey = "myAppKey";
 
@@ -78,6 +85,7 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     SecurityService securityService;
+
 
     public EntityManagerFactory getEmf() {
         return emf;
@@ -157,21 +165,24 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public DictService dictService(){
+    @ConditionalOnMissingBean
+    public DictService dictService() {
         return new DictServiceImpl();
     }
 
     @Bean
-    public SecurityService securityService(){
+    @ConditionalOnMissingBean
+    public SecurityService securityService() {
         return new SecurityServiceImpl();
     }
 
     @Bean
-    public I18NMessageProviderImpl i18NMessageProvider(I18NService i18NService){
+    @ConditionalOnMissingBean
+    public I18NMessageProviderImpl i18NMessageProvider(I18NService i18NService) {
 
         //ApplicationContextUtils.setServletContext(servletContext);
 
-        I18NMessageProviderImpl provider =  new I18NMessageProviderImpl();
+        I18NMessageProviderImpl provider = new I18NMessageProviderImpl();
 
         provider.setI18NService(i18NService);
 
@@ -180,44 +191,50 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public BSideBarUtils bSideBarUtils(ApplicationContext applicationContext){
-        return new BSideBarUtils(applicationContext,null);
+    @ConditionalOnMissingBean
+    public BSideBarUtils bSideBarUtils(ApplicationContext applicationContext) {
+        return new BSideBarUtils(applicationContext, null);
     }
 
     @Bean
     @UIScope
-    public BSideBar bSideBar (BSideBarUtils sideBarUtils){
+    public BSideBar bSideBar(BSideBarUtils sideBarUtils) {
         return new BSideBar(sideBarUtils);
     }
 
 
     @Bean
-    public EntityViewService entityViewService(){
+    @ConditionalOnMissingBean
+    public EntityViewService entityViewService() {
         return new EntityViewServiceImpl();
     }
 
     @Bean
-    public I18NService i18NService(){
-        return  new I18NServiceImpl();
+    @ConditionalOnMissingBean
+    public I18NService i18NService() {
+        return new I18NServiceImpl();
     }
 
     @Bean
-    public UISystemService uiSystemService(){
+    @ConditionalOnMissingBean
+    public UISystemService uiSystemService() {
         return new UISystemServiceImpl();
     }
 
     @Bean
-    public PlatformInfoService platformInfoService(){
+    @ConditionalOnMissingBean
+    public PlatformInfoService platformInfoService() {
         return new PlatformInfoServiceImpl();
     }
 
     @Bean
-    public Filter jpaFilter(){
+    public Filter jpaFilter() {
         return new org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter();
     }
 
     @Bean
-    public SpringEntityManagerProviderFactory springEntityManagerProviderFactory(){
+    @ConditionalOnMissingBean
+    public SpringEntityManagerProviderFactory springEntityManagerProviderFactory() {
         SpringEntityManagerProviderFactory factory = new SpringEntityManagerProviderFactory();
         factory.setEntityManager(entityManager);
         return factory;
@@ -228,7 +245,7 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
 
         private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
                 "classpath:/META-INF/resources/", "classpath:/resources/",
-                "classpath:/static/", "classpath:/public/" };
+                "classpath:/static/", "classpath:/public/"};
 
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -236,6 +253,42 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter {
         }
     }
 
+    @Configuration
+    public static class ViewProviderConfiguration implements ApplicationContextAware,
+            BeanDefinitionRegistryPostProcessor {
+
+        private ApplicationContext applicationContext;
+        private BeanDefinitionRegistry beanDefinitionRegistry;
+
+        @Autowired
+        private UISystemService uiSystemService;
+
+        @Override
+        public void setApplicationContext(ApplicationContext applicationContext)
+                throws BeansException {
+            this.applicationContext = applicationContext;
+        }
+
+        @Override
+        public void postProcessBeanDefinitionRegistry(
+                BeanDefinitionRegistry registry) throws BeansException {
+            beanDefinitionRegistry = registry;
+        }
+
+        @Override
+        public void postProcessBeanFactory(
+                ConfigurableListableBeanFactory beanFactory) throws BeansException {
+            // NOP
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public BlossomViewProvider blossomViewProvider() {
+            BlossomViewProvider viewProvider =  new BlossomViewProvider(applicationContext, beanDefinitionRegistry);
+            viewProvider.setUiSystemService(uiSystemService);
+            return  viewProvider;
+        }
+    }
 
 
 }

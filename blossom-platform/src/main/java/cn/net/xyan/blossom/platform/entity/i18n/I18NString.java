@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by zarra on 16/5/13.
  */
 @Entity
-@Table(schema = Constant.Schema,name ="i18n")
+@Table(schema = Constant.Schema,name ="ui_i18n")
 public class I18NString {
     String key;
 

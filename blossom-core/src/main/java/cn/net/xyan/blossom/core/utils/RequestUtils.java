@@ -23,6 +23,14 @@ public class RequestUtils {
         }
     }
 
+    public static String absolutePath(String path){
+        return contextPath()+path;
+    }
+
+    public static String absoluteURL(String path){
+        return appRootURL()+path;
+    }
+
     public static String contextPath(){
         HttpServletRequest request = httpServletRequest();
         String contextPath = request.getContextPath();

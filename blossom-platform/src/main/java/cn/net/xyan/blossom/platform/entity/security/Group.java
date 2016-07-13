@@ -100,4 +100,20 @@ public class Group {
             return title.value();
         return code;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        return code.equals(group.code);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
 }

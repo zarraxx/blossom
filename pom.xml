@@ -4,7 +4,7 @@
 
     <groupId>cn.net.xyan.blossom</groupId>
     <artifactId>blossom-parent</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
     <modules>
         <module>blossom-core</module>
         <module>blossom-platform</module>
@@ -188,23 +188,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
-                <plugin>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>vaadin-maven-plugin</artifactId>
-                    <configuration>
-                        <theme>blossom</theme>
-                        <warSourceDirectory>${basedir}/src/main/resources</warSourceDirectory>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>compile-theme</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
 
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
