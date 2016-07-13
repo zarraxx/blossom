@@ -336,12 +336,12 @@ public class SingleAttributeSpecification<E, V> extends UISpecification<E> {
             EntityRenderConfiguration.FormFieldConfig formFieldConfig = renderConfiguration.formFieldForAttribute(lastAttribute(), true);
 
             fieldFirst = formFieldConfig.getFieldType().newInstance();
-
-            formFieldConfig.getFormFieldSetup().fieldSetup(fieldFirst, null, uiContent, null);
+            if (formFieldConfig.getFormFieldSetup()!=null)
+                formFieldConfig.getFormFieldSetup().fieldSetup(fieldFirst, null, uiContent, null);
 
             fieldSecond = formFieldConfig.getFieldType().newInstance();
-
-            formFieldConfig.getFormFieldSetup().fieldSetup(fieldSecond, null, uiContent, null);
+            if (formFieldConfig.getFormFieldSetup()!=null)
+                formFieldConfig.getFormFieldSetup().fieldSetup(fieldSecond, null, uiContent, null);
 
             fieldSecond.setVisible(false);
 
