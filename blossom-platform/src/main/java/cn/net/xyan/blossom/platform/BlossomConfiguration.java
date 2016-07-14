@@ -74,18 +74,13 @@ import javax.servlet.Filter;
         repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
 )
 @EnableTransactionManagement
-public class BlossomConfiguration extends WebSecurityConfigurerAdapter  {
+public class BlossomConfiguration   {
 
     public static String RememberMeKey = "myAppKey";
 
     EntityManagerFactory emf;
 
-
     EntityManager entityManager;
-
-    @Autowired
-    SecurityService securityService;
-
 
     public EntityManagerFactory getEmf() {
         return emf;
@@ -99,69 +94,6 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter  {
     @PersistenceContext
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
-    }
-
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("user").password("user").roles("USER")
-//                .and().withUser("admin").password("admin").roles("ADMIN");
-        auth.userDetailsService(securityService);
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable(); // Use Vaadin's built-in CSRF protection instead
-        http.authorizeRequests().antMatchers("/ui/login/**").anonymous()
-                .antMatchers("/login/**").anonymous()
-                .antMatchers("/ui/UIDL/**").permitAll()
-                .antMatchers("/ui/HEARTBEAT/**").permitAll()
-                .antMatchers("/vaadinServlet/UIDL/**").permitAll()
-                .antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll()
-                .antMatchers("/public/**").permitAll()
-                .anyRequest().authenticated();
-
-        http.httpBasic().disable();
-        http.formLogin().disable();
-        // Remember to add the VaadinSessionClosingLogoutHandler
-        http.logout().addLogoutHandler(new VaadinSessionClosingLogoutHandler()).logoutUrl("/logout")
-                .logoutSuccessUrl("/ui/login?logout").permitAll();
-        http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/ui/login"));
-        // Instruct Spring Security to use the same RememberMeServices as Vaadin4Spring. Also remember the key.
-        http.rememberMe().rememberMeServices(rememberMeServices()).key(RememberMeKey);
-        // Instruct Spring Security to use the same authentication strategy as Vaadin4Spring
-        http.sessionManagement().sessionAuthenticationStrategy(sessionAuthenticationStrategy());
-
-        http.headers().disable();
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/VAADIN/**");
-    }
-
-
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-
-    @Bean
-    public RememberMeServices rememberMeServices() {
-        return new TokenBasedRememberMeServices(RememberMeKey, userDetailsService());
-    }
-
-    @Bean
-    public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new SessionFixationProtectionStrategy();
-    }
-
-    @Bean(name = VaadinSharedSecurityConfiguration.VAADIN_AUTHENTICATION_SUCCESS_HANDLER_BEAN)
-    VaadinAuthenticationSuccessHandler vaadinAuthenticationSuccessHandler(HttpService httpService,
-                                                                          VaadinRedirectStrategy vaadinRedirectStrategy) {
-        return new VaadinUrlAuthenticationSuccessHandler(httpService, vaadinRedirectStrategy, "/");
     }
 
     @Bean
@@ -238,6 +170,75 @@ public class BlossomConfiguration extends WebSecurityConfigurerAdapter  {
         SpringEntityManagerProviderFactory factory = new SpringEntityManagerProviderFactory();
         factory.setEntityManager(entityManager);
         return factory;
+    }
+
+
+    @Configuration
+    public static class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+        @Autowired
+        SecurityService securityService;
+
+        @Override
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser("user").password("user").roles("USER")
+//                .and().withUser("admin").password("admin").roles("ADMIN");
+            auth.userDetailsService(securityService);
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.csrf().disable(); // Use Vaadin's built-in CSRF protection instead
+            http.authorizeRequests().antMatchers("/ui/login/**").anonymous()
+                    .antMatchers("/login/**").anonymous()
+                    .antMatchers("/ui/UIDL/**").permitAll()
+                    .antMatchers("/ui/HEARTBEAT/**").permitAll()
+                    .antMatchers("/vaadinServlet/UIDL/**").permitAll()
+                    .antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll()
+                    .antMatchers("/public/**").permitAll()
+                    .anyRequest().authenticated();
+
+            http.httpBasic().disable();
+            http.formLogin().disable();
+            // Remember to add the VaadinSessionClosingLogoutHandler
+            http.logout().addLogoutHandler(new VaadinSessionClosingLogoutHandler()).logoutUrl("/logout")
+                    .logoutSuccessUrl("/ui/login?logout").permitAll();
+            http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/ui/login"));
+            // Instruct Spring Security to use the same RememberMeServices as Vaadin4Spring. Also remember the key.
+            http.rememberMe().rememberMeServices(rememberMeServices()).key(RememberMeKey);
+            // Instruct Spring Security to use the same authentication strategy as Vaadin4Spring
+            http.sessionManagement().sessionAuthenticationStrategy(sessionAuthenticationStrategy());
+
+            http.headers().disable();
+        }
+
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring().antMatchers("/VAADIN/**");
+        }
+
+
+        @Override
+        @Bean
+        public AuthenticationManager authenticationManagerBean() throws Exception {
+            return super.authenticationManagerBean();
+        }
+
+        @Bean
+        public RememberMeServices rememberMeServices() {
+            return new TokenBasedRememberMeServices(RememberMeKey, userDetailsService());
+        }
+
+        @Bean
+        public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+            return new SessionFixationProtectionStrategy();
+        }
+
+        @Bean(name = VaadinSharedSecurityConfiguration.VAADIN_AUTHENTICATION_SUCCESS_HANDLER_BEAN)
+        VaadinAuthenticationSuccessHandler vaadinAuthenticationSuccessHandler(HttpService httpService,
+                                                                              VaadinRedirectStrategy vaadinRedirectStrategy) {
+            return new VaadinUrlAuthenticationSuccessHandler(httpService, vaadinRedirectStrategy, "/");
+        }
     }
 
     @Configuration
