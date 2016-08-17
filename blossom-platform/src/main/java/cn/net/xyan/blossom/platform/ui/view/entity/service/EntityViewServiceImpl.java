@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -190,6 +191,9 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
 
         for (Class<? extends EntityRenderConfiguration> configurationCls : classSet){
             EntityRenderConfiguration<?> configuration = null;
+            if ( Modifier.isAbstract( configurationCls.getModifiers() ) ){
+                continue;
+            }
             try {
                 configuration = configurationCls.newInstance();
 

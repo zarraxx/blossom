@@ -15,6 +15,7 @@ import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Property;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.sass.internal.tree.controldirective.ElseNode;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -293,8 +294,14 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
     public void onClickAdd(Class<? extends E> eClass){
         try {
             E entity = eClass.newInstance();
+            JPAContainer<E> container;
 
-            EntityItem<E> item = getContainer().createEntityItem(entity);
+            if (eClass.equals(getEntityCls()))
+                container = getContainer();
+            else
+                container = EntityContainerFactory.jpaContainer((Class<E>) entity.getClass());
+
+            EntityItem<? extends E> item = container.createEntityItem(entity);
             showEntityForm(item, EntityEditForm.FormStatus.Add);
         }catch (Throwable e){
             throw  new StatusAndMessageError(-9,e);
@@ -305,6 +312,20 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
         Object itemId =  table.getValue();
 
         EntityItem<E> item = getContainer().getItem(itemId);
+
+        E entity = item.getEntity();
+
+        Class<? extends E> eClass = (Class<? extends E>) entity.getClass();
+
+        JPAContainer<E> container;
+
+        if (eClass.equals(getEntityCls())){
+            container = getContainer();
+        }else{
+            container = EntityContainerFactory.jpaContainer((Class<E>)entity.getClass());
+        }
+
+        item = container.getItem(itemId);
 
         showEntityForm(item, EntityEditForm.FormStatus.Edit);
     }
