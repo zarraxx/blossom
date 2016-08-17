@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Created by zarra on 16/6/4.
  */
-public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickListener {
+public class EntityEditForm<E> extends VerticalLayout implements Button.ClickListener {
 
     public static class EntityFormEvent {
         public enum Type {
@@ -70,7 +70,7 @@ public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickLis
     E entity;
     JPAContainer<E> jpaContainer;
     EntityItem<E> beanItem;
-    EntityRenderConfiguration<E> renderConfiguration;
+    EntityRenderConfiguration<? super E> renderConfiguration;
 
     FormStatus status;
 
@@ -87,14 +87,14 @@ public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickLis
         Add,Edit,ReadOnly
     }
 
-    public EntityEditFrom(EntityItem<E> item,EntityRenderConfiguration<E> renderConfiguration,FormStatus status){
+    public EntityEditForm(EntityItem<E> item, EntityRenderConfiguration<? super E> renderConfiguration, FormStatus status){
         this.beanItem = item;
         this.jpaContainer = (JPAContainer<E>) item.getContainer();
         this.entity = item.getEntity();
 
         init(renderConfiguration,status);
     }
-    public EntityEditFrom(E entity,EntityRenderConfiguration<E> renderConfiguration,FormStatus status){
+    public EntityEditForm(E entity, EntityRenderConfiguration<? super E> renderConfiguration, FormStatus status){
 
         Class<E> eClass = (Class<E>) entity.getClass();
         this.entity = entity;
@@ -105,7 +105,7 @@ public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickLis
 
     }
 
-    public void init(EntityRenderConfiguration<E> renderConfiguration,FormStatus status){
+    public void init(EntityRenderConfiguration<? super E> renderConfiguration,FormStatus status){
 
         this.renderConfiguration = renderConfiguration;
         this.status = status;
@@ -158,7 +158,7 @@ public class EntityEditFrom<E> extends VerticalLayout implements Button.ClickLis
         field.setCaption(string.value());
     }
 
-    public AbstractOrderedLayout createForm(FieldGroup fieldGroup, EntityRenderConfiguration<E> renderConfiguration, FormStatus mode){
+    public AbstractOrderedLayout createForm(FieldGroup fieldGroup, EntityRenderConfiguration<? super E> renderConfiguration, FormStatus mode){
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setSizeFull();
         formLayout.setSpacing(true);

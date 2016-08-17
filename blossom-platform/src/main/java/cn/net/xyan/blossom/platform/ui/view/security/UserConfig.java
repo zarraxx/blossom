@@ -3,13 +3,12 @@ package cn.net.xyan.blossom.platform.ui.view.security;
 import cn.net.xyan.blossom.platform.entity.dict.UserStatus;
 import cn.net.xyan.blossom.platform.entity.security.User;
 import cn.net.xyan.blossom.platform.entity.security.User_;
-import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditFrom;
+import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditForm;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ComboBox;
 
 import java.util.Map;
 
@@ -29,14 +28,14 @@ public class UserConfig extends EntityRenderConfiguration<User> {
 
         addFormField(User_.status).addFormFieldAfterBind(new FormFieldConfig.FormFieldSetup() {
             @Override
-            public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+            public void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
 
 
 
                 AbstractSelect abstractSelect = (AbstractSelect) field;
                 abstractSelect.setNullSelectionAllowed(false);
 
-                if (EntityEditFrom.FormStatus.Add == parent.getStatus()){
+                if (EntityEditForm.FormStatus.Add == parent.getStatus()){
 
                     JPAContainer<UserStatus> container = (JPAContainer<UserStatus>) abstractSelect.getContainerDataSource();
 

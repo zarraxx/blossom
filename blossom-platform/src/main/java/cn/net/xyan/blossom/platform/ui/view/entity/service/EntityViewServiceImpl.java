@@ -7,12 +7,7 @@ import cn.net.xyan.blossom.platform.ui.view.entity.*;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.EntityFilterForm;
 import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.data.util.converter.Converter;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.renderers.ButtonRenderer;
-import com.vaadin.ui.renderers.Renderer;
 import net.jodah.typetools.TypeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,30 +85,41 @@ public class EntityViewServiceImpl  extends InstallerAdaptor implements EntityVi
     }
 
     @Override
-    public <E> EntityRenderConfiguration<E> entityRenderConfiguration(Class<E> eClass) {
-        return (EntityRenderConfiguration<E>) entityConfigurationCache.get(eClass);
+    public <E> EntityRenderConfiguration<? super E> entityRenderConfiguration(Class<E> eClass) {
+        try {
+            if (EntityUtils.metamodel().entity(eClass) == null) return null;
+        }catch (Throwable e){
+            return null;
+        }
+
+         EntityRenderConfiguration<? super E> result = (EntityRenderConfiguration<? super E>) entityConfigurationCache.get(eClass);
+
+        if (result != null)
+            return result;
+        else
+            return entityRenderConfiguration((Class<? super E>) eClass.getSuperclass());
     }
 
     @Override
-    public <E> EntityEditFrom<E> createEntityForm(@Nonnull E entity, @Nonnull EntityEditFrom.FormStatus status) {
-        Class<E> eClass = (Class<E>) entity.getClass();
-        EntityRenderConfiguration<E> renderConfiguration = (EntityRenderConfiguration<E>) entityConfigurationCache.get(eClass);
-        EntityEditFrom<E> from = new EntityEditFrom<>(entity,renderConfiguration,status);
+    public <E> EntityEditForm<? super E> createEntityForm(@Nonnull E entity, @Nonnull EntityEditForm.FormStatus status) {
+        Class< E> eClass = (Class<E>) entity.getClass();
+        EntityRenderConfiguration<? super E> renderConfiguration = entityRenderConfiguration( eClass);
+        EntityEditForm<? super E> from = new EntityEditForm<>(entity,renderConfiguration,status);
         return from;
     }
 
     @Override
-    public <E> EntityEditFrom<E> createEntityForm(@Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status) {
+    public <E> EntityEditForm<? super E> createEntityForm(@Nonnull EntityItem<E> entityItem, @Nonnull EntityEditForm.FormStatus status) {
         Class<E> eClass = (Class<E>) entityItem.getEntity().getClass();
        return createEntityForm(eClass,entityItem,status);
     }
 
     @Override
-    public <E> EntityEditFrom<E> createEntityForm(@Nonnull Class<E> eClass, @Nonnull EntityItem<E> entityItem, @Nonnull EntityEditFrom.FormStatus status) {
-        EntityRenderConfiguration<E> renderConfiguration = (EntityRenderConfiguration<E>) entityConfigurationCache.get(eClass);
+    public <E> EntityEditForm<? super E> createEntityForm(@Nonnull Class<E> eClass, @Nonnull EntityItem<E> entityItem, @Nonnull EntityEditForm.FormStatus status) {
+        EntityRenderConfiguration<? super E> renderConfiguration = entityRenderConfiguration(eClass);
         if (renderConfiguration == null)
             throw new NullPointerException();
-        EntityEditFrom<E> from = new EntityEditFrom<>(entityItem,renderConfiguration,status);
+        EntityEditForm<? super E> from = new EntityEditForm<E>(entityItem,renderConfiguration,status);
         return from;
     }
 

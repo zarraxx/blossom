@@ -5,7 +5,6 @@ import cn.net.xyan.blossom.core.jpa.utils.JPA;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
 import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.core.utils.StringUtils;
-import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.support.MultiSelectConverter;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.FilterConfig;
 import cn.net.xyan.blossom.platform.ui.view.entity.filter.SingleAttributeSpecification;
@@ -21,7 +20,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import net.jodah.typetools.TypeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.tepi.listbuilder.ListBuilder;
 
 import javax.annotation.Nonnull;
 import javax.persistence.EntityManagerFactory;
@@ -116,7 +114,7 @@ public class EntityRenderConfiguration<E> {
     static public class FormFieldConfig{
 
         public interface FormFieldSetup{
-            void fieldSetup(AbstractField field,EntityEditFrom<?> parent,AbstractOrderedLayout formLayout,Map<String,AbstractField> fieldGroup);
+            void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String,AbstractField> fieldGroup);
         }
 
         public static String entityFormFieldCaptionKey(Class<?> entityType,String fieldName){
@@ -179,7 +177,7 @@ public class EntityRenderConfiguration<E> {
             final FormFieldSetup prev = before;
             FormFieldSetup setup = new FormFieldSetup() {
                 @Override
-                public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+                public void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
                     if (prev != null)
                         prev.fieldSetup(field,parent,formLayout,fieldGroup);
 
@@ -363,7 +361,7 @@ public class EntityRenderConfiguration<E> {
             if (TextField.class.isAssignableFrom(fieldType)){
                 formFieldConfig.setFormFieldSetup(new FormFieldConfig.FormFieldSetup() {
                     @Override
-                    public void fieldSetup(AbstractField field, EntityEditFrom<?> parent,AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+                    public void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
                         field.setConverter(new NullConverter());
                         field.setWidth("100%");
                     }
@@ -373,7 +371,7 @@ public class EntityRenderConfiguration<E> {
             if (jpaContainer != null && AbstractSelect.class.isAssignableFrom(fieldType)){
                 formFieldConfig.setFormFieldSetup(new FormFieldConfig.FormFieldSetup() {
                     @Override
-                    public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout,Map<String, AbstractField> fieldGroup) {
+                    public void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
                         AbstractSelect select = (AbstractSelect) field;
                         jpaContainerInner.refresh();
                         select.setContainerDataSource(jpaContainerInner);

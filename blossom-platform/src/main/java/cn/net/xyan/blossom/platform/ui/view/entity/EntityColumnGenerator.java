@@ -55,7 +55,7 @@ public class EntityColumnGenerator<E> implements Table.ColumnGenerator {
     public <T> Component generateCellForValue(T cellValue,TableValueConverter<? super  T> converter){
         Class<T> tClass = (Class<T>) cellValue.getClass();
 
-        EntityRenderConfiguration<T> entityRenderConfiguration = entityViewService.entityRenderConfiguration(tClass);
+        EntityRenderConfiguration<? super T> entityRenderConfiguration = entityViewService.entityRenderConfiguration(tClass);
 
         if (entityRenderConfiguration!=null){
             return entityRenderConfiguration.tableDisplayComponent(cellValue);

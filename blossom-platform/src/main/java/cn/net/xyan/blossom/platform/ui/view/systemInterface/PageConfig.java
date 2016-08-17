@@ -6,7 +6,7 @@ import cn.net.xyan.blossom.platform.entity.Catalog_;
 import cn.net.xyan.blossom.platform.entity.UIPage;
 
 import cn.net.xyan.blossom.platform.entity.UIPage_;
-import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditFrom;
+import cn.net.xyan.blossom.platform.ui.view.entity.EntityEditForm;
 import cn.net.xyan.blossom.platform.ui.view.entity.EntityRenderConfiguration;
 
 import cn.net.xyan.blossom.platform.ui.view.entity.TableValueConverter;
@@ -49,7 +49,7 @@ public class PageConfig extends EntityRenderConfiguration<UIPage> {
         addFormField(UIPage_.uiClassName);
         addFormField(UIPage_.sortOrder).addFormFieldSetup(new FormFieldConfig.FormFieldSetup() {
             @Override
-            public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+            public void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
                 NumberField numberField = (NumberField) field;
 
                 numberField.setNullRepresentation("");
@@ -57,7 +57,7 @@ public class PageConfig extends EntityRenderConfiguration<UIPage> {
         });
         addFormField(UIPage_.catalogs).addFormFieldSetup(new FormFieldConfig.FormFieldSetup() {
             @Override
-            public void fieldSetup(AbstractField field, EntityEditFrom<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
+            public void fieldSetup(AbstractField field, EntityEditForm<?> parent, AbstractOrderedLayout formLayout, Map<String, AbstractField> fieldGroup) {
                 logger.info("hello world");
             }
         });

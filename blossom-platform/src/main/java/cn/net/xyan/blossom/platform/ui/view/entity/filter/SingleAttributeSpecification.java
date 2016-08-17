@@ -242,7 +242,7 @@ public class SingleAttributeSpecification<E, V> extends UISpecification<E> {
 
         setupOperatorName();
 
-        EntityRenderConfiguration<E> renderConfiguration = entityViewService.entityRenderConfiguration(getEntityCls());
+        EntityRenderConfiguration<? super E> renderConfiguration = entityViewService.entityRenderConfiguration(getEntityCls());
 
         Class<?> valueCls = valueType();
 

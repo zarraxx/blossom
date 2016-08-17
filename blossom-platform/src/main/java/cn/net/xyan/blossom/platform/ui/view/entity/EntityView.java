@@ -13,7 +13,6 @@ import com.vaadin.addon.jpacontainer.EntityItem;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.shared.ui.MarginInfo;
@@ -24,7 +23,6 @@ import net.jodah.typetools.TypeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specifications;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.hene.popupbutton.PopupButton;
@@ -61,9 +59,9 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
     }
 
     public static class EntityFormWindow extends Window{
-        EntityEditFrom<?> entityForm;
+        EntityEditForm<?> entityForm;
 
-        public EntityFormWindow(EntityEditFrom<?> entityForm){
+        public EntityFormWindow(EntityEditForm<?> entityForm){
             this.entityForm = entityForm;
 
             //setSizeUndefined();
@@ -77,27 +75,27 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
             setCaption("AAA");
         }
 
-        public static EntityFormWindow displayEntityForm(EntityEditFrom<?> entityForm, EntityEditFrom.EntityFormListener listener){
+        public static EntityFormWindow displayEntityForm(EntityEditForm<?> entityForm, EntityEditForm.EntityFormListener listener){
             EntityFormWindow window = new EntityFormWindow(entityForm);
             if (listener!=null)
                 entityForm.addEntityFormListener(listener);
 
-            entityForm.addEntityFormListener(new EntityEditFrom.EntityFormListener() {
+            entityForm.addEntityFormListener(new EntityEditForm.EntityFormListener() {
                 @Override
-                public void onEvent(EntityEditFrom.EntityFormEvent event) {
-                    if (EntityEditFrom.EntityFormEvent.Type.NeedClose == event.getType()){
+                public void onEvent(EntityEditForm.EntityFormEvent event) {
+                    if (EntityEditForm.EntityFormEvent.Type.NeedClose == event.getType()){
                         window.close();
                     }
                 }
             });
 
-            if (EntityEditFrom.FormStatus.Add == entityForm.getStatus()){
+            if (EntityEditForm.FormStatus.Add == entityForm.getStatus()){
                 window.setCaption(TR.m(TR.Add,"New"));
             }
-            else if (EntityEditFrom.FormStatus.Edit == entityForm.getStatus()){
+            else if (EntityEditForm.FormStatus.Edit == entityForm.getStatus()){
                 window.setCaption(TR.m(TR.Edit,"Edit"));
             }
-            else if (EntityEditFrom.FormStatus.ReadOnly == entityForm.getStatus()){
+            else if (EntityEditForm.FormStatus.ReadOnly == entityForm.getStatus()){
                 window.setCaption(TR.m(TR.View,"View"));
             }
 
@@ -262,12 +260,20 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
         return buttonLayout;
     }
 
-    public void showEntityForm(EntityItem<E> item, EntityEditFrom.FormStatus status){
-        EntityEditFrom<E> form = entityViewService.createEntityForm(getEntityCls(),item,status);
+    public void showEntityForm(EntityItem<? extends E> item, EntityEditForm.FormStatus status){
+        //EntityEditFrom<E> form = entityViewService.createEntityForm(getEntityCls(),item,status);
+        E entity = item.getEntity();
+        EntityEditForm<? extends E> form;
+        if (entity!=null) {
+            Class<? extends  E> cls = (Class<? extends E>) entity.getClass();
+            form = (EntityEditForm<? extends E>) entityViewService.<E>createEntityForm((Class<E>)cls,(EntityItem<E>) item, status);
+        }else{
+            form = (EntityEditForm<? extends E>) entityViewService.<E>createEntityForm(getEntityCls(),(EntityItem<E>)item,status);
+        }
 
-        EntityFormWindow formWindow = EntityFormWindow.displayEntityForm(form, new EntityEditFrom.EntityFormListener() {
+        EntityFormWindow formWindow = EntityFormWindow.displayEntityForm(form, new EntityEditForm.EntityFormListener() {
             @Override
-            public void onEvent(EntityEditFrom.EntityFormEvent event) {
+            public void onEvent(EntityEditForm.EntityFormEvent event) {
                 if (!event.isHasCommit()){
 
                 }else{
@@ -289,7 +295,7 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
             E entity = eClass.newInstance();
 
             EntityItem<E> item = getContainer().createEntityItem(entity);
-            showEntityForm(item, EntityEditFrom.FormStatus.Add);
+            showEntityForm(item, EntityEditForm.FormStatus.Add);
         }catch (Throwable e){
             throw  new StatusAndMessageError(-9,e);
         }
@@ -300,7 +306,7 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
 
         EntityItem<E> item = getContainer().getItem(itemId);
 
-        showEntityForm(item, EntityEditFrom.FormStatus.Edit);
+        showEntityForm(item, EntityEditForm.FormStatus.Edit);
     }
 
     public void onClickRemove(){
@@ -429,7 +435,7 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
 
             entityViewService.setupEntityViewTable(this);
 
-            EntityRenderConfiguration<E> renderConfiguration = entityViewService.entityRenderConfiguration(getEntityCls());
+            EntityRenderConfiguration<? super E> renderConfiguration = entityViewService.<E>entityRenderConfiguration(getEntityCls());
 
             if (renderConfiguration!=null && renderConfiguration.getSpecificationsConfig().size()>0){
                 EntityFilterForm<E> filterForm = entityViewService.createEntityFilter(this);
