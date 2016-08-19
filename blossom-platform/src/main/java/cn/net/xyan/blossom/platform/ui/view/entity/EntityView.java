@@ -444,9 +444,14 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
         }
     }
 
+    public void beforeAttach(){
+
+    }
+
+
     @Override
     public void attach() {
-        super.attach();
+
 
         if (entityViewService == null)
             entityViewService = ApplicationContextUtils.getBean(EntityViewService.class);
@@ -480,6 +485,10 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
                 addComponentAsFirst(pFilter);
             }
         }
+
+        beforeAttach();
+
+        super.attach();
     }
 
     @Override

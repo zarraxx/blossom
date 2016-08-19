@@ -3,6 +3,8 @@ package cn.net.xyan.blossom.platform;
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
+import cn.net.xyan.blossom.platform.intercept.InterceptService;
+import cn.net.xyan.blossom.platform.intercept.impl.InterceptServiceImpl;
 import cn.net.xyan.blossom.platform.service.*;
 import cn.net.xyan.blossom.platform.service.impl.*;
 import cn.net.xyan.blossom.platform.support.BlossomViewProvider;
@@ -288,6 +290,14 @@ public class BlossomConfiguration   {
             BlossomViewProvider viewProvider =  new BlossomViewProvider(applicationContext, beanDefinitionRegistry);
             viewProvider.setUiSystemService(uiSystemService);
             return  viewProvider;
+        }
+    }
+
+    @Configuration
+    public static class InterceptConfiguration{
+        @Bean
+        public InterceptService interceptService(){
+            return new InterceptServiceImpl();
         }
     }
 
