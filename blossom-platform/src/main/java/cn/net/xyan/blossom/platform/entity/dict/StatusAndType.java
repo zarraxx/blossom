@@ -2,7 +2,6 @@ package cn.net.xyan.blossom.platform.entity.dict;
 
 import cn.net.xyan.blossom.core.jpa.utils.sequence.AbstractSequenceFormat;
 import cn.net.xyan.blossom.core.jpa.utils.sequence.TableSequenceGenerator;
-import cn.net.xyan.blossom.platform.entity.Constant;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import org.hibernate.annotations.*;
 
@@ -18,7 +17,7 @@ import java.util.Map;
  * Created by zarra on 16/5/13.
  */
 @Entity
-@Table(schema = Constant.Schema,name = "sys_status_and_type",uniqueConstraints = {
+@Table(name = "sys_status_and_type",uniqueConstraints = {
         @UniqueConstraint(columnNames = {"type","index_value"}),
         @UniqueConstraint(columnNames = {"type","c_title"})
 })
@@ -130,7 +129,7 @@ public abstract class StatusAndType {
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(schema = Constant.Schema,name = "sys_status_and_type_ex")
+    @CollectionTable(name = "sys_status_and_type_ex")
     @MapKeyColumn(name = "ex_name")
     @Column(name = "ex_value")
     public Map<String, String> getExValues() {

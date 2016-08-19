@@ -1,7 +1,5 @@
 package cn.net.xyan.blossom.platform.entity.i18n;
 
-import cn.net.xyan.blossom.platform.entity.Constant;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -12,7 +10,7 @@ import java.util.Locale;
  * Created by zarra on 16/5/14.
  */
 @Entity
-@Table( schema = Constant.Schema,name = "ui_language")
+@Table( name = "ui_language")
 public class Language  {
 
     public final static Locale English = Locale.US;

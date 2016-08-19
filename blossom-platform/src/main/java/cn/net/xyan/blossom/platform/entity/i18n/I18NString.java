@@ -1,7 +1,5 @@
 package cn.net.xyan.blossom.platform.entity.i18n;
 
-
-import cn.net.xyan.blossom.platform.entity.Constant;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import javax.persistence.*;
@@ -13,7 +11,7 @@ import java.util.Map;
  * Created by zarra on 16/5/13.
  */
 @Entity
-@Table(schema = Constant.Schema,name ="ui_i18n")
+@Table(name ="ui_i18n")
 public class I18NString {
     String key;
 
@@ -41,7 +39,7 @@ public class I18NString {
 
     @ElementCollection(fetch = FetchType.EAGER)
     //@ElementCollection
-    @CollectionTable(schema = Constant.Schema,name = "i18n_values")
+    @CollectionTable(name = "i18n_values")
     @MapKeyColumn(name = "ex_lang")
     @Column(name = "ex_value")
     public Map<Language, String> getValues() {
