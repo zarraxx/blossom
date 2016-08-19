@@ -12,6 +12,7 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.*;
+import javafx.scene.layout.Pane;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -137,14 +138,20 @@ public class EntityEditForm<E> extends VerticalLayout implements Button.ClickLis
 
         AbstractOrderedLayout formLayout = createForm(fieldGroup, renderConfiguration, status);
 
+        formLayout.setSizeUndefined();
+
         HorizontalLayout buttonLayout = createbuttonLayout(status);
 
 
         addComponent(header);
 
-        addComponent(formLayout);
+        Panel panel = new Panel();
+        panel.setSizeFull();
+        panel.setContent(formLayout);
 
-        setExpandRatio(formLayout,1);
+        addComponent(panel);
+
+        setExpandRatio(panel,1);
 
         addComponent(buttonLayout);
 
