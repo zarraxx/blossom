@@ -32,10 +32,10 @@ public class NeedMoreProcessAdvisor extends StaticMethodMatcherPointcutAdvisor {
         //logger.info("class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
 
         boolean b =  getInterceptService().accept(method,aClass);
-//        if (b){
-//            logger.info("bean class:"+aClass.getName());
-//            logger.info("class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
-//        }
+        if (b){
+            logger.info("Match Advisor bean class:"+aClass.getName());
+            logger.info("Match Advisor class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
+        }
 
         return b;
     }

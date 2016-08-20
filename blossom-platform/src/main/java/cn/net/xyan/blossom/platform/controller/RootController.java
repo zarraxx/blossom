@@ -26,6 +26,7 @@ import java.util.Locale;
  */
 @Controller
 @RequestMapping("/")
+@NeedLogInterceptor
 public class RootController implements InitializingBean {
 
 
@@ -36,7 +37,6 @@ public class RootController implements InitializingBean {
 
 
     @RequestMapping("/")
-    @NeedLogInterceptor
     public String indexPage(){
         String redirectPath = dictService.getVariable(DictService.KeyROOTPage);
         return String.format("redirect:%s",redirectPath);

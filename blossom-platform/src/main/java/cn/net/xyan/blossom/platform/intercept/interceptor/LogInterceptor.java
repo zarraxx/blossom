@@ -2,6 +2,7 @@ package cn.net.xyan.blossom.platform.intercept.interceptor;
 
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
 import cn.net.xyan.blossom.core.utils.RequestUtils;
+import cn.net.xyan.blossom.platform.controller.RootController;
 import cn.net.xyan.blossom.platform.dao.RequestLogDao;
 import cn.net.xyan.blossom.platform.entity.log.RequestLog;
 import cn.net.xyan.blossom.platform.intercept.InterceptService;
@@ -48,6 +49,8 @@ public class LogInterceptor extends AbstractMethodInterceptor{
     public boolean accept(EndPoint endPoint) {
         Class<?> targetClass = endPoint.getTargetClass();
         Method method = endPoint.getMethod();
+
+
 
         if (targetClass.isAnnotationPresent(NeedLogInterceptor.class) ||
                 method.isAnnotationPresent(NeedLogInterceptor.class))
