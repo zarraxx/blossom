@@ -6,6 +6,7 @@ import cn.net.xyan.blossom.platform.dao.StatusDao;
 import cn.net.xyan.blossom.platform.entity.dict.UserStatus;
 import cn.net.xyan.blossom.platform.entity.i18n.I18NString;
 import cn.net.xyan.blossom.platform.entity.i18n.Language;
+import cn.net.xyan.blossom.platform.intercept.annotation.NeedLogInterceptor;
 import cn.net.xyan.blossom.platform.service.DictService;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class RootController implements InitializingBean {
 
 
     @RequestMapping("/")
+    @NeedLogInterceptor
     public String indexPage(){
         String redirectPath = dictService.getVariable(DictService.KeyROOTPage);
         return String.format("redirect:%s",redirectPath);

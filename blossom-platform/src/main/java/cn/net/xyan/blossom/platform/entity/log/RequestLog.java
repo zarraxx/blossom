@@ -3,6 +3,7 @@ package cn.net.xyan.blossom.platform.entity.log;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.lang.reflect.Method;
 import java.util.Date;
 
 /**
@@ -20,6 +21,21 @@ public class RequestLog {
 
     String content;
 
+    String type;
+
+    public RequestLog(){
+        this(null,null);
+    }
+
+    public RequestLog(Object target,Method method){
+        if (target!=null)
+            setTargetClassName(target.getClass().getName());
+        if (method!=null)
+            setTargetMethodName(method.getName());
+        setDate(new Date());
+    }
+
+    @Column(name = "content",length = 8000)
     public String getContent() {
         return content;
     }
@@ -61,6 +77,14 @@ public class RequestLog {
         this.targetMethodName = targetMethodName;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Id
     @GeneratedValue(
             generator = "system-uuid"
@@ -76,4 +100,6 @@ public class RequestLog {
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
+
+
 }

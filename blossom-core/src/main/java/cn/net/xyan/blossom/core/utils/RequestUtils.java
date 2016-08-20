@@ -23,6 +23,10 @@ public class RequestUtils {
         }
     }
 
+    public static String remoteAddr(){
+        return httpServletRequest().getRemoteAddr();
+    }
+
     public static String absolutePath(String path){
         return contextPath()+path;
     }
