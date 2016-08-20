@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by zarra on 16/8/19.
  */
 @Entity
-@Table(name = "request_log")
+@Table(name = "sys_request_log")
 public class RequestLog {
     String uuid;
     Date date;
@@ -35,7 +35,8 @@ public class RequestLog {
         setDate(new Date());
     }
 
-    @Column(name = "content",length = 8000)
+    @Column(name = "content",length = Integer.MAX_VALUE)
+    @Lob
     public String getContent() {
         return content;
     }

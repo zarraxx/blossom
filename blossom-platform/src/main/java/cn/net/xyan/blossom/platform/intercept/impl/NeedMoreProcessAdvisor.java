@@ -28,14 +28,14 @@ public class NeedMoreProcessAdvisor extends StaticMethodMatcherPointcutAdvisor {
     public boolean matches(Method method, Class<?> aClass) {
         if (Object.class.equals(method.getDeclaringClass()))
             return false;
-        logger.info("bean class:"+aClass.getName());
-        logger.info("class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
+       // logger.info("bean class:"+aClass.getName());
+        //logger.info("class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
 
         boolean b =  getInterceptService().accept(method,aClass);
-        if (b){
-            //logger.info("bean class:"+aClass.getName());
-            //logger.info("class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
-        }
+//        if (b){
+//            logger.info("bean class:"+aClass.getName());
+//            logger.info("class:"+method.getDeclaringClass().getName() + " method:"+method.getName());
+//        }
 
         return b;
     }

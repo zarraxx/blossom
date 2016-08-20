@@ -32,4 +32,9 @@ public class ExtensionInterceptor extends AbstractMethodInterceptor {
     public Object exec(Map<String, Object> content, Object result) {
         return null;
     }
+
+    @Override
+    public void onException(Map<String, Object> content, Throwable exception) {
+
+    }
 }

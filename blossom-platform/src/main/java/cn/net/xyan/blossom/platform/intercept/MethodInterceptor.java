@@ -14,4 +14,5 @@ public interface MethodInterceptor {
     boolean accept(EndPoint endPoint);
     boolean needExec(Map<String,Object> content,Object result);
     Object exec(Map<String,Object> content,Object result);
+    void onException(Map<String,Object> content,Throwable exception);
 }

@@ -13,12 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,27 +31,29 @@ import java.util.Map;
 /**
  * Created by zarra on 16/8/19.
  */
-public class InterceptServiceImpl implements InterceptService,ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
+public class InterceptServiceImpl implements InterceptService, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
     BeanDefinitionRegistry registry;
 
     ApplicationContext applicationContext;
 
+    EntityManagerFactory emf;
+
     Logger logger = LoggerFactory.getLogger(InterceptServiceImpl.class);
 
-    Map<EndPoint,List<MethodInterceptor>> endPointAcceptCache = new HashMap<>();
+    Map<EndPoint, List<MethodInterceptor>> endPointAcceptCache = new HashMap<>();
 
     @Autowired
     List<MethodInterceptor> processorCache;
 
-    public BeanDefinitionBuilder beanDefinitionBuilder(Class<?> beanCls, Map<String,Object> propertyValues,Map<String,String> propertyRefs){
+    public BeanDefinitionBuilder beanDefinitionBuilder(Class<?> beanCls, Map<String, Object> propertyValues, Map<String, String> propertyRefs) {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(beanCls).setLazyInit(true);
-        if (propertyValues!=null) {
+        if (propertyValues != null) {
             for (String key : propertyValues.keySet()) {
                 builder.addPropertyValue(key, propertyValues.get(key));
             }
         }
-        if (propertyRefs!=null) {
+        if (propertyRefs != null) {
             for (String key : propertyRefs.keySet()) {
                 builder.addPropertyReference(key, propertyRefs.get(key));
             }
@@ -56,7 +61,7 @@ public class InterceptServiceImpl implements InterceptService,ApplicationContext
         return builder;
     }
 
-    public void registerBeanDefinition(String beanName,BeanDefinitionBuilder builder){
+    public void registerBeanDefinition(String beanName, BeanDefinitionBuilder builder) {
         registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
     }
 
@@ -64,25 +69,24 @@ public class InterceptServiceImpl implements InterceptService,ApplicationContext
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         this.registry = registry;
 
-
-
         InterceptService interceptService = applicationContext.getBean(InterceptService.class);
-        BeanDefinitionBuilder adviceBuilder = beanDefinitionBuilder(NeedMoreProcessAdvice.class,null,null);
-        adviceBuilder.addPropertyValue("interceptService",interceptService);
-        String  adviceBeanName = "needMoreProcessAdvice";
-        registerBeanDefinition(adviceBeanName,adviceBuilder);
+        BeanDefinitionBuilder adviceBuilder = beanDefinitionBuilder(NeedMoreProcessAdvice.class, null, null);
+        adviceBuilder.addPropertyValue("interceptService", interceptService);
+        String adviceBeanName = "needMoreProcessAdvice";
+        registerBeanDefinition(adviceBeanName, adviceBuilder);
 
-        Map<String,String> advisorParams = new HashMap<>();
-        advisorParams.put("advice",adviceBeanName);
+        Map<String, String> advisorParams = new HashMap<>();
+        advisorParams.put("advice", adviceBeanName);
 
-        BeanDefinitionBuilder advisorBuilder = beanDefinitionBuilder(NeedMoreProcessAdvisor.class,null,advisorParams);
-        advisorBuilder.addPropertyValue("interceptService",interceptService);
-        registerBeanDefinition("needMoreProcessAdvisor",advisorBuilder);
+        BeanDefinitionBuilder advisorBuilder = beanDefinitionBuilder(NeedMoreProcessAdvisor.class, null, advisorParams);
+        advisorBuilder.addPropertyValue("interceptService", interceptService);
+        registerBeanDefinition("needMoreProcessAdvisor", advisorBuilder);
     }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        Map<String,MethodInterceptor> map = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext,MethodInterceptor.class);
+
+        Map<String, MethodInterceptor> map = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, MethodInterceptor.class);
         if (processorCache == null)
             processorCache = new LinkedList<>();
 
@@ -92,10 +96,14 @@ public class InterceptServiceImpl implements InterceptService,ApplicationContext
     }
 
 
-    public Object doInterceptExec(MethodInterceptor p, Map<String, Object> context, Object result){
-        try{
-            result = p.exec(context,result);
-        }catch (Throwable e){
+    public Object doInterceptExec(MethodInterceptor p, Map<String, Object> context, Object result) {
+        try {
+            if (result!=null && result instanceof Throwable){
+                 p.onException(context, (Throwable) result);
+            }else {
+                result = p.exec(context, result);
+            }
+        } catch (Throwable e) {
 
             logger.error(ExceptionUtils.errorString(e));
 
@@ -110,19 +118,18 @@ public class InterceptServiceImpl implements InterceptService,ApplicationContext
     public Object doIntercept(EndPoint endPoint, Map<String, Object> context, Object result) {
         List<MethodInterceptor> processors = endPointAcceptCache.get(endPoint);
 
-        if (processors == null){
+        if (processors == null) {
             processors = new LinkedList<>();
-            for (MethodInterceptor p:this.processorCache){
-                if (p.accept(endPoint)){
+            for (MethodInterceptor p : this.processorCache) {
+                if (p.accept(endPoint)) {
                     processors.add(p);
                 }
             }
-            endPointAcceptCache.put(endPoint,processors);
+            endPointAcceptCache.put(endPoint, processors);
         }
-        for (MethodInterceptor p : processors){
-            if (p.needExec(context,result)){
-
-                result = doInterceptExec(p,context,result);
+        for (MethodInterceptor p : processors) {
+            if (p.needExec(context, result)) {
+                result = doInterceptExec(p, context, result);
             }
         }
 
@@ -131,9 +138,9 @@ public class InterceptServiceImpl implements InterceptService,ApplicationContext
 
     @Override
     public boolean accept(Method method, Class<?> aClass) {
-        EndPoint before = new EndPoint(aClass,method,EndPoint.BEFORE);
-        EndPoint after = new EndPoint(aClass,method,EndPoint.AFTER);
-        if (processorCache!=null) {
+        EndPoint before = new EndPoint(aClass, method, EndPoint.BEFORE);
+        EndPoint after = new EndPoint(aClass, method, EndPoint.AFTER);
+        if (processorCache != null) {
             for (MethodInterceptor i : this.processorCache) {
                 if (i.accept(before) || i.accept(after))
                     return true;
@@ -145,12 +152,26 @@ public class InterceptServiceImpl implements InterceptService,ApplicationContext
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        ApplicationContext parentAC = this.applicationContext.getParent();
+        if (parentAC != null) {
+
+            Map<String, Object> map = BeanFactoryUtils.beansOfTypeIncludingAncestors(parentAC, Object.class);
+
+            try {
+
+                emf = parentAC.getBean(EntityManagerFactory.class);
+
+            } catch (Throwable e) {
+
+            }
+
+        }
     }
 
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        for (MethodInterceptor i: processorCache){
+        for (MethodInterceptor i : processorCache) {
             i.setup(applicationContext);
         }
 

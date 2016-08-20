@@ -1,17 +1,14 @@
 package cn.net.xyan.blossom.script.test.proxy;
 
-import cn.net.xyan.blossom.declarative.script.RhinoInvocationHandler;
 import cn.net.xyan.blossom.declarative.script.RhinoScriptUtils;
 import cn.net.xyan.blossom.declarative.script.RuntimeContext;
-import cn.net.xyan.blossom.declarative.script.ScriptBeanFactory;
+import cn.net.xyan.blossom.declarative.script.ScriptFactoryBean;
 import cn.net.xyan.blossom.script.test.Help;
 import org.junit.Test;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Proxy;
 
 /**
  * Created by zarra on 16/6/10.
@@ -48,7 +45,7 @@ public class DynamicInterfaceTest {
       //  RhinoInvocationHandler invocationHandler = new RhinoInvocationHandler(runtimeContext);
 
 
-        Runnable runnable = ScriptBeanFactory.createBean(Runnable.class,inputStream,runtimeContext);
+        Runnable runnable = ScriptFactoryBean.createBean(Runnable.class,inputStream,runtimeContext);
 
         runnable.run();
 

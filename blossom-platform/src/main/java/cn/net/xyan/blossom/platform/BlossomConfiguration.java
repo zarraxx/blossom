@@ -1,10 +1,11 @@
 package cn.net.xyan.blossom.platform;
 
-import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import cn.net.xyan.blossom.core.support.SpringEntityManagerProviderFactory;
 import cn.net.xyan.blossom.core.ui.BSideBar;
+import cn.net.xyan.blossom.platform.annotation.BootstrapConfiguration;
 import cn.net.xyan.blossom.platform.intercept.InterceptService;
 import cn.net.xyan.blossom.platform.intercept.impl.InterceptServiceImpl;
+import cn.net.xyan.blossom.platform.intercept.interceptor.LogInterceptor;
 import cn.net.xyan.blossom.platform.service.*;
 import cn.net.xyan.blossom.platform.service.impl.*;
 import cn.net.xyan.blossom.platform.support.BlossomViewProvider;
@@ -12,25 +13,29 @@ import cn.net.xyan.blossom.platform.support.I18NMessageProviderImpl;
 import cn.net.xyan.blossom.platform.ui.component.BSideBarUtils;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewService;
 import cn.net.xyan.blossom.platform.ui.view.entity.service.EntityViewServiceImpl;
+import com.vaadin.external.org.slf4j.Logger;
+import com.vaadin.external.org.slf4j.LoggerFactory;
 import com.vaadin.spring.annotation.UIScope;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
-import org.springframework.boot.orm.jpa.EntityScan;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+
+import org.springframework.context.annotation.FilterType;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -44,7 +49,6 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.vaadin.spring.http.HttpService;
@@ -66,20 +70,17 @@ import javax.servlet.Filter;
  */
 
 @Configuration
-@ComponentScan
+@ComponentScan(excludeFilters = {
+        @ComponentScan.Filter(value=BootstrapConfiguration.class,type= FilterType.ANNOTATION)})
+@EnableAutoConfiguration(exclude = {
+        BlossomBootstrapConfiguration.class,
+        DataSourceAutoConfiguration.class,
+        HibernateJpaAutoConfiguration.class,
+       // EmbeddedServletContainerAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class})
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
 @EnableVaadinSharedSecurity
-@EntityScan(
-        basePackages = {
-                "cn.net.xyan.blossom.core.jpa.entity",
-                "cn.net.xyan.blossom.platform.entity"})
-@EnableJpaRepositories(
-        basePackages = {
-                "cn.net.xyan.blossom.core.jpa.dao",
-                "cn.net.xyan.blossom.platform.dao"},
-        repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
-)
 @EnableTransactionManagement
 public class BlossomConfiguration   {
 
@@ -113,6 +114,12 @@ public class BlossomConfiguration   {
     @ConditionalOnMissingBean
     public SecurityService securityService() {
         return new SecurityServiceImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LogService logService(){
+        return new  LogServiceImpl();
     }
 
     @Bean
@@ -299,16 +306,30 @@ public class BlossomConfiguration   {
     }
 
     @Configuration
-    @ComponentScan
-    @AutoConfigureAfter({ HibernateJpaAutoConfiguration.class })
-    public static class InterceptConfiguration{
+    @EnableScheduling
+    @EnableAsync
+    public static class InterceptConfiguration implements ApplicationContextAware{
 
         //@Autowired
         //LocalContainerEntityManagerFactoryBean entityManagerFactoryBean;
 
+        ApplicationContext ac;
+
+        Logger logger = LoggerFactory.getLogger(InterceptConfiguration.class);
+
         @Bean
-        public InterceptService interceptService(JpaProperties jpaProperties){
+        public InterceptService interceptService( ){
             return new InterceptServiceImpl();
+        }
+
+        @Bean
+        public LogInterceptor logInterceptor(){
+            return new LogInterceptor();
+        }
+
+        @Override
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+            this.ac = applicationContext;
         }
     }
 

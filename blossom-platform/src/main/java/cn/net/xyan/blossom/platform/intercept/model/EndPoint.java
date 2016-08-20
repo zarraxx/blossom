@@ -11,7 +11,9 @@ import java.util.List;
 public class EndPoint {
 
     public static final int BEFORE = 1;
-    public static final int AFTER = 1;
+    public static final int AFTER = 2;
+    public static final int EXCEPTION = 3;
+
     String className;
     String methodName;
 

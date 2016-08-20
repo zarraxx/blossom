@@ -55,9 +55,11 @@ public class NeedMoreProcessAdvice implements MethodInterceptor {
             //System.out.println("Around method : after ");
             //return  result;
 
-        }catch(IllegalArgumentException e){
-
+        }catch(Throwable e){
             logger.error("Around method : throw  an  exception ");
+            EndPoint exception = new EndPoint(target.getClass(),method,EndPoint.EXCEPTION);
+            getInterceptService().doIntercept(exception,context,e);
+
             throw  e;
         }
 

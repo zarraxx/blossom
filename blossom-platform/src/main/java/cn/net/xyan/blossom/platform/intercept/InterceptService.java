@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by zarra on 16/8/19.
  */
-public interface InterceptService extends BeanDefinitionRegistryPostProcessor {
+public interface InterceptService extends BeanDefinitionRegistryPostProcessor  {
      String KEYTarget = "__target__";
      String KEYMethod = "__method__";
 
