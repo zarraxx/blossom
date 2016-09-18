@@ -210,6 +210,7 @@ public class BlossomConfiguration   {
                     .antMatchers("/vaadinServlet/UIDL/**").permitAll()
                     .antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll()
                     .antMatchers("/public/**").permitAll()
+                    .antMatchers("/ui/public/**").permitAll()
                     .anyRequest().authenticated();
 
             http.httpBasic().disable();
