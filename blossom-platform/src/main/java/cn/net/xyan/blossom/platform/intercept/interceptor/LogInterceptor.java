@@ -2,8 +2,6 @@ package cn.net.xyan.blossom.platform.intercept.interceptor;
 
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
 import cn.net.xyan.blossom.core.utils.RequestUtils;
-import cn.net.xyan.blossom.platform.controller.RootController;
-import cn.net.xyan.blossom.platform.dao.RequestLogDao;
 import cn.net.xyan.blossom.platform.entity.log.RequestLog;
 import cn.net.xyan.blossom.platform.intercept.InterceptService;
 
@@ -15,8 +13,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
-
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

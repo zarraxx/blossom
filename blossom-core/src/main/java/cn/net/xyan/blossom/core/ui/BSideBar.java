@@ -21,6 +21,10 @@ public class BSideBar extends AbstractSideBar<CssLayout> {
 
     private Layout footerLayout;
 
+    private Panel pBody;
+
+    private VerticalLayout vBody;
+
     private Component logo;
     private boolean largeIcons = false;
 
@@ -46,9 +50,20 @@ public class BSideBar extends AbstractSideBar<CssLayout> {
         if (headerLayout != null) {
             layout.addComponent(headerLayout);
         }
-//        if (footerLayout!=null){
-//            layout.addComponent(footerLayout);
-//        }
+
+        pBody = new Panel();
+        pBody.setSizeFull();
+        pBody.addStyleName(ValoTheme.PANEL_BORDERLESS);
+        pBody.addStyleName("side-bar-body");
+        vBody = new VerticalLayout();
+
+        pBody.setContent(vBody);
+
+        layout.addComponent(pBody);
+
+        if (footerLayout!=null){
+            layout.addComponent(footerLayout);
+        }
         return layout;
     }
 
@@ -248,16 +263,17 @@ public class BSideBar extends AbstractSideBar<CssLayout> {
 
         @Override
         public void createSection(CssLayout compositionRoot, SideBarSectionDescriptor descriptor, Collection<SideBarItemDescriptor> itemDescriptors) {
+            Layout layout = vBody;//compositionRoot;
             Button header = new Button();
             header.setCaption(descriptor.getCaption());
             header.setSizeUndefined();
             header.setPrimaryStyleName(ValoTheme.MENU_SUBTITLE);
-            compositionRoot.addComponent(header);
+            layout.addComponent(header);
             List<Component> components = new LinkedList<>();
             for (SideBarItemDescriptor item : itemDescriptors) {
                 Component c = itemComponentFactory.createItemComponent(item);
                 c.setVisible(false);
-                compositionRoot.addComponent(c);
+                layout.addComponent(c);
                 components.add(c);
             }
             header.addClickListener(new Button.ClickListener() {

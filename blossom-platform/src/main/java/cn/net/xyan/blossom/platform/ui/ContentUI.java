@@ -92,8 +92,10 @@ public abstract class ContentUI extends UI implements DisposableBean {
         cn.net.xyan.blossom.platform.service.PlatformInfoService.ArtifactInfo artifactInfo
                 = platformInfoService.platformArtifactInfo();
 
-        String logoString = artifactInfo.getArtifactTitle();
-
+        String logoString = "Blossom";
+        if (artifactInfo !=null) {
+            logoString = artifactInfo.getArtifactTitle();
+        }
         Label title = new Label(logoString);
 
         title.setStyleName(ValoTheme.LABEL_H3);
