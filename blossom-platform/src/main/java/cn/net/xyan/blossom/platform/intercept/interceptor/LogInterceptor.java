@@ -115,7 +115,7 @@ public class LogInterceptor extends AbstractMethodInterceptor{
     @Override
     public void onException(Map<String, Object> content, Throwable exception) {
         RequestLog log = responseLog(content,ExceptionUtils.errorString(exception));
-        log.setContent("exception:"+log.getContent());
+        log.setType("exception");
         if (logService!=null)
             logService.saveLog(log);
     }
