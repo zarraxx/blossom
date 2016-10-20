@@ -11,6 +11,7 @@
         <module>blossom-build-tools</module>
         <module>blossom-dynamic-component</module>
         <module>blossom-plan</module>
+        <module>blossom-storage</module>
     </modules>
     <packaging>pom</packaging>
 

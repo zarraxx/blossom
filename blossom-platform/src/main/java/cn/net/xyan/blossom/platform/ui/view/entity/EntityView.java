@@ -452,11 +452,15 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
     @Override
     public void attach() {
 
+        super.attach();
 
         if (entityViewService == null)
             entityViewService = ApplicationContextUtils.getBean(EntityViewService.class);
         if (container == null) {
             JPAContainer<E> container = createContainer();
+
+            beforeAttach();
+
             table.setContainerDataSource(container);
 
             entityViewService.setupEntityViewTable(this);
@@ -486,9 +490,9 @@ public class EntityView<E>  extends VerticalLayout implements View,InitializingB
             }
         }
 
-        beforeAttach();
 
-        super.attach();
+
+
     }
 
     @Override

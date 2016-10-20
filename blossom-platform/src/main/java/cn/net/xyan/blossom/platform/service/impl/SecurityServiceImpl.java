@@ -126,6 +126,21 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
     }
 
     @Override
+    public Group findGroup(String groupCode) {
+        return groupDao.findOne(groupCode);
+    }
+
+    @Override
+    public User findUser(String username) {
+        return userDao.findOne(username);
+    }
+
+    @Override
+    public Permission findPermission(String permissionCode) {
+        return permissionDao.findByCode(permissionCode);
+    }
+
+    @Override
     public Boolean isUserNameExist(String user) {
         User databaseUser = queryUserByUsername(user);
         return databaseUser!=null;

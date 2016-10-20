@@ -30,6 +30,10 @@ public interface SecurityService extends Installer,UserDetailsService {
 
     User setupUser(String loginName, String password, String realName, Group ... groups);
 
+    Group findGroup(String groupCode);
+    User findUser(String username);
+    Permission findPermission(String permissionCode);
+
     Boolean isUserNameExist(String user);
 
     Boolean isUserBlocked(String user);
