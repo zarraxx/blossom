@@ -1,6 +1,7 @@
 package cn.net.xyan.blossom.storage.service.impl;
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
+import cn.net.xyan.blossom.core.utils.RequestUtils;
 import cn.net.xyan.blossom.core.utils.StringUtils;
 import cn.net.xyan.blossom.platform.entity.security.Group;
 import cn.net.xyan.blossom.platform.entity.security.Permission;
@@ -15,6 +16,7 @@ import cn.net.xyan.blossom.storage.entity.DirectoryNode;
 import cn.net.xyan.blossom.storage.entity.Node;
 import cn.net.xyan.blossom.storage.service.StorageService;
 import cn.net.xyan.blossom.storage.support.SlashPath;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,10 +119,19 @@ public class StorageServiceImpl implements StorageService {
         }
     }
 
+
+    public User currentUser(){
+        HttpServletRequest httpServletRequest = RequestUtils.httpServletRequest();
+        if (httpServletRequest!=null)
+            return securityService.currentUser();
+        else
+            return securityService.findUser(SecurityService.USERAdmin);
+    }
+
     @Override
     @Transactional
     public Node rename(Node node,String newName) {
-        promiseCanWrite(node,securityService.currentUser());
+        promiseCanWrite(node,currentUser());
         node.setTitle(newName);
         node.setModifyDate(new Date());
         return nodeDao.saveAndFlush(node);
@@ -128,7 +140,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional
     public void delete(Node node) {
-        promiseCanWrite(node,securityService.currentUser());
+        promiseCanWrite(node,currentUser());
         if (node instanceof ArchiveNode){
             ArchiveNode archiveNode = (ArchiveNode) node;
             dataDao.delete(archiveNode.getBinaryDataHolder());
@@ -148,8 +160,8 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional
     public Node move(Node node, DirectoryNode dest) {
-        promiseCanWrite(node.getParent(),securityService.currentUser());
-        promiseCanWrite(dest,securityService.currentUser());
+        promiseCanWrite(node.getParent(),currentUser());
+        promiseCanWrite(dest,currentUser());
         node.setParent(dest);
         node.setModifyDate(new Date());
         return nodeDao.saveAndFlush(node);
@@ -171,7 +183,7 @@ public class StorageServiceImpl implements StorageService {
             node.setVisitDate(node.getCreateDate());
 
 
-            User user = securityService.currentUser();
+            User user = currentUser();
             Group group = null;
 
             for (Group g : user.getGroups()){
@@ -215,7 +227,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional
     public ArchiveNode touch(DirectoryNode parent, String name) {
-        promiseCanWrite(parent,securityService.currentUser());
+        promiseCanWrite(parent,currentUser());
         Node node =find(parent,name);
         if (node == null){
             node = newArchive(parent,name);
@@ -239,7 +251,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional
     public ArchiveNode save(DirectoryNode parent, String name, InputStream in) {
-        promiseCanWrite(parent,securityService.currentUser());
+        promiseCanWrite(parent,currentUser());
         Node node = find(parent,name);
         if (node == null){
             node = newArchive(parent,name);
@@ -249,7 +261,7 @@ public class StorageServiceImpl implements StorageService {
         }
 
         ArchiveNode archiveNode = (ArchiveNode) node;
-        promiseCanWrite(archiveNode,securityService.currentUser());
+        promiseCanWrite(archiveNode,currentUser());
         try {
 
             BinaryDataHolder data = archiveNode.getBinaryDataHolder();
@@ -269,7 +281,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional
     public DirectoryNode mkdir(DirectoryNode parent, String name) {
-        promiseCanWrite(parent,securityService.currentUser());
+        promiseCanWrite(parent,currentUser());
 
         if (parent!=null) {
             Date current = new Date();
@@ -283,7 +295,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Node find(DirectoryNode parent, String name) {
-        promiseCanRead(parent,securityService.currentUser());
+        promiseCanRead(parent,currentUser());
         if (parent!=null) {
             parent.setVisitDate(new Date());
             nodeDao.saveAndFlush(parent);
@@ -323,8 +335,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public boolean exist(SlashPath slashPath) {
         try{
-            find(slashPath);
-            return true;
+            return  find(slashPath)!=null;
         }catch (Throwable e){
             return false;
         }
@@ -332,7 +343,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<Node> findAll(DirectoryNode parent) {
-        promiseCanRead(parent,securityService.currentUser());
+        promiseCanRead(parent,currentUser());
         if (parent!=null) {
             parent.setVisitDate(new Date());
             nodeDao.saveAndFlush(parent);
@@ -343,7 +354,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Page<Node> findAll(DirectoryNode parent, Pageable pageable) {
-        promiseCanRead(parent,securityService.currentUser());
+        promiseCanRead(parent,currentUser());
         if (parent!=null) {
             parent.setVisitDate(new Date());
             nodeDao.saveAndFlush(parent);
@@ -359,11 +370,12 @@ public class StorageServiceImpl implements StorageService {
         if (node == null)
             throw new StatusAndMessageError(-1,String.format("%s not found",name));
 
-        promiseCanRead(node,securityService.currentUser());
+        promiseCanRead(node,currentUser());
         if (node!=null) {
             node.setVisitDate(new Date());
             nodeDao.saveAndFlush(node);
         }
         return new ByteArrayInputStream(node.getBinaryDataHolder().getData());
     }
+
 }

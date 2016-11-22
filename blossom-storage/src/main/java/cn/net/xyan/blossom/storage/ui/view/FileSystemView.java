@@ -4,6 +4,7 @@ import cn.net.xyan.blossom.core.i18n.TR;
 import cn.net.xyan.blossom.platform.service.UISystemService;
 import cn.net.xyan.blossom.storage.entity.Node;
 import cn.net.xyan.blossom.storage.service.StorageService;
+import cn.net.xyan.blossom.storage.ui.component.Directory;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -34,6 +35,8 @@ public class FileSystemView extends VerticalLayout implements View,InitializingB
 
     HorizontalLayout buttonLayout;
 
+    Directory directory;
+
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
 
@@ -63,7 +66,7 @@ public class FileSystemView extends VerticalLayout implements View,InitializingB
         newFile.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                storageService.touch(null,"new_file");
+                storageService.mkdir(null,"home");
             }
         });
 
@@ -81,6 +84,10 @@ public class FileSystemView extends VerticalLayout implements View,InitializingB
         buttonLayout.addComponent(listFile);
 
         addComponent(buttonLayout);
+
+        directory = new Directory(storageService);
+
+        addComponent(directory);
 
     }
 }

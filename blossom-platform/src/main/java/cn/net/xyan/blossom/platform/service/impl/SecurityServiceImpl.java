@@ -160,6 +160,7 @@ public class SecurityServiceImpl extends InstallerAdaptor implements SecuritySer
     @Override
     public User currentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) return null;
         String name = auth.getName(); //get logged in username
         return userDao.findOne(name);
     }

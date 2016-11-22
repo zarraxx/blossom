@@ -83,14 +83,22 @@ public class EntityColumnGenerator<E> implements Table.ColumnGenerator {
 
         Object value = null;
 
+
+
         if (propertyNames.size() > 0){
             String pName = propertyNames.get(0);
-            EntityItemProperty property = entityItem.getItemProperty(pName);
-            value = property.getValue();
-            if (propertyNames.size() >1){
-                List<String> newPropertyNames = propertyNames.subList(1,propertyNames.size());
-                value = ReflectUtils.getProperty(value,newPropertyNames);
-            }
+            EntityItemProperty property = null;
+            //try {
+                property = entityItem.getItemProperty(pName);
+                value = property.getValue();
+                if (propertyNames.size() > 1) {
+                    List<String> newPropertyNames = propertyNames.subList(1, propertyNames.size());
+                    value = ReflectUtils.getProperty(value, newPropertyNames);
+                }
+           // }catch (Throwable e){
+           //     e.printStackTrace();
+           //     return new Label();
+           // }
         }
 
         if (value == null){

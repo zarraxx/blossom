@@ -1,7 +1,9 @@
 package cn.net.xyan.blossom.storage;
 
 import cn.net.xyan.blossom.platform.annotation.BootstrapConfiguration;
+import cn.net.xyan.blossom.storage.service.FileSystemService;
 import cn.net.xyan.blossom.storage.service.StorageService;
+import cn.net.xyan.blossom.storage.service.impl.FileSystemServiceImpl;
 import cn.net.xyan.blossom.storage.service.impl.StorageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,5 +22,10 @@ public class StorageConfiguration {
     @Bean
     public StorageService storageService(){
         return new StorageServiceImpl();
+    }
+
+    @Bean
+    public FileSystemService fileSystemService(){
+        return new FileSystemServiceImpl();
     }
 }

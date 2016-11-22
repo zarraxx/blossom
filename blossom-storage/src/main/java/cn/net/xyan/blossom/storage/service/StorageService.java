@@ -40,6 +40,8 @@ public interface StorageService {
 
     InputStream open(DirectoryNode parent,String name);
 
+    User currentUser();
+
 
 
 }
