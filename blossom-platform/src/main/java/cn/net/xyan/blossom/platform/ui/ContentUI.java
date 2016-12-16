@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by zarra on 16/5/13.
  */
-@Push(transport = Transport.LONG_POLLING)
+@Push(transport = Transport.WEBSOCKET)
 public abstract class ContentUI extends UI implements DisposableBean {
 
     @Autowired
