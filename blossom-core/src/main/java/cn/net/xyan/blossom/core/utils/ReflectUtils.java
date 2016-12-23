@@ -5,15 +5,11 @@ package cn.net.xyan.blossom.core.utils;
  */
 
 import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
-import javassist.*;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
+
 import org.reflections.Reflections;
-import org.springframework.beans.BeanUtils;
 
 import java.beans.BeanInfo;
-
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 
@@ -30,10 +26,6 @@ import java.util.*;
  * Created by xiashenpin on 16/1/19.
  */
 public class ReflectUtils {
-
-
-
-
 
     static public List<Field> fields(Class<?> cls) {
         List<Field> fields = new LinkedList<>();
@@ -106,11 +98,28 @@ public class ReflectUtils {
     }
 
     public static PropertyDescriptor[] getPropertyDescriptors(Object obj){
-        return BeanUtils.getPropertyDescriptors(obj.getClass());
+        Class<?> cls = obj.getClass();
+        try {
+            BeanInfo info = Introspector.getBeanInfo(cls);
+            return info.getPropertyDescriptors();
+        }catch (IntrospectionException e){
+            throw new StatusAndMessageError(-9,e);
+        }
+        //return BeanUtils.getPropertyDescriptors(obj.getClass());
     }
 
     public static PropertyDescriptor getPropertyDescriptor(Object obj,String propertyName){
-        return BeanUtils.getPropertyDescriptor(obj.getClass(),propertyName);
+
+        PropertyDescriptor propertyDescriptor = null;
+
+        for (PropertyDescriptor p : getPropertyDescriptors(obj)){
+            if (p.getDisplayName().equals(propertyName)) {
+                propertyDescriptor = p;
+                break;
+            }
+        }
+        return propertyDescriptor;
+        //return BeanUtils.getPropertyDescriptor(obj.getClass(),propertyName);
     }
 
     public static Object getProperty(Object obj, PropertyDescriptor propertyDescriptorse) {
@@ -149,7 +158,6 @@ public class ReflectUtils {
                 return p;
             }
         }
-
         return null;
     }
 
