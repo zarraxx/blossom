@@ -8,18 +8,41 @@ import org.hibernate.cfg.ImprovedNamingStrategy;
 public class TableNamingStrategy extends ImprovedNamingStrategy {
 
     public String addPrefix(String tableName){
+        if (tableName.startsWith("tb_"))
+            return tableName;
         return "tb_"+tableName;
+    }
+
+    public String addColumnPrefix(String columnName){
+        if (columnName == null) return null;
+        if (columnName.startsWith("c_"))
+            return columnName;
+        return "c_"+columnName;
     }
 
     @Override
     public String classToTableName(String className) {
-        String tableName = super.classToTableName(className);
-        return addPrefix(tableName);
+        return super.classToTableName(addPrefix(className));
     }
 
     @Override
     public String tableName(String tableName) {
-        String tn = super.tableName(tableName);
-        return addPrefix(tn);
+        return super.tableName(addPrefix(tableName));
+    }
+
+    @Override
+    public String joinKeyColumnName(String joinedColumn, String joinedTable) {
+        return super.joinKeyColumnName(addColumnPrefix(joinedColumn),joinedTable);
+        //return super.joinKeyColumnName(joinedColumn, joinedTable);
+    }
+
+    @Override
+    public String columnName(String columnName) {
+        return super.columnName(addColumnPrefix(columnName));
+    }
+
+    @Override
+    public String propertyToColumnName(String propertyName) {
+       return super.propertyToColumnName(addColumnPrefix(propertyName));
     }
 }

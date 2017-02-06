@@ -15,6 +15,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.sidebar.annotation.FontAwesomeIcon;
@@ -66,7 +67,8 @@ public class FileSystemView extends VerticalLayout implements View,InitializingB
         newFile.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                storageService.mkdir(null,"home");
+                //storageService.mkdir(null,"home");
+                storageService.mkdir(storageService.userHome(), RandomStringUtils.randomAscii(8));
             }
         });
 

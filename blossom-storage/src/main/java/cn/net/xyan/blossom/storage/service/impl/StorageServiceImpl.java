@@ -171,6 +171,12 @@ public class StorageServiceImpl implements StorageService {
         if (StringUtils.isEmpty(name))
             throw new NullPointerException();
 
+        Node old = find(parent,name);
+
+        if (old != null){
+            throw new StatusAndMessageError(-8,""+name+" exist!");
+        }
+
         try {
             T node = nodeCls.newInstance();
 
@@ -330,6 +336,14 @@ public class StorageServiceImpl implements StorageService {
         }
 
         return node;
+    }
+
+    @Override
+    public DirectoryNode userHome() {
+        Node home = find(null,"home");
+        User user = currentUser();
+        DirectoryNode userHome = (DirectoryNode) find((DirectoryNode) home,user.getLoginName());
+        return userHome;
     }
 
     @Override

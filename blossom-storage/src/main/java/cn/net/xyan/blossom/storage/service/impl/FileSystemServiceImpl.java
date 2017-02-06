@@ -35,7 +35,11 @@ public class FileSystemServiceImpl extends InstallerAdaptor implements FileSyste
 
         if (!storageService.exist(admin)){
             DirectoryNode homeDir = (DirectoryNode) storageService.find(home);
-            storageService.mkdir(homeDir,admin.getLastName().toString());
+            try {
+                storageService.mkdir(homeDir, admin.getLastName().toString());
+            }catch (Throwable e){
+
+            }
         }
 
     }

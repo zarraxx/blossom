@@ -12,13 +12,31 @@ public class NodeSpecification {
     public static Specification<Node> specificationByParent(Node parent){
         return new Specification<Node>() {
             @Override
-            public Predicate toPredicate(Root<Node> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+            public Predicate toPredicate(Root<Node> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Path<Node> parentPath = root.get("parent");
                 if (parent == null){
-                    return criteriaBuilder.isNull(parentPath);
+                    return cb.isNull(parentPath);
                 }else {
-                    return criteriaBuilder.equal(parentPath,parent);
+                    return cb.equal(parentPath,parent);
                 }
+            }
+        };
+    }
+
+    public static Specification<Node> specificationByType(Class<? extends Node> nClass){
+        return new Specification<Node>() {
+            @Override
+            public Predicate toPredicate(Root<Node> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.equal(root.type(), cb.literal(nClass));
+            }
+        };
+    }
+
+    public static Specification<Node> specificationByTypeNot(Class<? extends Node> nClass){
+        return new Specification<Node>() {
+            @Override
+            public Predicate toPredicate(Root<Node> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.notEqual(root.type(), cb.literal(nClass));
             }
         };
     }

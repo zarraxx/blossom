@@ -13,7 +13,6 @@ import java.util.Date;
 @Entity
 @Table(name = "storage_node",uniqueConstraints = {
         @UniqueConstraint(columnNames = {"parent","title"})
-        //,@UniqueConstraint(columnNames = {"type","c_title"})
 })
 @Inheritance(strategy= InheritanceType.JOINED)
 @DiscriminatorColumn(name="type",discriminatorType = DiscriminatorType.STRING)

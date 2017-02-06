@@ -33,6 +33,9 @@ public interface StorageService {
     DirectoryNode mkdir(DirectoryNode parent,String name);
     Node find(DirectoryNode parent,String name);
     Node find(SlashPath slashPath);
+
+    DirectoryNode userHome();
+
     boolean exist(SlashPath slashPath);
     List<Node> findAll(DirectoryNode parent);
 

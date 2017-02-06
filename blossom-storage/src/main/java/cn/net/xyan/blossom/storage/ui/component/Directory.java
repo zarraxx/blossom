@@ -1,19 +1,25 @@
 package cn.net.xyan.blossom.storage.ui.component;
 
 
+import cn.net.xyan.blossom.core.exception.StatusAndMessageError;
+import cn.net.xyan.blossom.core.jpa.utils.JPA;
 import cn.net.xyan.blossom.core.support.EntityContainerFactory;
+import cn.net.xyan.blossom.core.utils.ApplicationContextUtils;
 import cn.net.xyan.blossom.core.utils.ExceptionUtils;
+import cn.net.xyan.blossom.storage.dao.NodeDao;
 import cn.net.xyan.blossom.storage.dao.NodeSpecification;
 import cn.net.xyan.blossom.storage.entity.DirectoryNode;
 import cn.net.xyan.blossom.storage.entity.Node;
 import cn.net.xyan.blossom.storage.service.StorageService;
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.AbstractContainer;
 
 import com.vaadin.data.util.filter.UnsupportedFilterException;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Tree;
@@ -21,6 +27,7 @@ import com.vaadin.ui.Tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specifications;
 
 
 import javax.persistence.EntityManager;
@@ -37,9 +44,17 @@ import java.util.List;
  */
 public class Directory extends CustomComponent {
 
+    public interface NodeClickListener{
+         void nodeClick(Node node,Directory directory);
+    }
+
     StorageService storageService;
 
     Tree tree;
+
+    NodeDao nodeDao;
+
+    List<NodeClickListener> listeners = new LinkedList<>();
 
     Logger logger = LoggerFactory.getLogger(Directory.class);
 
@@ -51,6 +66,17 @@ public class Directory extends CustomComponent {
         public DirectoryContainer(JPAContainer<Node> jpaContainer, StorageService storageService){
             this.jpaContainer = jpaContainer;
             this.storageService = storageService;
+
+            jpaContainer.removeAllContainerFilters();
+
+            jpaContainer.setQueryModifierDelegate(new DefaultQueryModifierDelegate(){
+                @Override
+                public void filtersWillBeAdded(CriteriaBuilder cb, CriteriaQuery<?> query, List<Predicate> predicates) {
+                    Root<Node> root = (Root<Node>) query.getRoots().iterator().next();
+                    Predicate predicate = NodeSpecification.specificationByType(DirectoryNode.class).toPredicate(root,query,cb);
+                    predicates.add(predicate);
+                }
+            });
         }
 
         public JPAContainer<Node> getJpaContainer() {
@@ -62,21 +88,11 @@ public class Directory extends CustomComponent {
         }
 
 
-        public List<Node> query(Specification<Node> specification){
-            EntityManager em  = jpaContainer.getEntityProvider().getEntityManager();
-            CriteriaBuilder builder = em.getCriteriaBuilder();
-            CriteriaQuery<Node> query = builder.createQuery(Node.class);
-            Root<Node> root = query.from(Node.class);
-
-            Predicate predicate = specification.toPredicate(root,query,builder);
-
-            query.where(predicate);
-
-            return em.createQuery(query).getResultList();
-        }
-
         public List<Node> queryChildren(Node parent){
-            List<Node> rawResult = query(NodeSpecification.specificationByParent(parent));
+            Specifications<Node> w = Specifications.where(JPA.oneEqualOne());
+            w = w.and(NodeSpecification.specificationByParent(parent));
+            w = w.and(NodeSpecification.specificationByType(DirectoryNode.class));
+            List<Node> rawResult = NodeUtils.query(w,jpaContainer);
             List<Node> result = new LinkedList<>();
             for (Node node:rawResult){
                 if (storageService.canRead(node,storageService.currentUser())){
@@ -227,7 +243,7 @@ public class Directory extends CustomComponent {
         @Override
         public boolean hasChildren(Object itemId) {
             Node node = getNode(itemId);
-            List<Node> children = query(NodeSpecification.specificationByParent(node));
+            List<Node> children = queryChildren(node);
             return children.size()>0;
         }
 
@@ -238,6 +254,8 @@ public class Directory extends CustomComponent {
     public Directory(StorageService storageService){
         this.storageService = storageService;
         tree = new Tree();
+
+        nodeDao = ApplicationContextUtils.getBean(NodeDao.class);
 
         JPAContainer<Node> jpaContainer = EntityContainerFactory.jpaContainer(Node.class);
 
@@ -250,9 +268,38 @@ public class Directory extends CustomComponent {
         tree.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY);
 
 
+        tree.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                String id = (String) event.getItemId();
+                Node node = nodeDao.findOne(id);
+                List<Throwable> throwables = new LinkedList<>();
+                for (NodeClickListener l : listeners){
+                    try {
+                        l.nodeClick(node, Directory.this);
+                    }catch (Throwable e){
+                        throwables.add(e);
+                    }
+                }
+
+                if (throwables.size()>0){
+                    throw new StatusAndMessageError(-9,throwables.get(0));
+                }
+            }
+        });
 
         setCompositionRoot(tree);
     }
 
+    public void addNodeClickListener(NodeClickListener clickListener){
+        if (!listeners.contains(clickListener))
+            listeners.add(clickListener);
+    }
+
+    public void removeNodeClickListener(NodeClickListener clickListener){
+        if (listeners.contains(clickListener)){
+            listeners.remove(clickListener);
+        }
+    }
 
 }
