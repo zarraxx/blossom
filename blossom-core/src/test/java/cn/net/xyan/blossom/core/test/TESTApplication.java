@@ -21,7 +21,7 @@ public class TESTApplication {
             basePackages = {"cn.net.xyan.blossom.core.test.dao"},
             repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
     )
-    @EnableBootstrap
+    //@EnableBootstrap
     static public class TESTApplicationConfig{
 
     }
