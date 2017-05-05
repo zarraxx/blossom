@@ -1,5 +1,6 @@
 package cn.net.xyan.blossom.core.test;
 
+import cn.net.xyan.blossom.core.annotation.EnableBootstrap;
 import cn.net.xyan.blossom.core.jpa.support.EasyJpaRepositoryFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +21,7 @@ public class TESTApplication {
             basePackages = {"cn.net.xyan.blossom.core.test.dao"},
             repositoryFactoryBeanClass = EasyJpaRepositoryFactoryBean.class
     )
+    @EnableBootstrap
     static public class TESTApplicationConfig{
 
     }
