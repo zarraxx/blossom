@@ -64,6 +64,9 @@ public class BootstrapRegistrar implements ImportBeanDefinitionRegistrar {
                     String[] lines = content.split("\n");
                     for (String line : lines){
                         try {
+                            line = line.trim();
+                            if (line.length()== 0)
+                                continue;
                             BeanDefinitionBuilder builder = beanDefinitionBuilder(Class.forName(line));
                             registry.registerBeanDefinition(line,builder.getBeanDefinition());
                         } catch (ClassNotFoundException e) {
