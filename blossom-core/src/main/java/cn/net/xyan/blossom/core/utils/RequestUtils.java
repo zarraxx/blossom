@@ -24,7 +24,11 @@ public class RequestUtils {
     }
 
     public static String remoteAddr(){
-        return httpServletRequest().getRemoteAddr();
+        try {
+            return httpServletRequest().getRemoteAddr();
+        }catch (Throwable e){
+            return "0.0.0.0";
+        }
     }
 
     public static String absolutePath(String path){
