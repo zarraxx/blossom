@@ -140,6 +140,9 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
     @Transactional
     public Module setupModule(String beanName, String viewName, String title,  String param,Class<?> viewClass, Catalog catalog, Permission permission) {
         Module module = moduleDao.findOne(beanName);
+        if (module == null){
+            module = moduleDao.findOne(viewName);
+        }
         if (module == null) {
             if (View.class.isAssignableFrom(viewClass)) {
                 module = new VaadinViewModule();
