@@ -209,7 +209,7 @@ public class UISystemServiceImpl extends InstallerAdaptor implements UISystemSer
 
         Catalog debug     = setupCatalog(UISystemService.CatalogDebug,"Debug",admingPage,superPermission);
 
-        Catalog system     = setupCatalog(UISystemService.CatalogSystem,"System",admingPage,superPermission);
+        Catalog system    = setupCatalog(UISystemService.CatalogSystem,"System",admingPage,superPermission);
     }
 
     @Override
